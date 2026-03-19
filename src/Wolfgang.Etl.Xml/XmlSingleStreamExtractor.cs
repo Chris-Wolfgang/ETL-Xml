@@ -126,7 +126,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var skipBudget = SkipItemCount;
-        var settings = _readerSettings ?? new XmlReaderSettings();
+        var settings = _readerSettings?.Clone() ?? new XmlReaderSettings();
         settings.CloseInput = false;
         settings.Async = true;
 

@@ -128,7 +128,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     {
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
-        var settings = _writerSettings ?? new XmlWriterSettings { Indent = true };
+        var settings = _writerSettings?.Clone() ?? new XmlWriterSettings { Indent = true };
         settings.CloseOutput = false;
         settings.Async = true;
 
