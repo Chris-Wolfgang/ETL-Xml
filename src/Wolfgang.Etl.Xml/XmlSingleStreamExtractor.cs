@@ -203,12 +203,6 @@ public class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlRepor
             return default;
         }
 
-        if (!_serializer.CanDeserialize(reader))
-        {
-            XmlLogMessages.SkippingNullElement(_logger, null);
-            return default;
-        }
-
         var item = (TRecord?)_serializer.Deserialize(reader);
         if (item is null)
         {
