@@ -35,7 +35,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
 {
     private static readonly string OperationName = $"XML multi-stream extraction of {typeof(TRecord).Name}";
     private readonly IEnumerable<Stream> _streams;
-    private readonly XmlSerializer _serializer;
+    private static readonly XmlSerializer Serializer = new(typeof(TRecord));
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
@@ -58,7 +58,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _serializer = new XmlSerializer(typeof(TRecord));
+
     }
 
 
@@ -80,7 +80,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _serializer = new XmlSerializer(typeof(TRecord));
+
     }
 
 
@@ -106,7 +106,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
             TRecord? item;
             try
             {
-                item = (TRecord?)_serializer.Deserialize(stream);
+                item = (TRecord?)Serializer.Deserialize(stream);
             }
             finally
             {
