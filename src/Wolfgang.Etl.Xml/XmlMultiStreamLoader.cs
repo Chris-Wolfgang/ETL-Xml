@@ -34,6 +34,7 @@ namespace Wolfgang.Etl.Xml;
 public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
+    private static readonly string OperationName = $"XML multi-stream loading of {typeof(TRecord).Name}";
     private readonly Func<TRecord, Stream> _streamFactory;
     private readonly XmlWriterSettings? _writerSettings;
     private readonly XmlSerializer _serializer;
@@ -130,7 +131,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         CancellationToken token
     )
     {
-        XmlLogMessages.StartingOperation(_logger, $"XML multi-stream loading of {typeof(TRecord).Name}", null);
+        XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var streamIndex = 0;
 

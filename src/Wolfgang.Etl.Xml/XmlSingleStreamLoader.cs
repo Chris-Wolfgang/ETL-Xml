@@ -30,6 +30,7 @@ namespace Wolfgang.Etl.Xml;
 public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
+    private static readonly string OperationName = $"XML single-stream loading of {typeof(TRecord).Name}";
     private static readonly XmlSerializerNamespaces EmptyNamespaces =
         new(new[] { new XmlQualifiedName(name: "", ns: "") });
 
@@ -125,7 +126,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         CancellationToken token
     )
     {
-        XmlLogMessages.StartingOperation(_logger, $"XML single-stream loading of {typeof(TRecord).Name}", null);
+        XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var settings = _writerSettings ?? new XmlWriterSettings { Indent = true };
         settings.CloseOutput = false;
