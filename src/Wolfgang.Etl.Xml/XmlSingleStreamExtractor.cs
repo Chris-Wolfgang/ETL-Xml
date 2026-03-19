@@ -37,7 +37,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
 {
     private readonly Stream _stream;
     private readonly XmlReaderSettings? _readerSettings;
-    private readonly XmlSerializer _serializer;
+    private static readonly XmlSerializer Serializer = new(typeof(TRecord));
     private readonly ILogger _logger;
     private static readonly string OperationName = $"XML single-stream extraction of {typeof(TRecord).Name}";
     private readonly IProgressTimer? _progressTimer;
@@ -62,7 +62,6 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _readerSettings = null;
-        _serializer = new XmlSerializer(typeof(TRecord));
     }
 
 
@@ -87,7 +86,6 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _serializer = new XmlSerializer(typeof(TRecord));
     }
 
 
@@ -112,7 +110,6 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _serializer = new XmlSerializer(typeof(TRecord));
     }
 
 
@@ -204,7 +201,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
             return default;
         }
 
-        var item = (TRecord?)_serializer.Deserialize(reader);
+        var item = (TRecord?)Serializer.Deserialize(reader);
         if (item is null)
         {
             XmlLogMessages.SkippingNullElement(_logger, null);

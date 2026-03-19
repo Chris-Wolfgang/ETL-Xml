@@ -36,7 +36,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     private readonly Stream _stream;
     private readonly XmlWriterSettings? _writerSettings;
-    private readonly XmlSerializer _serializer;
+    private static readonly XmlSerializer Serializer = new(typeof(TRecord));
     private readonly string _rootElementName;
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
@@ -61,7 +61,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _writerSettings = null;
-        _serializer = new XmlSerializer(typeof(TRecord));
+
         _rootElementName = "ArrayOf" + typeof(TRecord).Name;
     }
 
@@ -87,7 +87,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _serializer = new XmlSerializer(typeof(TRecord));
+
         _rootElementName = "ArrayOf" + typeof(TRecord).Name;
     }
 
@@ -113,7 +113,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _serializer = new XmlSerializer(typeof(TRecord));
+
         _rootElementName = "ArrayOf" + typeof(TRecord).Name;
     }
 
@@ -154,7 +154,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
                 break;
             }
 
-            _serializer.Serialize(writer, item, EmptyNamespaces);
+            Serializer.Serialize(writer, item, EmptyNamespaces);
             IncrementCurrentItemCount();
 
             XmlLogMessages.LoadedItem(_logger, CurrentItemCount, null);
