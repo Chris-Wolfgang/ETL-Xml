@@ -30,7 +30,7 @@ namespace Wolfgang.Etl.Xml;
 /// }
 /// </code>
 /// </example>
-public class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlReport>
+public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private readonly IEnumerable<Stream> _streams;
