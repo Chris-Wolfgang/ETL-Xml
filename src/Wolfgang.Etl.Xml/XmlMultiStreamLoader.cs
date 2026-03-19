@@ -37,7 +37,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     private static readonly string OperationName = $"XML multi-stream loading of {typeof(TRecord).Name}";
     private readonly Func<TRecord, Stream> _streamFactory;
     private readonly XmlWriterSettings? _writerSettings;
-    private readonly XmlSerializer _serializer;
+    private static readonly XmlSerializer Serializer = new(typeof(TRecord));
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
@@ -64,7 +64,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _writerSettings = null;
-        _serializer = new XmlSerializer(typeof(TRecord));
+
     }
 
 
@@ -92,7 +92,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _serializer = new XmlSerializer(typeof(TRecord));
+
     }
 
 
@@ -119,7 +119,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _serializer = new XmlSerializer(typeof(TRecord));
+
     }
 
 
@@ -161,7 +161,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
 
             try
             {
-                _serializer.Serialize(stream, item);
+                Serializer.Serialize(stream, item);
 #if NETSTANDARD2_0 || NET462 || NET481
 #pragma warning disable CA2016, MA0040 // FlushAsync(CancellationToken) not available on this TFM
                 await stream.FlushAsync().ConfigureAwait(false);
