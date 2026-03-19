@@ -39,6 +39,7 @@ public class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlRepor
     private readonly XmlReaderSettings? _readerSettings;
     private readonly XmlSerializer _serializer;
     private readonly ILogger _logger;
+    private static readonly string OperationName = $"XML single-stream extraction of {typeof(TRecord).Name}";
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
 
@@ -122,7 +123,7 @@ public class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlRepor
         [EnumeratorCancellation] CancellationToken token
     )
     {
-        XmlLogMessages.StartingOperation(_logger, $"XML single-stream extraction of {typeof(TRecord).Name}", null);
+        XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var skipBudget = SkipItemCount;
         var settings = _readerSettings ?? new XmlReaderSettings();

@@ -33,6 +33,7 @@ namespace Wolfgang.Etl.Xml;
 public class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
+    private static readonly string OperationName = $"XML multi-stream extraction of {typeof(TRecord).Name}";
     private readonly IEnumerable<Stream> _streams;
     private readonly XmlSerializer _serializer;
     private readonly ILogger _logger;
@@ -92,7 +93,7 @@ public class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlReport
     )
 #pragma warning restore CS1998
     {
-        XmlLogMessages.StartingOperation(_logger, $"XML multi-stream extraction of {typeof(TRecord).Name}", null);
+        XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var skipBudget = SkipItemCount;
         var streamIndex = 0;
