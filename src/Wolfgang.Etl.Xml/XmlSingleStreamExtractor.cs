@@ -32,7 +32,7 @@ namespace Wolfgang.Etl.Xml;
 /// }
 /// </code>
 /// </example>
-public class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlReport>
+public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private readonly Stream _stream;

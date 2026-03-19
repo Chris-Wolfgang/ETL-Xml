@@ -27,7 +27,7 @@ namespace Wolfgang.Etl.Xml;
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
-public class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
+public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private static readonly XmlSerializerNamespaces EmptyNamespaces =

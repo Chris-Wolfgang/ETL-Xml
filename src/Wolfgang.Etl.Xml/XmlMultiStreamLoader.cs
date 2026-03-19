@@ -31,7 +31,7 @@ namespace Wolfgang.Etl.Xml;
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
-public class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
+public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private readonly Func<TRecord, Stream> _streamFactory;
