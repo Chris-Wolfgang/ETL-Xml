@@ -127,7 +127,7 @@ public class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
     {
         XmlLogMessages.StartingOperation(_logger, $"XML single-stream loading of {typeof(TRecord).Name}", null);
 
-        var settings = _writerSettings ?? new XmlWriterSettings { Indent = true };
+        var settings = _writerSettings?.Clone() ?? new XmlWriterSettings { Indent = true };
         settings.CloseOutput = false;
         settings.Async = true;
 
