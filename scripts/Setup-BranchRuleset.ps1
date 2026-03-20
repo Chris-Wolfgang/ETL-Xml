@@ -54,7 +54,7 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$Repository = "@Chris-Wolfgang/ETL-Xml",
+    [string]$Repository = "Chris-Wolfgang/ETL-Xml",
     
     [Parameter()]
     [string]$BranchName = "main"
@@ -83,7 +83,7 @@ try {
 }
 
 # Determine repository
-if ($Repository -eq "@Chris-Wolfgang/ETL-Xml" -or -not $Repository) {
+if (-not $Repository) {
     # Placeholders not replaced or no repository specified - auto-detect
     Write-Host "🔍 Detecting current repository..." -ForegroundColor Cyan
     try {
@@ -91,11 +91,7 @@ if ($Repository -eq "@Chris-Wolfgang/ETL-Xml" -or -not $Repository) {
         $Repository = $repoInfo.nameWithOwner
         Write-Host "✅ Using repository: $Repository" -ForegroundColor Green
     } catch {
-        if ($Repository -eq "@Chris-Wolfgang/ETL-Xml") {
-            Write-Error "❌ Could not detect repository. Please run the setup script (pwsh ./scripts/setup.ps1) first to replace placeholders, or specify -Repository parameter."
-        } else {
-            Write-Error "❌ Could not detect repository. Please run from within a git repository or specify -Repository parameter."
-        }
+        Write-Error "❌ Could not detect repository. Please run from within a git repository or specify -Repository parameter."
         exit 1
     }
 } else {
