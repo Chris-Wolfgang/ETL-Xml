@@ -25,7 +25,7 @@ internal static class XmlLogMessages
     // ── SingleStream Extractor ───────────────────────────────────────
 
     internal static readonly Action<ILogger, Exception?> SkippingNullElement =
-        LoggerMessage.Define(LogLevel.Debug, new EventId(100, nameof(SkippingNullElement)), "Skipping null element encountered in XML stream.");
+        LoggerMessage.Define(LogLevel.Debug, new EventId(100, nameof(SkippingNullElement)), "Skipping element that deserialized to null.");
 
     internal static readonly Action<ILogger, int, Exception?> ExtractedItem =
         LoggerMessage.Define<int>(LogLevel.Debug, new EventId(101, nameof(ExtractedItem)), "Extracted item {CurrentItemCount}.");

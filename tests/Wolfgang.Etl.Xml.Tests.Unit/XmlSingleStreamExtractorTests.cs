@@ -88,7 +88,7 @@ public class XmlSingleStreamExtractorTests
 
 
     [Fact]
-    public async Task ExtractAsync_when_null_element_deserialized_skips_it()
+    public async Task ExtractAsync_when_single_item_extracts_correctly()
     {
         var xml = "<?xml version=\"1.0\"?><ArrayOfPersonRecord><PersonRecord><FirstName>Alice</FirstName><LastName>Smith</LastName><Age>30</Age></PersonRecord></ArrayOfPersonRecord>";
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
