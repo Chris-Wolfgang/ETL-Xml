@@ -142,6 +142,35 @@ public class XmlSingleStreamExtractorTests
 
 
     [Fact]
+    public async Task ExtractAsync_when_custom_XmlReaderSettings_does_not_mutate_caller_settings()
+    {
+        var stream = CreateXmlStream(1);
+
+        var settings = new XmlReaderSettings
+        {
+            IgnoreWhitespace = true,
+            CloseInput = true,
+            Async = false,
+        };
+
+        var sut = new XmlSingleStreamExtractor<PersonRecord>
+        (
+            stream,
+            settings,
+            NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
+        );
+
+        await foreach (var _ in sut.ExtractAsync())
+        {
+        }
+
+        Assert.True(settings.CloseInput);
+        Assert.False(settings.Async);
+    }
+
+
+
+    [Fact]
     public async Task ExtractAsync_when_XmlElement_attributes_maps_correctly()
     {
         var xml = "<?xml version=\"1.0\"?><ArrayOfperson><person><first_name>Alice</first_name><last_name>Smith</last_name><age>30</age></person></ArrayOfperson>";
