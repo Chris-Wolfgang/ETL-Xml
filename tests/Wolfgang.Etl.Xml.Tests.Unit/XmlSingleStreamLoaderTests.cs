@@ -200,6 +200,37 @@ public class XmlSingleStreamLoaderTests
 
 
     [Fact]
+    public async Task LoadAsync_when_custom_XmlWriterSettings_does_not_mutate_caller_settings()
+    {
+        var stream = new MemoryStream();
+        var settings = new XmlWriterSettings
+        {
+            Indent = false,
+            CloseOutput = true,
+            Async = false,
+        };
+
+        var sut = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            settings,
+            NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
+        );
+
+        var items = new List<PersonRecord>
+        {
+            new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
+        };
+
+        await sut.LoadAsync(items.ToAsyncEnumerable());
+
+        Assert.True(settings.CloseOutput);
+        Assert.False(settings.Async);
+    }
+
+
+
+    [Fact]
     public async Task LoadAsync_when_XmlElement_attributes_writes_mapped_names()
     {
         var stream = new MemoryStream();
