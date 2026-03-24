@@ -8,23 +8,21 @@ Extractors and loaders for working with XML files using the Wolfgang.Etl design 
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 dotnet add package Wolfgang.Etl.Xml
 ```
 
-**NuGet Package:** Coming soon to NuGet.org
-
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - **GitHub Repository:** [https://github.com/Chris-Wolfgang/ETL-Xml](https://github.com/Chris-Wolfgang/ETL-Xml)
 - **API Documentation:** https://Chris-Wolfgang.github.io/ETL-Xml/
@@ -33,32 +31,113 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
-{{QUICK_START_EXAMPLE}}
+Extract items from an XML stream through a full ETL pipeline:
+
+```csharp
+using Wolfgang.Etl.TestKit;
+using Wolfgang.Etl.Xml;
+
+// Extract from XML → Transform → Load into memory
+var extractor = new XmlSingleStreamExtractor<Person>
+(
+    xmlStream,
+    logger
+);
+
+var transformer = new TestTransformer<Person>();
+var loader = new TestLoader<Person>(collectItems: true);
+
+await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+
+var items = loader.GetCollectedItems();
+```
+
+Load items to an XML stream from an in-memory source:
+
+```csharp
+// Extract from memory → Transform → Load to XML
+var extractor = new TestExtractor<Person>(people);
+var transformer = new TestTransformer<Person>();
+
+var loader = new XmlSingleStreamLoader<Person>
+(
+    outputStream,
+    logger
+);
+
+await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+```
 
 ---
 
-## ✨ Features
+## Features
 
-{{FEATURES_TABLE}}
+| Feature | Description |
+|---------|-------------|
+| Single-stream XML | Read/write multiple items from/to a single XML document with a root element wrapper |
+| Multi-stream XML | Read/write one item per XML stream (one file per record) |
+| Streaming deserialization | Uses `XmlReader` for memory-efficient forward-only parsing |
+| Progress reporting | Built-in `IProgress<XmlReport>` support with configurable reporting intervals |
+| Skip and maximum | `SkipItemCount` and `MaximumItemCount` for paging through large XML sources |
+| Custom XML settings | Accept `XmlReaderSettings` and `XmlWriterSettings` for full control over XML behavior |
+| Structured logging | High-performance `LoggerMessage`-based logging with categorized event IDs |
+| Multi-TFM | Targets .NET Framework 4.6.2+, .NET Standard 2.0, .NET 8.0, and .NET 10.0 |
 
-**Examples:**
-{{FEATURE_EXAMPLES}}
+### Extractors
+
+- **`XmlSingleStreamExtractor<T>`** — Extracts items from a single XML stream containing a root element with child elements (e.g. `<ArrayOfPerson><Person/>...</ArrayOfPerson>`).
+- **`XmlMultiStreamExtractor<T>`** — Extracts items from multiple XML streams, one document per stream.
+
+### Loaders
+
+- **`XmlSingleStreamLoader<T>`** — Loads items into a single XML stream wrapped in a root element.
+- **`XmlMultiStreamLoader<T>`** — Loads items into multiple XML streams via a factory function, one document per stream.
+
+### Progress reporting
+
+```csharp
+var extractor = new XmlSingleStreamExtractor<Person>(xmlStream, logger);
+extractor.ReportingInterval = 100; // Report every 100ms
+
+var progress = new Progress<XmlReport>(report =>
+    Console.WriteLine($"Progress: {report.CurrentItemCount} items, {report.CurrentSkippedItemCount} skipped")
+);
+
+var transformer = new TestTransformer<Person>();
+var loader = new TestLoader<Person>(collectItems: true);
+
+await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync(progress)));
+```
+
+### Skip and maximum item count
+
+```csharp
+var extractor = new XmlSingleStreamExtractor<Person>(xmlStream, logger);
+extractor.SkipItemCount = 10;     // Skip first 10 items
+extractor.MaximumItemCount = 5;   // Then take 5 items
+
+var transformer = new TestTransformer<Person>();
+var loader = new TestLoader<Person>(collectItems: true);
+
+await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+// extractor.CurrentItemCount == 5, extractor.CurrentSkippedItemCount == 10
+```
 
 ---
 
-## 🎯 Target Frameworks
+## Target Frameworks
 
-| Framework | Versions |
-|-----------|----------|
-| .Net Framework | .net 4.6.2, .net 4.7.0, .net 4.7.1, .net 4.7.2, .net 4.8, .net 4.8.1 | 
-| .Net Core | |
-| .Net | .net 5.0, .net 6.0, .net 7.0, .net 8.0, .net 9.0, .net 10.0 |
+| Platform | Versions |
+|----------|----------|
+| .NET Framework | 4.6.2, 4.8.1 |
+| .NET Standard | 2.0 |
+| .NET | 8.0, 10.0 |
 
 ---
 
-## 🔍 Code Quality & Static Analysis
+## Code Quality & Static Analysis
 
 This project enforces **strict code quality standards** through **7 specialized analyzers** and custom async-first rules:
 
@@ -77,18 +156,16 @@ This project enforces **strict code quality standards** through **7 specialized 
 This library uses **`BannedSymbols.txt`** to prohibit synchronous APIs and enforce async-first patterns:
 
 **Blocked APIs Include:**
-- ❌ `Task.Wait()`, `Task.Result` - Use `await` instead
-- ❌ `Thread.Sleep()` - Use `await Task.Delay()` instead
-- ❌ Synchronous file I/O (`File.ReadAllText`) - Use async versions
-- ❌ Synchronous stream operations - Use `ReadAsync()`, `WriteAsync()`
-- ❌ `Parallel.For/ForEach` - Use `Task.WhenAll()` or `Parallel.ForEachAsync()`
-- ❌ Obsolete APIs (`WebClient`, `BinaryFormatter`)
-
-**Why?** To ensure all code is **truly async** and **non-blocking** for optimal performance in async contexts.
+- `Task.Wait()`, `Task.Result` - Use `await` instead
+- `Thread.Sleep()` - Use `await Task.Delay()` instead
+- Synchronous file I/O (`File.ReadAllText`) - Use async versions
+- Synchronous stream operations - Use `ReadAsync()`, `WriteAsync()`
+- `Parallel.For/ForEach` - Use `Task.WhenAll()` or `Parallel.ForEachAsync()`
+- Obsolete APIs (`WebClient`, `BinaryFormatter`)
 
 ---
 
-## 🛠️ Building from Source
+## Building from Source
 
 ### Prerequisites
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download) or later
@@ -164,7 +241,7 @@ docfx build --serve
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - Code quality standards
@@ -174,8 +251,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ---
 
+## Acknowledgments
 
-## 🙏 Acknowledgments
-
-{{ACKNOWLEDGMENTS}}
-
+- [Wolfgang.Etl.Abstractions](https://github.com/Chris-Wolfgang/ETL-Abstractions) — the base class framework this library builds on
+- [Wolfgang.Etl.TestKit](https://github.com/Chris-Wolfgang/ETL-Test-Kit) — test doubles and contract test base classes for pipeline development

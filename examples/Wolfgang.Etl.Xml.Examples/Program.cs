@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
+using Wolfgang.Etl.TestKit;
 using Wolfgang.Etl.Xml;
 using Wolfgang.Etl.Xml.Examples;
 
@@ -15,58 +16,48 @@ using var loggerFactory = LoggerFactory.Create(builder =>
     builder.SetMinimumLevel(LogLevel.Debug);
 });
 
-await SingleStreamExample(loggerFactory);
+await SingleStreamExtractPipeline(loggerFactory);
 Console.WriteLine();
-await MultiStreamExample(loggerFactory);
+await SingleStreamLoadPipeline(loggerFactory);
 Console.WriteLine();
-await ProgressReportingExample(loggerFactory);
+await MultiStreamExtractPipeline(loggerFactory);
 Console.WriteLine();
-await SkipAndMaxExample(loggerFactory);
+await MultiStreamLoadPipeline(loggerFactory);
 
 
 
-static async Task SingleStreamExample(ILoggerFactory loggerFactory)
+/// <summary>
+/// Demonstrates extracting from XML through a full ETL pipeline.
+/// XmlSingleStreamExtractor reads from an XML stream, then a
+/// TestTransformer passes items through, and a TestLoader collects them.
+/// </summary>
+static async Task SingleStreamExtractPipeline(ILoggerFactory loggerFactory)
 {
-    Console.WriteLine("=== Single Stream Example ===");
+    Console.WriteLine("=== Single-Stream Extract Pipeline ===");
     Console.WriteLine();
 
-    // Create sample data
-    var people = new List<Person>
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30, Email = "alice@example.com" },
-        new() { FirstName = "Bob", LastName = "Jones", Age = 25, Email = "bob@example.com" },
-        new() { FirstName = "Carol", LastName = "White", Age = 35, Email = "carol@example.com" },
-    };
+    // Prepare sample XML data
+    var xmlStream = CreateSampleXmlStream();
 
-    // --- Load to XML ---
-    var stream = new MemoryStream();
-    var loader = new XmlSingleStreamLoader<Person>
-    (
-        stream,
-        loggerFactory.CreateLogger<XmlSingleStreamLoader<Person>>()
-    );
-
-    await loader.LoadAsync(people.ToAsyncEnumerable());
-    Console.WriteLine($"Loaded {loader.CurrentItemCount} items to XML stream.");
-
-    // Show the XML
-    stream.Position = 0;
-    using var reader = new StreamReader(stream);
-    var xml = await reader.ReadToEndAsync();
-    Console.WriteLine();
-    Console.WriteLine("Generated XML:");
-    Console.WriteLine(xml);
-
-    // --- Extract from XML ---
-    stream.Position = 0;
+    // --- Extract → Transform → Load pipeline ---
     var extractor = new XmlSingleStreamExtractor<Person>
     (
-        stream,
+        xmlStream,
         loggerFactory.CreateLogger<XmlSingleStreamExtractor<Person>>()
     );
 
-    Console.WriteLine("Extracted items:");
-    await foreach (var person in extractor.ExtractAsync())
+    var transformer = new TestTransformer<Person>();
+    var loader = new TestLoader<Person>(collectItems: true);
+
+    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+
+    // Show results
+    Console.WriteLine($"Extracted {extractor.CurrentItemCount} items from XML.");
+    Console.WriteLine($"Transformed {transformer.CurrentItemCount} items.");
+    Console.WriteLine($"Loaded {loader.CurrentItemCount} items.");
+    Console.WriteLine();
+
+    foreach (var person in loader.GetCollectedItems()!)
     {
         Console.WriteLine($"  {person.FirstName} {person.LastName}, age {person.Age}");
     }
@@ -74,18 +65,106 @@ static async Task SingleStreamExample(ILoggerFactory loggerFactory)
 
 
 
-static async Task MultiStreamExample(ILoggerFactory loggerFactory)
+/// <summary>
+/// Demonstrates loading to XML through a full ETL pipeline.
+/// TestExtractor provides in-memory data, TestTransformer passes it
+/// through, and XmlSingleStreamLoader writes the XML output.
+/// </summary>
+static async Task SingleStreamLoadPipeline(ILoggerFactory loggerFactory)
 {
-    Console.WriteLine("=== Multi-Stream Example ===");
+    Console.WriteLine("=== Single-Stream Load Pipeline ===");
     Console.WriteLine();
 
+    // --- Extract → Transform → Load pipeline ---
+    var people = new List<Person>
+    {
+        new() { FirstName = "Alice", LastName = "Smith", Age = 30, Email = "alice@example.com" },
+        new() { FirstName = "Bob", LastName = "Jones", Age = 25, Email = "bob@example.com" },
+        new() { FirstName = "Carol", LastName = "White", Age = 35, Email = "carol@example.com" },
+    };
+
+    var extractor = new TestExtractor<Person>(people);
+    var transformer = new TestTransformer<Person>();
+
+    var outputStream = new MemoryStream();
+    var loader = new XmlSingleStreamLoader<Person>
+    (
+        outputStream,
+        new XmlWriterSettings { Indent = true },
+        loggerFactory.CreateLogger<XmlSingleStreamLoader<Person>>()
+    );
+
+    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+
+    // Show resulting XML
+    Console.WriteLine($"Extracted {extractor.CurrentItemCount} items from memory.");
+    Console.WriteLine($"Transformed {transformer.CurrentItemCount} items.");
+    Console.WriteLine($"Loaded {loader.CurrentItemCount} items to XML.");
+    Console.WriteLine();
+
+    outputStream.Position = 0;
+    using var reader = new StreamReader(outputStream);
+    Console.WriteLine(await reader.ReadToEndAsync());
+}
+
+
+
+/// <summary>
+/// Demonstrates extracting from multiple XML streams (one item per file)
+/// through a full ETL pipeline using TestTransformer and TestLoader.
+/// </summary>
+static async Task MultiStreamExtractPipeline(ILoggerFactory loggerFactory)
+{
+    Console.WriteLine("=== Multi-Stream Extract Pipeline ===");
+    Console.WriteLine();
+
+    // Prepare individual XML streams (simulating one-item-per-file)
+    var streams = CreateSampleMultiStreams();
+
+    // --- Extract → Transform → Load pipeline ---
+    var extractor = new XmlMultiStreamExtractor<Person>
+    (
+        streams,
+        loggerFactory.CreateLogger<XmlMultiStreamExtractor<Person>>()
+    );
+
+    var transformer = new TestTransformer<Person>();
+    var loader = new TestLoader<Person>(collectItems: true);
+
+    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+
+    Console.WriteLine($"Extracted {extractor.CurrentItemCount} items from {streams.Count} streams.");
+    Console.WriteLine($"Transformed {transformer.CurrentItemCount} items.");
+    Console.WriteLine($"Loaded {loader.CurrentItemCount} items.");
+    Console.WriteLine();
+
+    foreach (var person in loader.GetCollectedItems()!)
+    {
+        Console.WriteLine($"  {person.FirstName} {person.LastName}, age {person.Age}");
+    }
+}
+
+
+
+/// <summary>
+/// Demonstrates loading to multiple XML streams (one item per file)
+/// through a full ETL pipeline using TestExtractor and TestTransformer.
+/// </summary>
+static async Task MultiStreamLoadPipeline(ILoggerFactory loggerFactory)
+{
+    Console.WriteLine("=== Multi-Stream Load Pipeline ===");
+    Console.WriteLine();
+
+    // --- Extract → Transform → Load pipeline ---
     var people = new List<Person>
     {
         new() { FirstName = "Alice", LastName = "Smith", Age = 30, Email = "alice@example.com" },
         new() { FirstName = "Bob", LastName = "Jones", Age = 25, Email = "bob@example.com" },
     };
 
-    // --- Load each person to its own stream ---
+    var extractor = new TestExtractor<Person>(people);
+    var transformer = new TestTransformer<Person>();
+
     var buffers = new Dictionary<string, MemoryStream>();
     var loader = new XmlMultiStreamLoader<Person>
     (
@@ -96,103 +175,85 @@ static async Task MultiStreamExample(ILoggerFactory loggerFactory)
             buffers[key] = ms;
             return ms;
         },
+        new XmlWriterSettings { Indent = true },
         loggerFactory.CreateLogger<XmlMultiStreamLoader<Person>>()
     );
 
-    await loader.LoadAsync(people.ToAsyncEnumerable());
-    Console.WriteLine($"Loaded {loader.CurrentItemCount} items to {buffers.Count} streams.");
+    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 
-    // --- Extract from the streams ---
-    var streams = buffers.Values.Select(ms =>
+    Console.WriteLine($"Extracted {extractor.CurrentItemCount} items from memory.");
+    Console.WriteLine($"Transformed {transformer.CurrentItemCount} items.");
+    Console.WriteLine($"Loaded {loader.CurrentItemCount} items to {buffers.Count} XML streams.");
+    Console.WriteLine();
+
+    foreach (var (fileName, buffer) in buffers)
     {
-        var copy = new MemoryStream(ms.ToArray());
-        return (Stream)copy;
-    });
-
-    var extractor = new XmlMultiStreamExtractor<Person>
-    (
-        streams,
-        loggerFactory.CreateLogger<XmlMultiStreamExtractor<Person>>()
-    );
-
-    Console.WriteLine("Extracted items:");
-    await foreach (var person in extractor.ExtractAsync())
-    {
-        Console.WriteLine($"  {person.FirstName} {person.LastName}, age {person.Age}");
+        buffer.Position = 0;
+        using var streamReader = new StreamReader(buffer);
+        Console.WriteLine($"--- {fileName} ---");
+        Console.WriteLine(await streamReader.ReadToEndAsync());
+        Console.WriteLine();
     }
 }
 
 
 
-static async Task ProgressReportingExample(ILoggerFactory loggerFactory)
+/// <summary>
+/// Creates a MemoryStream containing sample XML with three Person elements.
+/// </summary>
+static MemoryStream CreateSampleXmlStream()
 {
-    Console.WriteLine("=== Progress Reporting Example ===");
-    Console.WriteLine();
-
-    var people = Enumerable.Range(1, 20).Select(i => new Person
-    {
-        FirstName = $"Person{i}",
-        LastName = $"Last{i}",
-        Age = 20 + i,
-    }).ToList();
+    var serializer = new XmlSerializer(typeof(Person));
+    var emptyNs = new XmlSerializerNamespaces(new[] { new XmlQualifiedName("", "") });
 
     var stream = new MemoryStream();
-    var loader = new XmlSingleStreamLoader<Person>
-    (
-        stream,
-        loggerFactory.CreateLogger<XmlSingleStreamLoader<Person>>()
-    );
-    loader.ReportingInterval = 100; // Report every 100ms
+    var settings = new XmlWriterSettings { Indent = true, CloseOutput = false };
+    using var writer = XmlWriter.Create(stream, settings);
 
-    var progress = new Progress<XmlReport>(report =>
-        Console.WriteLine($"  Progress: {report.CurrentItemCount} items loaded, {report.CurrentSkippedItemCount} skipped")
-    );
+    writer.WriteStartDocument();
+    writer.WriteStartElement("ArrayOfPerson");
 
-    await loader.LoadAsync(people.ToAsyncEnumerable(), progress);
-    Console.WriteLine($"Completed. Loaded {loader.CurrentItemCount} items.");
-}
-
-
-
-static async Task SkipAndMaxExample(ILoggerFactory loggerFactory)
-{
-    Console.WriteLine("=== Skip and Maximum Item Count Example ===");
-    Console.WriteLine();
-
-    // Create a large XML stream
-    var people = Enumerable.Range(1, 100).Select(i => new Person
+    foreach (var person in SamplePeople())
     {
-        FirstName = $"Person{i}",
-        LastName = $"Last{i}",
-        Age = 20 + (i % 50),
-    }).ToList();
+        serializer.Serialize(writer, person, emptyNs);
+    }
 
-    var stream = new MemoryStream();
-    var loader = new XmlSingleStreamLoader<Person>
-    (
-        stream,
-        new XmlWriterSettings { Indent = false },
-        loggerFactory.CreateLogger<XmlSingleStreamLoader<Person>>()
-    );
+    writer.WriteEndElement();
+    writer.WriteEndDocument();
+    writer.Flush();
 
-    await loader.LoadAsync(people.ToAsyncEnumerable());
-    Console.WriteLine($"Loaded {loader.CurrentItemCount} items to stream.");
-
-    // Now extract with skip and max
     stream.Position = 0;
-    var extractor = new XmlSingleStreamExtractor<Person>
-    (
-        stream,
-        loggerFactory.CreateLogger<XmlSingleStreamExtractor<Person>>()
-    );
-    extractor.SkipItemCount = 10;     // Skip first 10
-    extractor.MaximumItemCount = 5;   // Then take 5
+    return stream;
+}
 
-    Console.WriteLine("Extracting with SkipItemCount=10, MaximumItemCount=5:");
-    await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
+
+
+/// <summary>
+/// Creates a list of MemoryStreams, each containing a single Person as XML.
+/// </summary>
+static List<MemoryStream> CreateSampleMultiStreams()
+{
+    var serializer = new XmlSerializer(typeof(Person));
+    var emptyNs = new XmlSerializerNamespaces(new[] { new XmlQualifiedName("", "") });
+    var streams = new List<MemoryStream>();
+
+    foreach (var person in SamplePeople())
     {
-        Console.WriteLine($"  {person.FirstName} {person.LastName}");
+        var ms = new MemoryStream();
+        serializer.Serialize(ms, person, emptyNs);
+        ms.Position = 0;
+        streams.Add(ms);
     }
 
-    Console.WriteLine($"Extracted: {extractor.CurrentItemCount}, Skipped: {extractor.CurrentSkippedItemCount}");
+    return streams;
 }
+
+
+
+static List<Person> SamplePeople() =>
+    new()
+    {
+        new() { FirstName = "Alice", LastName = "Smith", Age = 30, Email = "alice@example.com" },
+        new() { FirstName = "Bob", LastName = "Jones", Age = 25, Email = "bob@example.com" },
+        new() { FirstName = "Carol", LastName = "White", Age = 35, Email = "carol@example.com" },
+    };
