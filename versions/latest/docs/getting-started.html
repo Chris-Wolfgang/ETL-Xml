@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Getting Started | Wolfgang.Etl.Xml Documentation </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Getting Started | Wolfgang.Etl.Xml Documentation ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/docfx_project/docs/getting-started.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="Wolfgang.Etl.Xml">
+            Wolfgang.Etl.Xml
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="getting-started">Getting Started</h1>
+
+<p>This guide will help you quickly get up and running with Wolfgang.Etl.Xml.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>.NET 8.0 SDK or later (also supports .NET Framework 4.6.2+ and .NET Standard 2.0)</li>
+<li>A logging provider (e.g. <code>Microsoft.Extensions.Logging</code>)</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<h3 id="via-net-cli">Via .NET CLI</h3>
+<pre><code class="lang-bash">dotnet add package Wolfgang.Etl.Xml
+</code></pre>
+<h3 id="via-package-manager-console">Via Package Manager Console</h3>
+<pre><code class="lang-powershell">Install-Package Wolfgang.Etl.Xml
+</code></pre>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="extracting-from-xml">Extracting from XML</h3>
+<p>Read items from an XML stream and pipe them through a transformer into a loader:</p>
+<pre><code class="lang-csharp">using Wolfgang.Etl.TestKit;
+using Wolfgang.Etl.Xml;
+
+// XmlSingleStreamExtractor reads items from a single XML document
+var extractor = new XmlSingleStreamExtractor&lt;Person&gt;
+(
+    xmlStream,
+    logger
+);
+
+// Use TestKit placeholders for the rest of the pipeline
+var transformer = new TestTransformer&lt;Person&gt;();
+var loader = new TestLoader&lt;Person&gt;(collectItems: true);
+
+await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+
+var items = loader.GetCollectedItems();
+</code></pre>
+<h3 id="loading-to-xml">Loading to XML</h3>
+<p>Pipe items from any source through a transformer and write them to an XML stream:</p>
+<pre><code class="lang-csharp">using Wolfgang.Etl.TestKit;
+using Wolfgang.Etl.Xml;
+
+// Use TestKit as the data source
+var extractor = new TestExtractor&lt;Person&gt;(people);
+var transformer = new TestTransformer&lt;Person&gt;();
+
+// XmlSingleStreamLoader writes items to a single XML document
+var loader = new XmlSingleStreamLoader&lt;Person&gt;
+(
+    outputStream,
+    new XmlWriterSettings { Indent = true },
+    logger
+);
+
+await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+</code></pre>
+<h3 id="multi-stream-one-item-per-file">Multi-stream (one item per file)</h3>
+<p>For scenarios where each record lives in its own XML file:</p>
+<pre><code class="lang-csharp">// Extract from multiple XML files
+var extractor = new XmlMultiStreamExtractor&lt;Person&gt;
+(
+    xmlStreams,
+    logger
+);
+
+// Load to individual XML files via a stream factory
+var loader = new XmlMultiStreamLoader&lt;Person&gt;
+(
+    person =&gt; File.Create($&quot;{person.Id}.xml&quot;),
+    logger
+);
+</code></pre>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li>Explore the <a href="../api/index.html">API Reference</a> for detailed documentation</li>
+<li>Read the <a href="introduction.html">Introduction</a> to learn more about Wolfgang.Etl.Xml</li>
+<li>Check out <a href="https://github.com/Chris-Wolfgang/ETL-Xml/tree/main/examples">example projects</a> in the GitHub repository</li>
+</ul>
+<h2 id="additional-resources">Additional Resources</h2>
+<ul>
+<li><a href="https://github.com/Chris-Wolfgang/ETL-Xml">GitHub Repository</a></li>
+<li><a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/main/CONTRIBUTING.md">Contributing Guidelines</a></li>
+<li><a href="https://github.com/Chris-Wolfgang/ETL-Xml/issues">Report an Issue</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Made with DocFX
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
