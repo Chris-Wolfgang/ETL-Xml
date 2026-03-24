@@ -1,0 +1,212 @@
+{
+  "source_base_path": "D:/a/ETL-Xml/ETL-Xml/docfx_project",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "output": {
+        "resource": {
+          "relative_path": "index.json"
+        }
+      }
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/README.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/README.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.yml\" sourcestartlinenumber=\"1\">Extracts items of type <code class=\"typeparamref\">TRecord</code> from multiple streams,\nreading one XML document per stream.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.yml\" sourcestartlinenumber=\"1\">Loads items of type <code class=\"typeparamref\">TRecord</code> into multiple streams,\nwriting one XML document per stream.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.Xml.XmlReport.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.Xml.XmlReport.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.Xml.XmlReport",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.Xml.XmlReport.yml\" sourcestartlinenumber=\"1\">Progress report for XML extraction and loading operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.yml\" sourcestartlinenumber=\"1\">Extracts items of type <code class=\"typeparamref\">TRecord</code> from a single XML stream\ncontaining a root element with child elements.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.yml\" sourcestartlinenumber=\"1\">Loads items of type <code class=\"typeparamref\">TRecord</code> into a single XML stream\nwrapped in a root element.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.Xml.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.Xml.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.Xml",
+      "Summary": null
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/getting-started.md",
+      "output": {
+        ".html": {
+          "relative_path": "docs/getting-started.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "docs/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/introduction.md",
+      "output": {
+        ".html": {
+          "relative_path": "docs/introduction.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "docs/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "docs/toc.html"
+        },
+        ".json": {
+          "relative_path": "docs/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "logo.svg",
+      "output": {
+        "resource": {
+          "relative_path": "logo.svg"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
