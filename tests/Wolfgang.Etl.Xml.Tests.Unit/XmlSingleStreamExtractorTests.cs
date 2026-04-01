@@ -212,16 +212,15 @@ public class XmlSingleStreamExtractorTests
 
 
     [Fact]
-    public void Constructor_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_when_logger_is_null_does_not_throw()
     {
-        Assert.Throws<ArgumentNullException>
+        var sut = new XmlSingleStreamExtractor<PersonRecord>
         (
-            () => new XmlSingleStreamExtractor<PersonRecord>
-            (
-                new MemoryStream(),
-                logger: null!
-            )
+            new MemoryStream(),
+            logger: null
         );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -260,18 +259,17 @@ public class XmlSingleStreamExtractorTests
 
 
     [Fact]
-    public void Internal_constructor_when_logger_is_null_throws_ArgumentNullException()
+    public void Internal_constructor_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        var sut = new XmlSingleStreamExtractor<PersonRecord>
         (
-            () => new XmlSingleStreamExtractor<PersonRecord>
-            (
-                new MemoryStream(),
-                new XmlReaderSettings(),
-                logger: null!,
-                new ManualProgressTimer()
-            )
+            new MemoryStream(),
+            new XmlReaderSettings(),
+            logger: null!,
+            new ManualProgressTimer()
         );
+
+        Assert.NotNull(sut);
     }
 
 

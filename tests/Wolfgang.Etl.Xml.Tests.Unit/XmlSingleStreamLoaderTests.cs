@@ -274,16 +274,15 @@ public class XmlSingleStreamLoaderTests
 
 
     [Fact]
-    public void Constructor_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        var sut = new XmlSingleStreamLoader<PersonRecord>
         (
-            () => new XmlSingleStreamLoader<PersonRecord>
-            (
-                new MemoryStream(),
-                logger: null!
-            )
+            new MemoryStream(),
+            logger: null!
         );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -322,18 +321,17 @@ public class XmlSingleStreamLoaderTests
 
 
     [Fact]
-    public void Internal_constructor_when_logger_is_null_throws_ArgumentNullException()
+    public void Internal_constructor_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        var sut = new XmlSingleStreamLoader<PersonRecord>
         (
-            () => new XmlSingleStreamLoader<PersonRecord>
-            (
-                new MemoryStream(),
-                new XmlWriterSettings(),
-                logger: null!,
-                new ManualProgressTimer()
-            )
+            new MemoryStream(),
+            new XmlWriterSettings(),
+            logger: null!,
+            new ManualProgressTimer()
         );
+
+        Assert.NotNull(sut);
     }
 
 

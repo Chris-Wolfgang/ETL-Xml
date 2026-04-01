@@ -250,16 +250,15 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
-    public void Constructor_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        var sut = new XmlMultiStreamLoader<PersonRecord>
         (
-            () => new XmlMultiStreamLoader<PersonRecord>
-            (
-                _ => new MemoryStream(),
-                logger: null!
-            )
+            _ => new MemoryStream(),
+            logger: null!
         );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -298,18 +297,17 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
-    public void Internal_constructor_when_logger_is_null_throws_ArgumentNullException()
+    public void Internal_constructor_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        var sut = new XmlMultiStreamLoader<PersonRecord>
         (
-            () => new XmlMultiStreamLoader<PersonRecord>
-            (
-                _ => new MemoryStream(),
-                new XmlWriterSettings(),
-                logger: null!,
-                new ManualProgressTimer()
-            )
+            _ => new MemoryStream(),
+            new XmlWriterSettings(),
+            logger: null!,
+            new ManualProgressTimer()
         );
+
+        Assert.NotNull(sut);
     }
 
 
