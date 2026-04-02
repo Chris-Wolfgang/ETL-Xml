@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Wolfgang.Etl.Xml.Benchmarks;
 
@@ -37,11 +36,7 @@ public class XmlMultiStreamLoaderBenchmarks
     [Benchmark]
     public async Task LoadAsync()
     {
-        var loader = new XmlMultiStreamLoader<BenchmarkPerson>
-        (
-            _ => new MemoryStream(),
-            NullLogger<XmlMultiStreamLoader<BenchmarkPerson>>.Instance
-        );
+        var loader = new XmlMultiStreamLoader<BenchmarkPerson>(_ => new MemoryStream());
 
         await loader.LoadAsync(_items.ToAsyncEnumerable());
     }

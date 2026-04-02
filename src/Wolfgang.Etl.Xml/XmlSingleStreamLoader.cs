@@ -24,7 +24,7 @@ namespace Wolfgang.Etl.Xml;
 /// <example>
 /// <code>
 /// using var stream = File.Create("output.xml");
-/// var loader = new XmlSingleStreamLoader&lt;Person&gt;(stream, logger);
+/// var loader = new XmlSingleStreamLoader&lt;Person&gt;(stream);
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
@@ -49,18 +49,13 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class.
     /// </summary>
     /// <param name="stream">The stream to write XML data to.</param>
-    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/> is <c>null</c>.
     /// </exception>
-    public XmlSingleStreamLoader
-    (
-        Stream stream,
-        ILogger<XmlSingleStreamLoader<TRecord>>? logger = null
-    )
+    public XmlSingleStreamLoader(Stream stream)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = NullLogger.Instance;
         _writerSettings = null;
 
         _rootElementName = "ArrayOf" + typeof(TRecord).Name;
@@ -74,20 +69,20 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// </summary>
     /// <param name="stream">The stream to write XML data to.</param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
-    /// <param name="logger">An optional logger instance for diagnostic output.</param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="stream"/> or <paramref name="writerSettings"/> is <c>null</c>.
+    /// Thrown when <paramref name="stream"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
     public XmlSingleStreamLoader
     (
         Stream stream,
         XmlWriterSettings writerSettings,
-        ILogger<XmlSingleStreamLoader<TRecord>>? logger = null
+        ILogger<XmlSingleStreamLoader<TRecord>> logger
     )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _rootElementName = "ArrayOf" + typeof(TRecord).Name;
     }

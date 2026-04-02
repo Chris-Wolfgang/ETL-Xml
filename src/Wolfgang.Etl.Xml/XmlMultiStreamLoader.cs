@@ -26,8 +26,7 @@ namespace Wolfgang.Etl.Xml;
 /// <code>
 /// var loader = new XmlMultiStreamLoader&lt;Person&gt;
 /// (
-///     person => File.Create($"output/{person.Id}.xml"),
-///     logger
+///     person => File.Create($"output/{person.Id}.xml")
 /// );
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
@@ -52,20 +51,14 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// A factory function that receives the item to be written and returns a <see cref="Stream"/> to write it to.
     /// The loader will dispose the stream after writing.
     /// </param>
-    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streamFactory"/> is <c>null</c>.
     /// </exception>
-    public XmlMultiStreamLoader
-    (
-        Func<TRecord, Stream> streamFactory,
-        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
-    )
+    public XmlMultiStreamLoader(Func<TRecord, Stream> streamFactory)
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = NullLogger.Instance;
         _writerSettings = null;
-
     }
 
 
@@ -79,20 +72,20 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// The loader will dispose the stream after writing.
     /// </param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
-    /// <param name="logger">An optional logger instance for diagnostic output.</param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="streamFactory"/> or <paramref name="writerSettings"/> is <c>null</c>.
+    /// Thrown when <paramref name="streamFactory"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
     public XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
         XmlWriterSettings writerSettings,
-        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
+        ILogger<XmlMultiStreamLoader<TRecord>> logger
     )
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     }
 

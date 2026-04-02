@@ -61,11 +61,7 @@ public class XmlSingleStreamExtractorTests
 
 
     protected override XmlSingleStreamExtractor<PersonRecord> CreateSut(int itemCount) =>
-        new
-        (
-            CreateXmlStream(itemCount),
-            NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
-        );
+        new(CreateXmlStream(itemCount));
 
 
 
@@ -93,11 +89,7 @@ public class XmlSingleStreamExtractorTests
         var xml = "<?xml version=\"1.0\"?><ArrayOfPersonRecord><PersonRecord><FirstName>Alice</FirstName><LastName>Smith</LastName><Age>30</Age></PersonRecord></ArrayOfPersonRecord>";
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
 
-        var sut = new XmlSingleStreamExtractor<PersonRecord>
-        (
-            stream,
-            NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
-        );
+        var sut = new XmlSingleStreamExtractor<PersonRecord>(stream);
 
         var results = new List<PersonRecord>();
         await foreach (var item in sut.ExtractAsync())
@@ -176,11 +168,7 @@ public class XmlSingleStreamExtractorTests
         var xml = "<?xml version=\"1.0\"?><ArrayOfperson><person><first_name>Alice</first_name><last_name>Smith</last_name><age>30</age></person></ArrayOfperson>";
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
 
-        var sut = new XmlSingleStreamExtractor<XmlAttributePersonRecord>
-        (
-            stream,
-            NullLogger<XmlSingleStreamExtractor<XmlAttributePersonRecord>>.Instance
-        );
+        var sut = new XmlSingleStreamExtractor<XmlAttributePersonRecord>(stream);
 
         var results = new List<XmlAttributePersonRecord>();
         await foreach (var item in sut.ExtractAsync())
@@ -201,31 +189,8 @@ public class XmlSingleStreamExtractorTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => new XmlSingleStreamExtractor<PersonRecord>
-            (
-                null!,
-                NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
-            )
+            () => new XmlSingleStreamExtractor<PersonRecord>(null!)
         );
-    }
-
-
-
-    [Fact]
-    public async Task Constructor_when_logger_is_null_does_not_throw()
-    {
-        var stream = CreateXmlStream(1);
-        var sut = new XmlSingleStreamExtractor<PersonRecord>
-        (
-            stream,
-            logger: null
-        );
-
-        await foreach (var _ in sut.ExtractAsync())
-        {
-        }
-
-        Assert.NotNull(sut);
     }
 
 

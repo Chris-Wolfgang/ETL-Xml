@@ -34,11 +34,7 @@ public class XmlMultiStreamLoaderTests
 
 
     protected override XmlMultiStreamLoader<PersonRecord> CreateSut(int itemCount) =>
-        new
-        (
-            _ => new MemoryStream(),
-            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
-        );
+        new(_ => new MemoryStream());
 
 
 
@@ -70,8 +66,7 @@ public class XmlMultiStreamLoaderTests
             {
                 var stream = new CapturingMemoryStream(buffers);
                 return stream;
-            },
-            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
+            }
         );
 
         var items = new List<PersonRecord>
@@ -100,11 +95,7 @@ public class XmlMultiStreamLoaderTests
     [Fact]
     public async Task LoadAsync_when_stream_factory_returns_null_throws_InvalidOperationException()
     {
-        var sut = new XmlMultiStreamLoader<PersonRecord>
-        (
-            _ => null!,
-            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
-        );
+        var sut = new XmlMultiStreamLoader<PersonRecord>(_ => null!);
 
         var items = new List<PersonRecord>
         {
@@ -130,8 +121,7 @@ public class XmlMultiStreamLoaderTests
                 var stream = new MemoryStream();
                 streams.Add(stream);
                 return stream;
-            },
-            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
+            }
         );
 
         var items = new List<PersonRecord>
@@ -157,8 +147,7 @@ public class XmlMultiStreamLoaderTests
             {
                 streamCount++;
                 return new MemoryStream();
-            },
-            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
+            }
         );
 
         await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
@@ -174,8 +163,7 @@ public class XmlMultiStreamLoaderTests
         var buffers = new List<byte[]>();
         var sut = new XmlMultiStreamLoader<XmlAttributePersonRecord>
         (
-            _ => new CapturingMemoryStream(buffers),
-            NullLogger<XmlMultiStreamLoader<XmlAttributePersonRecord>>.Instance
+            _ => new CapturingMemoryStream(buffers)
         );
 
         var items = new List<XmlAttributePersonRecord>
@@ -201,8 +189,7 @@ public class XmlMultiStreamLoaderTests
         var buffers = new List<byte[]>();
         var loader = new XmlMultiStreamLoader<PersonRecord>
         (
-            _ => new CapturingMemoryStream(buffers),
-            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
+            _ => new CapturingMemoryStream(buffers)
         );
 
         var items = new List<PersonRecord>
@@ -216,8 +203,7 @@ public class XmlMultiStreamLoaderTests
 
         var extractor = new XmlMultiStreamExtractor<PersonRecord>
         (
-            new[] { (Stream)new MemoryStream(buffers[0]) },
-            NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
+            new[] { (Stream)new MemoryStream(buffers[0]) }
         );
 
         var results = new List<PersonRecord>();
@@ -239,28 +225,8 @@ public class XmlMultiStreamLoaderTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => new XmlMultiStreamLoader<PersonRecord>
-            (
-                null!,
-                NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
-            )
+            () => new XmlMultiStreamLoader<PersonRecord>(null!)
         );
-    }
-
-
-
-    [Fact]
-    public async Task Constructor_when_logger_is_null_uses_NullLogger()
-    {
-        var sut = new XmlMultiStreamLoader<PersonRecord>
-        (
-            _ => new MemoryStream(),
-            logger: null
-        );
-
-        await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
-
-        Assert.NotNull(sut);
     }
 
 

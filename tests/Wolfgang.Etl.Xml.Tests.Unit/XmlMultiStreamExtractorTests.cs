@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
@@ -48,11 +49,7 @@ public class XmlMultiStreamExtractorTests
 
 
     protected override XmlMultiStreamExtractor<PersonRecord> CreateSut(int itemCount) =>
-        new
-        (
-            CreateXmlStreams(itemCount),
-            NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
-        );
+        new(CreateXmlStreams(itemCount));
 
 
 
@@ -67,6 +64,7 @@ public class XmlMultiStreamExtractorTests
         new
         (
             CreateXmlStreams(ExpectedItems.Count),
+            new XmlReaderSettings(),
             NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance,
             timer
         );
@@ -84,11 +82,7 @@ public class XmlMultiStreamExtractorTests
             return stream;
         }).ToList();
 
-        var sut = new XmlMultiStreamExtractor<PersonRecord>
-        (
-            streams,
-            NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
-        );
+        var sut = new XmlMultiStreamExtractor<PersonRecord>(streams);
 
         var results = new List<PersonRecord>();
         await foreach (var item in sut.ExtractAsync())
@@ -116,8 +110,7 @@ public class XmlMultiStreamExtractorTests
 
         var sut = new XmlMultiStreamExtractor<XmlAttributePersonRecord>
         (
-            new[] { (Stream)stream },
-            NullLogger<XmlMultiStreamExtractor<XmlAttributePersonRecord>>.Instance
+            new[] { (Stream)stream }
         );
 
         var results = new List<XmlAttributePersonRecord>();
@@ -139,9 +132,21 @@ public class XmlMultiStreamExtractorTests
     {
         Assert.Throws<ArgumentNullException>
         (
+            () => new XmlMultiStreamExtractor<PersonRecord>(null!)
+        );
+    }
+
+
+
+    [Fact]
+    public void Constructor_with_settings_when_streams_is_null_throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
             () => new XmlMultiStreamExtractor<PersonRecord>
             (
                 null!,
+                new XmlReaderSettings(),
                 NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
             )
         );
@@ -150,19 +155,33 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
-    public async Task Constructor_when_logger_is_null_uses_NullLogger()
+    public void Constructor_with_settings_when_readerSettings_is_null_throws_ArgumentNullException()
     {
-        var sut = new XmlMultiStreamExtractor<PersonRecord>
+        Assert.Throws<ArgumentNullException>
         (
-            streams: CreateXmlStreams(1),
-            logger: null
+            () => new XmlMultiStreamExtractor<PersonRecord>
+            (
+                Array.Empty<Stream>(),
+                readerSettings: null!,
+                NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
+            )
         );
+    }
 
-        await foreach (var _ in sut.ExtractAsync())
-        {
-        }
 
-        Assert.NotNull(sut);
+
+    [Fact]
+    public void Constructor_with_settings_when_logger_is_null_throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => new XmlMultiStreamExtractor<PersonRecord>
+            (
+                Array.Empty<Stream>(),
+                new XmlReaderSettings(),
+                logger: null!
+            )
+        );
     }
 
 
@@ -175,6 +194,24 @@ public class XmlMultiStreamExtractorTests
             () => new XmlMultiStreamExtractor<PersonRecord>
             (
                 null!,
+                new XmlReaderSettings(),
+                NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance,
+                new ManualProgressTimer()
+            )
+        );
+    }
+
+
+
+    [Fact]
+    public void Internal_constructor_when_readerSettings_is_null_throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => new XmlMultiStreamExtractor<PersonRecord>
+            (
+                Array.Empty<Stream>(),
+                readerSettings: null!,
                 NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance,
                 new ManualProgressTimer()
             )
@@ -189,6 +226,7 @@ public class XmlMultiStreamExtractorTests
         var sut = new XmlMultiStreamExtractor<PersonRecord>
         (
             CreateXmlStreams(1),
+            new XmlReaderSettings(),
             logger: null,
             new ManualProgressTimer()
         );
@@ -210,6 +248,7 @@ public class XmlMultiStreamExtractorTests
             () => new XmlMultiStreamExtractor<PersonRecord>
             (
                 Array.Empty<Stream>(),
+                new XmlReaderSettings(),
                 NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance,
                 timer: null!
             )
