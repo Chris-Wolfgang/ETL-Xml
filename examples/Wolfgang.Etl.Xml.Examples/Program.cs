@@ -16,11 +16,11 @@ using var loggerFactory = LoggerFactory.Create(builder =>
     builder.SetMinimumLevel(LogLevel.Debug);
 });
 
-await SingleStreamExtractPipeline(loggerFactory);
+await SingleStreamExtractPipeline();
 Console.WriteLine();
 await SingleStreamLoadPipeline(loggerFactory);
 Console.WriteLine();
-await MultiStreamExtractPipeline(loggerFactory);
+await MultiStreamExtractPipeline();
 Console.WriteLine();
 await MultiStreamLoadPipeline(loggerFactory);
 
@@ -31,7 +31,7 @@ await MultiStreamLoadPipeline(loggerFactory);
 /// XmlSingleStreamExtractor reads from an XML stream, then a
 /// TestTransformer passes items through, and a TestLoader collects them.
 /// </summary>
-static async Task SingleStreamExtractPipeline(ILoggerFactory loggerFactory)
+static async Task SingleStreamExtractPipeline()
 {
     Console.WriteLine("=== Single-Stream Extract Pipeline ===");
     Console.WriteLine();
@@ -109,7 +109,7 @@ static async Task SingleStreamLoadPipeline(ILoggerFactory loggerFactory)
 /// Demonstrates extracting from multiple XML streams (one item per file)
 /// through a full ETL pipeline using TestTransformer and TestLoader.
 /// </summary>
-static async Task MultiStreamExtractPipeline(ILoggerFactory loggerFactory)
+static async Task MultiStreamExtractPipeline()
 {
     Console.WriteLine("=== Multi-Stream Extract Pipeline ===");
     Console.WriteLine();
