@@ -74,7 +74,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     internal XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
-        ILogger logger,
+        ILogger? logger,
         IProgressTimer timer
     )
     {

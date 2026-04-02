@@ -103,7 +103,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     (
         Stream stream,
         XmlReaderSettings readerSettings,
-        ILogger logger,
+        ILogger? logger,
         IProgressTimer timer
     )
     {

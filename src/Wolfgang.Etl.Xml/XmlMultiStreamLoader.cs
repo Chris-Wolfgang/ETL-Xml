@@ -112,7 +112,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     (
         Func<TRecord, Stream> streamFactory,
         XmlWriterSettings writerSettings,
-        ILogger logger,
+        ILogger? logger,
         IProgressTimer timer
     )
     {

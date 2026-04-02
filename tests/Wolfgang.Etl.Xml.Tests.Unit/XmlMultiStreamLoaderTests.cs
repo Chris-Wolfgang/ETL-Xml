@@ -250,13 +250,15 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
-    public void Constructor_when_logger_is_null_uses_NullLogger()
+    public async Task Constructor_when_logger_is_null_uses_NullLogger()
     {
         var sut = new XmlMultiStreamLoader<PersonRecord>
         (
             _ => new MemoryStream(),
-            logger: null!
+            logger: null
         );
+
+        await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
 
         Assert.NotNull(sut);
     }
@@ -297,15 +299,17 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
-    public void Internal_constructor_when_logger_is_null_uses_NullLogger()
+    public async Task Internal_constructor_when_logger_is_null_uses_NullLogger()
     {
         var sut = new XmlMultiStreamLoader<PersonRecord>
         (
             _ => new MemoryStream(),
             new XmlWriterSettings(),
-            logger: null!,
+            logger: null,
             new ManualProgressTimer()
         );
+
+        await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
 
         Assert.NotNull(sut);
     }

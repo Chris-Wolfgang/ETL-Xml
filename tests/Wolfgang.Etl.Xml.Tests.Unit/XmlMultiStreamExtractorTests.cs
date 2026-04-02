@@ -150,13 +150,17 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
-    public void Constructor_when_logger_is_null_uses_NullLogger()
+    public async Task Constructor_when_logger_is_null_uses_NullLogger()
     {
         var sut = new XmlMultiStreamExtractor<PersonRecord>
         (
-            streams: Array.Empty<Stream>(),
-            logger: null!
+            streams: CreateXmlStreams(1),
+            logger: null
         );
+
+        await foreach (var _ in sut.ExtractAsync())
+        {
+        }
 
         Assert.NotNull(sut);
     }
@@ -180,14 +184,18 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
-    public void Internal_constructor_when_logger_is_null_uses_NullLogger()
+    public async Task Internal_constructor_when_logger_is_null_uses_NullLogger()
     {
         var sut = new XmlMultiStreamExtractor<PersonRecord>
         (
-            Array.Empty<Stream>(),
-            logger: null!,
+            CreateXmlStreams(1),
+            logger: null,
             new ManualProgressTimer()
         );
+
+        await foreach (var _ in sut.ExtractAsync())
+        {
+        }
 
         Assert.NotNull(sut);
     }
