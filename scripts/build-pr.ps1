@@ -84,7 +84,8 @@ if (-not $SkipTests -and $failed.Count -eq 0) {
     $testProjects = @(Get-ChildItem -Path './tests' -Recurse -File -Include '*.csproj', '*.vbproj', '*.fsproj' -ErrorAction SilentlyContinue)
 
     if ($testProjects.Count -eq 0) {
-        Write-Host "No test projects found in ./tests — skipping"
+        Write-Fail "No test projects found in ./tests — CI would fail"
+        $failed += "Tests (no projects)"
     }
     else {
         foreach ($testProj in $testProjects) {
@@ -124,10 +125,13 @@ if (-not $SkipTests -and $failed.Count -eq 0) {
                     $testArgs += '--collect:XPlat Code Coverage'
                     $testArgs += '--results-directory'
                     $testArgs += './TestResults'
-                    if (Test-Path 'coverlet.runsettings') {
-                        $testArgs += '--settings'
-                        $testArgs += 'coverlet.runsettings'
+                    if (-not (Test-Path 'coverlet.runsettings')) {
+                        Write-Fail "  coverlet.runsettings not found — CI passes --settings and would fail"
+                        $failed += "Tests (missing coverlet.runsettings)"
+                        break
                     }
+                    $testArgs += '--settings'
+                    $testArgs += 'coverlet.runsettings'
                 }
 
                 dotnet test @testArgs
@@ -165,6 +169,17 @@ if (-not $SkipTests -and -not $SkipCoverage -and $failed.Count -eq 0) {
         if (-not $rgPath) {
             Write-Host "Installing ReportGenerator..."
             dotnet tool install -g dotnet-reportgenerator-globaltool
+
+            # Ensure global tools directory is on PATH for the current session
+            $dotnetToolsPath = Join-Path $HOME ".dotnet/tools"
+            if (($env:PATH -split [IO.Path]::PathSeparator) -notcontains $dotnetToolsPath) {
+                $env:PATH = "$env:PATH$([IO.Path]::PathSeparator)$dotnetToolsPath"
+            }
+
+            $rgPath = Get-Command reportgenerator -ErrorAction SilentlyContinue
+            if (-not $rgPath) {
+                throw "ReportGenerator was installed but could not be resolved from PATH."
+            }
         }
 
         reportgenerator `
@@ -217,6 +232,17 @@ if (-not $SkipSecurity) {
     if (-not $devskim) {
         Write-Host "Installing DevSkim CLI..."
         dotnet tool install --global Microsoft.CST.DevSkim.CLI
+
+        # Ensure global tools directory is on PATH for the current session
+        $dotnetToolsPath = Join-Path $HOME ".dotnet/tools"
+        if (($env:PATH -split [IO.Path]::PathSeparator) -notcontains $dotnetToolsPath) {
+            $env:PATH = "$env:PATH$([IO.Path]::PathSeparator)$dotnetToolsPath"
+        }
+
+        $devskim = Get-Command devskim -ErrorAction SilentlyContinue
+        if (-not $devskim) {
+            throw "DevSkim CLI was installed but could not be resolved from PATH."
+        }
     }
 
     devskim analyze `
@@ -264,10 +290,30 @@ if (-not $SkipSecurity) {
             Remove-Item $zip -ErrorAction SilentlyContinue
             $env:PATH = "$dest;$env:PATH"
         }
-        else {
+        elseif ($IsLinux) {
             $archive = "gitleaks_${version}_linux_x64.tar.gz"
             $url = "https://github.com/gitleaks/gitleaks/releases/download/v${version}/$archive"
-            curl -sSfL $url | tar xz -C /usr/local/bin gitleaks
+            $dest = Join-Path $HOME ".local/bin"
+            $tarball = Join-Path ([System.IO.Path]::GetTempPath()) $archive
+            New-Item -ItemType Directory -Force -Path $dest | Out-Null
+            Invoke-WebRequest -Uri $url -OutFile $tarball -UseBasicParsing
+            tar -xzf $tarball -C $dest gitleaks
+            Remove-Item $tarball -ErrorAction SilentlyContinue
+            $env:PATH = "${dest}:$env:PATH"
+        }
+        elseif ($IsMacOS) {
+            $archive = "gitleaks_${version}_darwin_x64.tar.gz"
+            $url = "https://github.com/gitleaks/gitleaks/releases/download/v${version}/$archive"
+            $dest = Join-Path $HOME ".local/bin"
+            $tarball = Join-Path ([System.IO.Path]::GetTempPath()) $archive
+            New-Item -ItemType Directory -Force -Path $dest | Out-Null
+            Invoke-WebRequest -Uri $url -OutFile $tarball -UseBasicParsing
+            tar -xzf $tarball -C $dest gitleaks
+            Remove-Item $tarball -ErrorAction SilentlyContinue
+            $env:PATH = "${dest}:$env:PATH"
+        }
+        else {
+            throw "Unsupported platform for automatic gitleaks installation."
         }
     }
 
