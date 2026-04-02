@@ -36,11 +36,7 @@ public class XmlSingleStreamLoaderTests
     protected override XmlSingleStreamLoader<PersonRecord> CreateSut(int itemCount)
     {
         var stream = new MemoryStream();
-        return new XmlSingleStreamLoader<PersonRecord>
-        (
-            stream,
-            NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
-        );
+        return new XmlSingleStreamLoader<PersonRecord>(stream);
     }
 
 
@@ -70,11 +66,7 @@ public class XmlSingleStreamLoaderTests
     public async Task LoadAsync_writes_valid_xml_with_root_element()
     {
         var stream = new MemoryStream();
-        var sut = new XmlSingleStreamLoader<PersonRecord>
-        (
-            stream,
-            NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
-        );
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream);
 
         var items = new List<PersonRecord>
         {
@@ -98,11 +90,7 @@ public class XmlSingleStreamLoaderTests
     public async Task LoadAsync_when_empty_sequence_writes_empty_root_element()
     {
         var stream = new MemoryStream();
-        var sut = new XmlSingleStreamLoader<PersonRecord>
-        (
-            stream,
-            NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
-        );
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream);
 
         await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
 
@@ -133,11 +121,7 @@ public class XmlSingleStreamLoaderTests
     public async Task LoadAsync_round_trips_correctly()
     {
         var stream = new MemoryStream();
-        var loader = new XmlSingleStreamLoader<PersonRecord>
-        (
-            stream,
-            NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
-        );
+        var loader = new XmlSingleStreamLoader<PersonRecord>(stream);
 
         var items = new List<PersonRecord>
         {
@@ -147,11 +131,7 @@ public class XmlSingleStreamLoaderTests
         await loader.LoadAsync(items.ToAsyncEnumerable());
 
         stream.Position = 0;
-        var extractor = new XmlSingleStreamExtractor<PersonRecord>
-        (
-            stream,
-            NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
-        );
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>(stream);
 
         var results = new List<PersonRecord>();
         await foreach (var item in extractor.ExtractAsync())
@@ -234,11 +214,7 @@ public class XmlSingleStreamLoaderTests
     public async Task LoadAsync_when_XmlElement_attributes_writes_mapped_names()
     {
         var stream = new MemoryStream();
-        var sut = new XmlSingleStreamLoader<XmlAttributePersonRecord>
-        (
-            stream,
-            NullLogger<XmlSingleStreamLoader<XmlAttributePersonRecord>>.Instance
-        );
+        var sut = new XmlSingleStreamLoader<XmlAttributePersonRecord>(stream);
 
         var items = new List<XmlAttributePersonRecord>
         {
@@ -263,26 +239,7 @@ public class XmlSingleStreamLoaderTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => new XmlSingleStreamLoader<PersonRecord>
-            (
-                null!,
-                NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
-            )
-        );
-    }
-
-
-
-    [Fact]
-    public void Constructor_when_logger_is_null_throws_ArgumentNullException()
-    {
-        Assert.Throws<ArgumentNullException>
-        (
-            () => new XmlSingleStreamLoader<PersonRecord>
-            (
-                new MemoryStream(),
-                logger: null!
-            )
+            () => new XmlSingleStreamLoader<PersonRecord>(null!)
         );
     }
 

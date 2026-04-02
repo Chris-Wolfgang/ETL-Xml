@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 
 namespace Wolfgang.Etl.Xml;
@@ -23,7 +24,7 @@ namespace Wolfgang.Etl.Xml;
 /// <example>
 /// <code>
 /// using var stream = File.Create("output.xml");
-/// var loader = new XmlSingleStreamLoader&lt;Person&gt;(stream, logger);
+/// var loader = new XmlSingleStreamLoader&lt;Person&gt;(stream);
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
@@ -48,18 +49,13 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class.
     /// </summary>
     /// <param name="stream">The stream to write XML data to.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="stream"/> or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="stream"/> is <c>null</c>.
     /// </exception>
-    public XmlSingleStreamLoader
-    (
-        Stream stream,
-        ILogger<XmlSingleStreamLoader<TRecord>> logger
-    )
+    public XmlSingleStreamLoader(Stream stream)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = NullLogger.Instance;
         _writerSettings = null;
 
         _rootElementName = "ArrayOf" + typeof(TRecord).Name;

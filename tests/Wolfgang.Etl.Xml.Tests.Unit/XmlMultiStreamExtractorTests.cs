@@ -48,11 +48,7 @@ public class XmlMultiStreamExtractorTests
 
 
     protected override XmlMultiStreamExtractor<PersonRecord> CreateSut(int itemCount) =>
-        new
-        (
-            CreateXmlStreams(itemCount),
-            NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
-        );
+        new(CreateXmlStreams(itemCount));
 
 
 
@@ -84,11 +80,7 @@ public class XmlMultiStreamExtractorTests
             return stream;
         }).ToList();
 
-        var sut = new XmlMultiStreamExtractor<PersonRecord>
-        (
-            streams,
-            NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
-        );
+        var sut = new XmlMultiStreamExtractor<PersonRecord>(streams);
 
         var results = new List<PersonRecord>();
         await foreach (var item in sut.ExtractAsync())
@@ -116,8 +108,7 @@ public class XmlMultiStreamExtractorTests
 
         var sut = new XmlMultiStreamExtractor<XmlAttributePersonRecord>
         (
-            new[] { (Stream)stream },
-            NullLogger<XmlMultiStreamExtractor<XmlAttributePersonRecord>>.Instance
+            new[] { (Stream)stream }
         );
 
         var results = new List<XmlAttributePersonRecord>();
@@ -139,26 +130,7 @@ public class XmlMultiStreamExtractorTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => new XmlMultiStreamExtractor<PersonRecord>
-            (
-                null!,
-                NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
-            )
-        );
-    }
-
-
-
-    [Fact]
-    public void Constructor_when_logger_is_null_throws_ArgumentNullException()
-    {
-        Assert.Throws<ArgumentNullException>
-        (
-            () => new XmlMultiStreamExtractor<PersonRecord>
-            (
-                streams: Array.Empty<Stream>(),
-                logger: null!
-            )
+            () => new XmlMultiStreamExtractor<PersonRecord>(null!)
         );
     }
 

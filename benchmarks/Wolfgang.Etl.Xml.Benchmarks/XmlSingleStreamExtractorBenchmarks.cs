@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using BenchmarkDotNet.Attributes;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Wolfgang.Etl.Xml.Benchmarks;
 
@@ -67,11 +66,7 @@ public class XmlSingleStreamExtractorBenchmarks
     public async Task<int> ExtractAsync()
     {
         var stream = new MemoryStream(_xmlData);
-        var extractor = new XmlSingleStreamExtractor<BenchmarkPerson>
-        (
-            stream,
-            NullLogger<XmlSingleStreamExtractor<BenchmarkPerson>>.Instance
-        );
+        var extractor = new XmlSingleStreamExtractor<BenchmarkPerson>(stream);
 
         var count = 0;
         await foreach (var _ in extractor.ExtractAsync())

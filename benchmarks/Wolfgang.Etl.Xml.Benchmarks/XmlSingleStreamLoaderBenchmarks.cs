@@ -39,11 +39,7 @@ public class XmlSingleStreamLoaderBenchmarks
     public async Task LoadAsync()
     {
         var stream = new MemoryStream();
-        var loader = new XmlSingleStreamLoader<BenchmarkPerson>
-        (
-            stream,
-            NullLogger<XmlSingleStreamLoader<BenchmarkPerson>>.Instance
-        );
+        var loader = new XmlSingleStreamLoader<BenchmarkPerson>(stream);
 
         await loader.LoadAsync(_items.ToAsyncEnumerable());
     }
