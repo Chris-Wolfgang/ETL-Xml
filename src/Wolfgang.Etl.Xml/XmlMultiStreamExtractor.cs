@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 
 namespace Wolfgang.Etl.Xml;
@@ -23,7 +24,7 @@ namespace Wolfgang.Etl.Xml;
 /// <example>
 /// <code>
 /// var streams = Directory.GetFiles("data/", "*.xml").Select(File.OpenRead);
-/// var extractor = new XmlMultiStreamExtractor&lt;Person&gt;(streams, logger);
+/// var extractor = new XmlMultiStreamExtractor&lt;Person&gt;(streams);
 /// await foreach (var person in extractor.ExtractAsync(cancellationToken))
 /// {
 ///     Console.WriteLine(person.Name);
@@ -46,19 +47,13 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// Initializes a new instance of the <see cref="XmlMultiStreamExtractor{TRecord}"/> class.
     /// </summary>
     /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="streams"/> or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="streams"/> is <c>null</c>.
     /// </exception>
-    public XmlMultiStreamExtractor
-    (
-        IEnumerable<Stream> streams,
-        ILogger<XmlMultiStreamExtractor<TRecord>> logger
-    )
+    public XmlMultiStreamExtractor(IEnumerable<Stream> streams)
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
+        _logger = NullLogger.Instance;
     }
 
 

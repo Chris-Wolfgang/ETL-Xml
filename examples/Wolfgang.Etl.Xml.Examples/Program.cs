@@ -40,11 +40,7 @@ static async Task SingleStreamExtractPipeline(ILoggerFactory loggerFactory)
     var xmlStream = CreateSampleXmlStream();
 
     // --- Extract → Transform → Load pipeline ---
-    var extractor = new XmlSingleStreamExtractor<Person>
-    (
-        xmlStream,
-        loggerFactory.CreateLogger<XmlSingleStreamExtractor<Person>>()
-    );
+    var extractor = new XmlSingleStreamExtractor<Person>(xmlStream);
 
     var transformer = new TestTransformer<Person>();
     var loader = new TestLoader<Person>(collectItems: true);
@@ -122,11 +118,7 @@ static async Task MultiStreamExtractPipeline(ILoggerFactory loggerFactory)
     var streams = CreateSampleMultiStreams();
 
     // --- Extract → Transform → Load pipeline ---
-    var extractor = new XmlMultiStreamExtractor<Person>
-    (
-        streams,
-        loggerFactory.CreateLogger<XmlMultiStreamExtractor<Person>>()
-    );
+    var extractor = new XmlMultiStreamExtractor<Person>(streams);
 
     var transformer = new TestTransformer<Person>();
     var loader = new TestLoader<Person>(collectItems: true);
