@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -24,7 +25,12 @@ namespace Wolfgang.Etl.Xml;
 /// <example>
 /// <code>
 /// var streams = Directory.GetFiles("data/", "*.xml").Select(File.OpenRead);
-/// var extractor = new XmlMultiStreamExtractor&lt;Person&gt;(streams);
+/// var extractor = new XmlMultiStreamExtractor&lt;Person&gt;
+/// (
+///     streams,
+///     new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit },
+///     logger
+/// );
 /// await foreach (var person in extractor.ExtractAsync(cancellationToken))
 /// {
 ///     Console.WriteLine(person.Name);
@@ -36,6 +42,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
 {
     private static readonly string OperationName = $"XML multi-stream extraction of {typeof(TRecord).Name}";
     private readonly IEnumerable<Stream> _streams;
+    private readonly XmlReaderSettings? _readerSettings;
     private static readonly XmlSerializer Serializer = new(typeof(TRecord));
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
@@ -53,7 +60,32 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     public XmlMultiStreamExtractor(IEnumerable<Stream> streams)
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
+        _readerSettings = null;
         _logger = NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamExtractor{TRecord}"/> class
+    /// with custom reader settings.
+    /// </summary>
+    /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
+    /// <param name="readerSettings">The XML reader settings to use for deserialization.</param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="streams"/>, <paramref name="readerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    public XmlMultiStreamExtractor
+    (
+        IEnumerable<Stream> streams,
+        XmlReaderSettings readerSettings,
+        ILogger<XmlMultiStreamExtractor<TRecord>> logger
+    )
+    {
+        _streams = streams ?? throw new ArgumentNullException(nameof(streams));
+        _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
 
@@ -63,19 +95,21 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// with an injected progress timer for testing.
     /// </summary>
     /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
+    /// <param name="readerSettings">The XML reader settings to use for deserialization.</param>
     /// <param name="logger">The logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
     internal XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
+        XmlReaderSettings readerSettings,
         ILogger logger,
         IProgressTimer timer
     )
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
+        _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-
     }
 
 
@@ -101,7 +135,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
             TRecord? item;
             try
             {
-                item = (TRecord?)Serializer.Deserialize(stream);
+                item = DeserializeFromStream(stream);
             }
             finally
             {
@@ -141,6 +175,21 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
         }
 
         XmlLogMessages.MultiStreamExtractionCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, streamIndex, null);
+    }
+
+
+
+    private TRecord? DeserializeFromStream(Stream stream)
+    {
+        if (_readerSettings is not null)
+        {
+            var settings = _readerSettings.Clone();
+            settings.CloseInput = false;
+            using var reader = XmlReader.Create(stream, settings);
+            return (TRecord?)Serializer.Deserialize(reader);
+        }
+
+        return (TRecord?)Serializer.Deserialize(stream);
     }
 
 
