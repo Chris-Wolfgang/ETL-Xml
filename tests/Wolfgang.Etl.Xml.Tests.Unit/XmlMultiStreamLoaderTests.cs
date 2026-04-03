@@ -93,7 +93,7 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
-    public async Task LoadAsync_when_stream_factory_returns_null_throws_InvalidOperationException()
+    public Task LoadAsync_when_stream_factory_returns_null_throws_InvalidOperationException()
     {
         var sut = new XmlMultiStreamLoader<PersonRecord>(_ => null!);
 
@@ -102,7 +102,7 @@ public class XmlMultiStreamLoaderTests
             new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
         };
 
-        await Assert.ThrowsAsync<InvalidOperationException>
+        return Assert.ThrowsAsync<InvalidOperationException>
         (
             () => sut.LoadAsync(items.ToAsyncEnumerable())
         );
@@ -176,9 +176,9 @@ public class XmlMultiStreamLoaderTests
         Assert.Single(buffers);
         var content = Encoding.UTF8.GetString(buffers[0]);
 
-        Assert.Contains("<first_name>Alice</first_name>", content);
-        Assert.Contains("<last_name>Smith</last_name>", content);
-        Assert.DoesNotContain("<FirstName>", content);
+        Assert.Contains("<first_name>Alice</first_name>", content, StringComparison.Ordinal);
+        Assert.Contains("<last_name>Smith</last_name>", content, StringComparison.Ordinal);
+        Assert.DoesNotContain("<FirstName>", content, StringComparison.Ordinal);
     }
 
 
