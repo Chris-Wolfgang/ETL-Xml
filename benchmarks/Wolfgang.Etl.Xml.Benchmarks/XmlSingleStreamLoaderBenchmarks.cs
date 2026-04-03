@@ -36,18 +36,17 @@ public class XmlSingleStreamLoaderBenchmarks
 
 
     [Benchmark]
-    public async Task LoadAsync()
+    public Task LoadAsync()
     {
         var stream = new MemoryStream();
         var loader = new XmlSingleStreamLoader<BenchmarkPerson>(stream);
-
-        await loader.LoadAsync(_items.ToAsyncEnumerable());
+        return loader.LoadAsync(_items.ToAsyncEnumerable());
     }
 
 
 
     [Benchmark]
-    public async Task LoadAsync_NoIndent()
+    public Task LoadNoIndentAsync()
     {
         var stream = new MemoryStream();
         var settings = new XmlWriterSettings { Indent = false };
@@ -57,7 +56,6 @@ public class XmlSingleStreamLoaderBenchmarks
             settings,
             NullLogger<XmlSingleStreamLoader<BenchmarkPerson>>.Instance
         );
-
-        await loader.LoadAsync(_items.ToAsyncEnumerable());
+        return loader.LoadAsync(_items.ToAsyncEnumerable());
     }
 }
