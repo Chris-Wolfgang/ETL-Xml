@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 
 namespace Wolfgang.Etl.Xml;
@@ -25,7 +26,7 @@ namespace Wolfgang.Etl.Xml;
 /// <example>
 /// <code>
 /// using var stream = File.OpenRead("data.xml");
-/// var extractor = new XmlSingleStreamExtractor&lt;Person&gt;(stream, logger);
+/// var extractor = new XmlSingleStreamExtractor&lt;Person&gt;(stream);
 /// await foreach (var person in extractor.ExtractAsync(cancellationToken))
 /// {
 ///     Console.WriteLine(person.Name);
@@ -49,18 +50,13 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// Initializes a new instance of the <see cref="XmlSingleStreamExtractor{TRecord}"/> class.
     /// </summary>
     /// <param name="stream">The stream containing XML data to read from.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="stream"/> or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="stream"/> is <c>null</c>.
     /// </exception>
-    public XmlSingleStreamExtractor
-    (
-        Stream stream,
-        ILogger<XmlSingleStreamExtractor<TRecord>> logger
-    )
+    public XmlSingleStreamExtractor(Stream stream)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = NullLogger.Instance;
         _readerSettings = null;
     }
 
