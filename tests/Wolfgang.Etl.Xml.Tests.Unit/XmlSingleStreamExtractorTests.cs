@@ -152,8 +152,9 @@ public class XmlSingleStreamExtractorTests
             NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
         );
 
-        await foreach (var _ in sut.ExtractAsync())
+        await foreach (var item in sut.ExtractAsync())
         {
+            _ = item;
         }
 
         Assert.True(settings.CloseInput);

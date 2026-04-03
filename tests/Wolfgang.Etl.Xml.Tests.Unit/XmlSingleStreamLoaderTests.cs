@@ -79,9 +79,9 @@ public class XmlSingleStreamLoaderTests
         stream.Position = 0;
         var content = Encoding.UTF8.GetString(stream.ToArray());
 
-        Assert.Contains("ArrayOfPersonRecord", content);
-        Assert.Contains("<FirstName>Alice</FirstName>", content);
-        Assert.Contains("<FirstName>Bob</FirstName>", content);
+        Assert.Contains("ArrayOfPersonRecord", content, StringComparison.Ordinal);
+        Assert.Contains("<FirstName>Alice</FirstName>", content, StringComparison.Ordinal);
+        Assert.Contains("<FirstName>Bob</FirstName>", content, StringComparison.Ordinal);
     }
 
 
@@ -98,7 +98,7 @@ public class XmlSingleStreamLoaderTests
         using var reader = new StreamReader(stream);
         var content = await reader.ReadToEndAsync();
 
-        Assert.Contains("ArrayOfPersonRecord", content);
+        Assert.Contains("ArrayOfPersonRecord", content, StringComparison.Ordinal);
 
         // Should be valid XML — parse it to verify
         var settings = new XmlReaderSettings { Async = true };
@@ -174,7 +174,7 @@ public class XmlSingleStreamLoaderTests
         stream.Position = 0;
         var content = Encoding.UTF8.GetString(stream.ToArray());
 
-        Assert.DoesNotContain("<?xml", content);
+        Assert.DoesNotContain("<?xml", content, StringComparison.Ordinal);
     }
 
 
@@ -226,10 +226,10 @@ public class XmlSingleStreamLoaderTests
         stream.Position = 0;
         var content = Encoding.UTF8.GetString(stream.ToArray());
 
-        Assert.Contains("<first_name>Alice</first_name>", content);
-        Assert.Contains("<last_name>Smith</last_name>", content);
-        Assert.DoesNotContain("<FirstName>", content);
-        Assert.DoesNotContain("<LastName>", content);
+        Assert.Contains("<first_name>Alice</first_name>", content, StringComparison.Ordinal);
+        Assert.Contains("<last_name>Smith</last_name>", content, StringComparison.Ordinal);
+        Assert.DoesNotContain("<FirstName>", content, StringComparison.Ordinal);
+        Assert.DoesNotContain("<LastName>", content, StringComparison.Ordinal);
     }
 
 
