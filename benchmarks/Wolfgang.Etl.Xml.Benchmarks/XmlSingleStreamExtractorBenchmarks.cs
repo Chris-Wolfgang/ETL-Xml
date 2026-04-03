@@ -69,7 +69,7 @@ public class XmlSingleStreamExtractorBenchmarks
         var extractor = new XmlSingleStreamExtractor<BenchmarkPerson>(stream);
 
         var count = 0;
-        await foreach (var _ in extractor.ExtractAsync())
+        await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
         {
             count++;
         }

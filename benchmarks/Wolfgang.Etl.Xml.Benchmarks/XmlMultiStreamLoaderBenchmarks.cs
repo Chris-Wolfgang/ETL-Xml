@@ -34,10 +34,9 @@ public class XmlMultiStreamLoaderBenchmarks
 
 
     [Benchmark]
-    public async Task LoadAsync()
+    public Task LoadAsync()
     {
         var loader = new XmlMultiStreamLoader<BenchmarkPerson>(_ => new MemoryStream());
-
-        await loader.LoadAsync(_items.ToAsyncEnumerable());
+        return loader.LoadAsync(_items.ToAsyncEnumerable());
     }
 }
