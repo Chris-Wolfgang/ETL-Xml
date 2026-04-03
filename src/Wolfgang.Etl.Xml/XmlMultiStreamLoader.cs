@@ -99,19 +99,19 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// A factory function that receives the item to be written and returns a <see cref="Stream"/> to write it to.
     /// </param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
     internal XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
         XmlWriterSettings writerSettings,
-        ILogger logger,
+        ILogger? logger,
         IProgressTimer timer
     )
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
 
     }

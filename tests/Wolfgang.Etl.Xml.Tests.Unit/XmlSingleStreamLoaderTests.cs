@@ -279,18 +279,19 @@ public class XmlSingleStreamLoaderTests
 
 
     [Fact]
-    public void Internal_constructor_when_logger_is_null_throws_ArgumentNullException()
+    public async Task Internal_constructor_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        var sut = new XmlSingleStreamLoader<PersonRecord>
         (
-            () => new XmlSingleStreamLoader<PersonRecord>
-            (
-                new MemoryStream(),
-                new XmlWriterSettings(),
-                logger: null!,
-                new ManualProgressTimer()
-            )
+            new MemoryStream(),
+            new XmlWriterSettings(),
+            logger: null,
+            new ManualProgressTimer()
         );
+
+        await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
+
+        Assert.NotNull(sut);
     }
 
 

@@ -92,19 +92,19 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// </summary>
     /// <param name="stream">The stream containing XML data to read from.</param>
     /// <param name="readerSettings">The XML reader settings to use for deserialization.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
     internal XmlSingleStreamExtractor
     (
         Stream stream,
         XmlReaderSettings readerSettings,
-        ILogger logger,
+        ILogger? logger,
         IProgressTimer timer
     )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
 

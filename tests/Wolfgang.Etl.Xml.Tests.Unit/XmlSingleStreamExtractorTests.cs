@@ -230,18 +230,23 @@ public class XmlSingleStreamExtractorTests
 
 
     [Fact]
-    public void Internal_constructor_when_logger_is_null_throws_ArgumentNullException()
+    public async Task Internal_constructor_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        var stream = CreateXmlStream(1);
+        var sut = new XmlSingleStreamExtractor<PersonRecord>
         (
-            () => new XmlSingleStreamExtractor<PersonRecord>
-            (
-                new MemoryStream(),
-                new XmlReaderSettings(),
-                logger: null!,
-                new ManualProgressTimer()
-            )
+            stream,
+            new XmlReaderSettings(),
+            logger: null,
+            new ManualProgressTimer()
         );
+
+        await foreach (var item in sut.ExtractAsync())
+        {
+            _ = item;
+        }
+
+        Assert.NotNull(sut);
     }
 
 

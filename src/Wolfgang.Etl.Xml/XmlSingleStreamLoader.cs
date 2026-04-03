@@ -95,19 +95,19 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// </summary>
     /// <param name="stream">The stream to write XML data to.</param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
     internal XmlSingleStreamLoader
     (
         Stream stream,
         XmlWriterSettings writerSettings,
-        ILogger logger,
+        ILogger? logger,
         IProgressTimer timer
     )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
 
         _rootElementName = "ArrayOf" + typeof(TRecord).Name;
