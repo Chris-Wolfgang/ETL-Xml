@@ -128,7 +128,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         await AdvancePastRootElementAsync(reader).ConfigureAwait(false);
 
         var needsRead = true;
-        while (needsRead ? await reader.ReadAsync().ConfigureAwait(false) : true)
+        while (!needsRead || await reader.ReadAsync().ConfigureAwait(false))
         {
             token.ThrowIfCancellationRequested();
             needsRead = true;
