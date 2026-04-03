@@ -16,13 +16,13 @@ using var loggerFactory = LoggerFactory.Create(builder =>
     builder.SetMinimumLevel(LogLevel.Debug);
 });
 
-await SingleStreamExtractPipeline();
+await SingleStreamExtractPipelineAsync().ConfigureAwait(false);
 Console.WriteLine();
-await SingleStreamLoadPipeline(loggerFactory);
+await SingleStreamLoadPipelineAsync(loggerFactory).ConfigureAwait(false);
 Console.WriteLine();
-await MultiStreamExtractPipeline();
+await MultiStreamExtractPipelineAsync().ConfigureAwait(false);
 Console.WriteLine();
-await MultiStreamLoadPipeline(loggerFactory);
+await MultiStreamLoadPipelineAsync(loggerFactory).ConfigureAwait(false);
 
 
 
@@ -31,7 +31,7 @@ await MultiStreamLoadPipeline(loggerFactory);
 /// XmlSingleStreamExtractor reads from an XML stream, then a
 /// TestTransformer passes items through, and a TestLoader collects them.
 /// </summary>
-static async Task SingleStreamExtractPipeline()
+static async Task SingleStreamExtractPipelineAsync()
 {
     Console.WriteLine("=== Single-Stream Extract Pipeline ===");
     Console.WriteLine();
@@ -45,7 +45,7 @@ static async Task SingleStreamExtractPipeline()
     var transformer = new TestTransformer<Person>();
     var loader = new TestLoader<Person>(collectItems: true);
 
-    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync())).ConfigureAwait(false);
 
     // Show results
     Console.WriteLine($"Extracted {extractor.CurrentItemCount} items from XML.");
@@ -66,7 +66,7 @@ static async Task SingleStreamExtractPipeline()
 /// TestExtractor provides in-memory data, TestTransformer passes it
 /// through, and XmlSingleStreamLoader writes the XML output.
 /// </summary>
-static async Task SingleStreamLoadPipeline(ILoggerFactory loggerFactory)
+static async Task SingleStreamLoadPipelineAsync(ILoggerFactory loggerFactory)
 {
     Console.WriteLine("=== Single-Stream Load Pipeline ===");
     Console.WriteLine();
@@ -90,7 +90,7 @@ static async Task SingleStreamLoadPipeline(ILoggerFactory loggerFactory)
         loggerFactory.CreateLogger<XmlSingleStreamLoader<Person>>()
     );
 
-    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync())).ConfigureAwait(false);
 
     // Show resulting XML
     Console.WriteLine($"Extracted {extractor.CurrentItemCount} items from memory.");
@@ -100,7 +100,7 @@ static async Task SingleStreamLoadPipeline(ILoggerFactory loggerFactory)
 
     outputStream.Position = 0;
     using var reader = new StreamReader(outputStream);
-    Console.WriteLine(await reader.ReadToEndAsync());
+    Console.WriteLine(await reader.ReadToEndAsync().ConfigureAwait(false));
 }
 
 
@@ -109,7 +109,7 @@ static async Task SingleStreamLoadPipeline(ILoggerFactory loggerFactory)
 /// Demonstrates extracting from multiple XML streams (one item per file)
 /// through a full ETL pipeline using TestTransformer and TestLoader.
 /// </summary>
-static async Task MultiStreamExtractPipeline()
+static async Task MultiStreamExtractPipelineAsync()
 {
     Console.WriteLine("=== Multi-Stream Extract Pipeline ===");
     Console.WriteLine();
@@ -123,7 +123,7 @@ static async Task MultiStreamExtractPipeline()
     var transformer = new TestTransformer<Person>();
     var loader = new TestLoader<Person>(collectItems: true);
 
-    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync())).ConfigureAwait(false);
 
     Console.WriteLine($"Extracted {extractor.CurrentItemCount} items from {streams.Count} streams.");
     Console.WriteLine($"Transformed {transformer.CurrentItemCount} items.");
@@ -142,7 +142,7 @@ static async Task MultiStreamExtractPipeline()
 /// Demonstrates loading to multiple XML streams (one item per file)
 /// through a full ETL pipeline using TestExtractor and TestTransformer.
 /// </summary>
-static async Task MultiStreamLoadPipeline(ILoggerFactory loggerFactory)
+static async Task MultiStreamLoadPipelineAsync(ILoggerFactory loggerFactory)
 {
     Console.WriteLine("=== Multi-Stream Load Pipeline ===");
     Console.WriteLine();
@@ -157,7 +157,7 @@ static async Task MultiStreamLoadPipeline(ILoggerFactory loggerFactory)
     var extractor = new TestExtractor<Person>(people);
     var transformer = new TestTransformer<Person>();
 
-    var buffers = new Dictionary<string, MemoryStream>();
+    var buffers = new Dictionary<string, MemoryStream>(StringComparer.Ordinal);
     var loader = new XmlMultiStreamLoader<Person>
     (
         person =>
@@ -171,7 +171,7 @@ static async Task MultiStreamLoadPipeline(ILoggerFactory loggerFactory)
         loggerFactory.CreateLogger<XmlMultiStreamLoader<Person>>()
     );
 
-    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
+    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync())).ConfigureAwait(false);
 
     Console.WriteLine($"Extracted {extractor.CurrentItemCount} items from memory.");
     Console.WriteLine($"Transformed {transformer.CurrentItemCount} items.");
@@ -183,7 +183,7 @@ static async Task MultiStreamLoadPipeline(ILoggerFactory loggerFactory)
         buffer.Position = 0;
         using var streamReader = new StreamReader(buffer);
         Console.WriteLine($"--- {fileName} ---");
-        Console.WriteLine(await streamReader.ReadToEndAsync());
+        Console.WriteLine(await streamReader.ReadToEndAsync().ConfigureAwait(false));
         Console.WriteLine();
     }
 }

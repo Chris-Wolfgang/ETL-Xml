@@ -52,7 +52,7 @@ public class XmlMultiStreamExtractorBenchmarks
         var extractor = new XmlMultiStreamExtractor<BenchmarkPerson>(streams);
 
         var count = 0;
-        await foreach (var _ in extractor.ExtractAsync())
+        await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
         {
             count++;
         }
