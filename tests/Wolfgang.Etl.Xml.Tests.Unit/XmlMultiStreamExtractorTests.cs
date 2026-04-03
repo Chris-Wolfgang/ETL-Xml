@@ -231,8 +231,9 @@ public class XmlMultiStreamExtractorTests
             new ManualProgressTimer()
         );
 
-        await foreach (var _ in sut.ExtractAsync())
+        await foreach (var item in sut.ExtractAsync())
         {
+            _ = item;
         }
 
         Assert.NotNull(sut);
