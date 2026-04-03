@@ -155,7 +155,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
 
             try
             {
-                Serializer.Serialize(stream, item);
+                SerializeToStream(stream, item);
 #if NETSTANDARD2_0 || NET462 || NET481
 #pragma warning disable CA2016, MA0040 // FlushAsync(CancellationToken) not available on this TFM
                 await stream.FlushAsync().ConfigureAwait(false);
@@ -178,6 +178,23 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         }
 
         XmlLogMessages.MultiStreamLoadingCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, streamIndex, null);
+    }
+
+
+
+    private void SerializeToStream(Stream stream, TRecord item)
+    {
+        if (_writerSettings is not null)
+        {
+            var settings = _writerSettings.Clone();
+            settings.CloseOutput = false;
+            using var writer = XmlWriter.Create(stream, settings);
+            Serializer.Serialize(writer, item);
+        }
+        else
+        {
+            Serializer.Serialize(stream, item);
+        }
     }
 
 
