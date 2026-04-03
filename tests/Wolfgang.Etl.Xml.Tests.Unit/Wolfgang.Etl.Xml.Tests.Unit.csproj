@@ -19,8 +19,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.5" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" Condition="!$(TargetFramework.StartsWith('net5.')) AND !$(TargetFramework.StartsWith('net6.')) AND !$(TargetFramework.StartsWith('net7.'))" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" Condition="$(TargetFramework.StartsWith('net5.')) OR $(TargetFramework.StartsWith('net6.')) OR $(TargetFramework.StartsWith('net7.'))" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" Condition="!$(TargetFramework.StartsWith('net5.')) AND !$(TargetFramework.StartsWith('net6.')) AND !$(TargetFramework.StartsWith('net7.')) AND !$(TargetFramework.StartsWith('netcoreapp'))" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" Condition="$(TargetFramework.StartsWith('net5.')) OR $(TargetFramework.StartsWith('net6.')) OR $(TargetFramework.StartsWith('net7.')) OR $(TargetFramework.StartsWith('netcoreapp'))" />
     <PackageReference Include="System.Linq.Async" Version="7.0.0" />
     <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.6.0" />
     <PackageReference Include="Wolfgang.Etl.TestKit.Xunit" Version="0.5.0" />
