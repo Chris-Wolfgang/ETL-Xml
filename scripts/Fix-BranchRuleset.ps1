@@ -15,6 +15,9 @@
 .PARAMETER Force
     Skip the confirmation prompt and proceed automatically. Alias: -y
 
+.PARAMETER SkipSetup
+    Skip automatic invocation of Setup-BranchRuleset.ps1 after fixing.
+
 .EXAMPLE
     .\Fix-BranchRuleset.ps1
     Inspects and fixes rulesets for the current repository with interactive confirmation
@@ -22,6 +25,10 @@
 .EXAMPLE
     .\Fix-BranchRuleset.ps1 -Force
     Inspects and fixes rulesets without prompting for confirmation
+
+.EXAMPLE
+    .Fix-BranchRuleset.ps1 -Force -SkipSetup
+    Fixes rulesets non-interactively without recreating a fresh ruleset
 
 .EXAMPLE
     .\Fix-BranchRuleset.ps1 -y
@@ -43,7 +50,10 @@ param(
 
     [Parameter()]
     [Alias("y")]
-    [switch]$Force
+    [switch]$Force,
+
+    [Parameter()]
+    [switch]$SkipSetup
 )
 
 # Check if gh CLI is installed
@@ -173,7 +183,7 @@ foreach ($item in $plan) {
 Write-Host ""
 
 # Prompt for confirmation
-if ($Force) {
+if ($SkipSetup) {
     Write-Host "Auto-confirmed via -Force/-y flag." -ForegroundColor Green
 } else {
     $response = Read-Host "Proceed with these changes? (y/N)"
