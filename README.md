@@ -90,9 +90,10 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 
 ### Constructor overloads
 
-Each extractor and loader provides two public constructors:
-- **1-param** `(stream)` — uses default XML settings and no logging
-- **3-param** `(stream, settings, logger)` — custom `XmlReaderSettings`/`XmlWriterSettings` and an `ILogger` for structured logging
+Each extractor and loader provides two public constructors (the first parameter varies by type):
+- **`XmlSingleStreamExtractor<T>` / `XmlSingleStreamLoader<T>`** — `(stream)` or `(stream, settings, logger)`
+- **`XmlMultiStreamExtractor<T>`** — `(streams)` or `(streams, settings, logger)` where `streams` is `IEnumerable<Stream>`
+- **`XmlMultiStreamLoader<T>`** — `(streamFactory)` or `(streamFactory, settings, logger)` where `streamFactory` is `Func<T, Stream>`
 
 ### Progress reporting
 
@@ -198,7 +199,7 @@ This project uses `.editorconfig` and `dotnet format`:
 # Format code
 dotnet format
 
-# Verify formatting (as CI does)
+# Verify formatting
 dotnet format --verify-no-changes
 ```
 
