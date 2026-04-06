@@ -5,7 +5,7 @@ This guide will help you quickly get up and running with Wolfgang.Etl.Xml.
 ## Prerequisites
 
 - .NET 8.0 SDK or later (also supports .NET Framework 4.6.2+ and .NET Standard 2.0)
-- A logging provider (e.g. `Microsoft.Extensions.Logging`)
+- (Optional) A logging provider (e.g. `Microsoft.Extensions.Logging`)
 
 ## Installation
 
@@ -32,11 +32,8 @@ using Wolfgang.Etl.TestKit;
 using Wolfgang.Etl.Xml;
 
 // XmlSingleStreamExtractor reads items from a single XML document
-var extractor = new XmlSingleStreamExtractor<Person>
-(
-    xmlStream,
-    logger
-);
+// ILogger is optional — omit for no logging, or pass settings + logger for full control
+var extractor = new XmlSingleStreamExtractor<Person>(xmlStream);
 
 // Use TestKit placeholders for the rest of the pipeline
 var transformer = new TestTransformer<Person>();
@@ -60,11 +57,12 @@ var extractor = new TestExtractor<Person>(people);
 var transformer = new TestTransformer<Person>();
 
 // XmlSingleStreamLoader writes items to a single XML document
+// Use the 3-param constructor to customize settings and enable logging
 var loader = new XmlSingleStreamLoader<Person>
 (
     outputStream,
     new XmlWriterSettings { Indent = true },
-    logger
+    logger  // optional — use 1-param constructor to omit
 );
 
 await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
@@ -76,17 +74,12 @@ For scenarios where each record lives in its own XML file:
 
 ```csharp
 // Extract from multiple XML files
-var extractor = new XmlMultiStreamExtractor<Person>
-(
-    xmlStreams,
-    logger
-);
+var extractor = new XmlMultiStreamExtractor<Person>(xmlStreams);
 
 // Load to individual XML files via a stream factory
 var loader = new XmlMultiStreamLoader<Person>
 (
-    person => File.Create($"{person.Id}.xml"),
-    logger
+    person => File.Create($"{person.Id}.xml")
 );
 ```
 

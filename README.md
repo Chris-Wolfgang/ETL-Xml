@@ -26,7 +26,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 - **GitHub Repository:** [https://github.com/Chris-Wolfgang/ETL-Xml](https://github.com/Chris-Wolfgang/ETL-Xml)
 - **API Documentation:** https://Chris-Wolfgang.github.io/ETL-Xml/
-- **Formatting Guide:** [README-FORMATTING.md](README-FORMATTING.md)
+- **Formatting Guide:** [README-FORMATTING.md](docs/README-FORMATTING.md)
 - **Contributing Guide:** [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
@@ -40,11 +40,7 @@ using Wolfgang.Etl.TestKit;
 using Wolfgang.Etl.Xml;
 
 // Extract from XML → Transform → Load into memory
-var extractor = new XmlSingleStreamExtractor<Person>
-(
-    xmlStream,
-    logger
-);
+var extractor = new XmlSingleStreamExtractor<Person>(xmlStream);
 
 var transformer = new TestTransformer<Person>();
 var loader = new TestLoader<Person>(collectItems: true);
@@ -61,11 +57,7 @@ Load items to an XML stream from an in-memory source:
 var extractor = new TestExtractor<Person>(people);
 var transformer = new TestTransformer<Person>();
 
-var loader = new XmlSingleStreamLoader<Person>
-(
-    outputStream,
-    logger
-);
+var loader = new XmlSingleStreamLoader<Person>(outputStream);
 
 await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 ```
@@ -94,11 +86,18 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 
 - **`XmlSingleStreamLoader<T>`** — Loads items into a single XML stream wrapped in a root element.
 - **`XmlMultiStreamLoader<T>`** — Loads items into multiple XML streams via a factory function, one document per stream.
+- **`XmlReport`** — Progress report returned via `IProgress<XmlReport>`. Properties: `CurrentItemCount`, `CurrentSkippedItemCount`.
+
+### Constructor overloads
+
+Each extractor and loader provides two public constructors:
+- **1-param** `(stream)` — uses default XML settings and no logging
+- **3-param** `(stream, settings, logger)` — custom `XmlReaderSettings`/`XmlWriterSettings` and an `ILogger` for structured logging
 
 ### Progress reporting
 
 ```csharp
-var extractor = new XmlSingleStreamExtractor<Person>(xmlStream, logger);
+var extractor = new XmlSingleStreamExtractor<Person>(xmlStream);
 extractor.ReportingInterval = 100; // Report every 100ms
 
 var progress = new Progress<XmlReport>(report =>
@@ -114,7 +113,7 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync(progres
 ### Skip and maximum item count
 
 ```csharp
-var extractor = new XmlSingleStreamExtractor<Person>(xmlStream, logger);
+var extractor = new XmlSingleStreamExtractor<Person>(xmlStream);
 extractor.SkipItemCount = 10;     // Skip first 10 items
 extractor.MaximumItemCount = 5;   // Then take 5 items
 
@@ -203,7 +202,7 @@ dotnet format
 dotnet format --verify-no-changes
 ```
 
-See [README-FORMATTING.md](README-FORMATTING.md) for detailed formatting guidelines.
+See [README-FORMATTING.md](docs/README-FORMATTING.md) for detailed formatting guidelines.
 
 ### Building Documentation
 
