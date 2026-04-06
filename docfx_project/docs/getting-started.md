@@ -57,13 +57,7 @@ var extractor = new TestExtractor<Person>(people);
 var transformer = new TestTransformer<Person>();
 
 // XmlSingleStreamLoader writes items to a single XML document
-// Use the 3-param constructor to customize settings and enable logging
-var loader = new XmlSingleStreamLoader<Person>
-(
-    outputStream,
-    new XmlWriterSettings { Indent = true },
-    logger  // optional — use 1-param constructor to omit
-);
+var loader = new XmlSingleStreamLoader<Person>(outputStream);
 
 await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 ```

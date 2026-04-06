@@ -30,7 +30,7 @@ pwsh ./scripts/format.ps1 -Check
 dotnet format
 ```
 
-### Check Formatting (like CI does)
+### Check Formatting
 
 ```bash
 dotnet format --verify-no-changes
