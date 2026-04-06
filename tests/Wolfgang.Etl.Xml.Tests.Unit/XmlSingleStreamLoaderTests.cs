@@ -235,6 +235,125 @@ public class XmlSingleStreamLoaderTests
 
 
     [Fact]
+    public async Task LoadAsync_when_rootElementName_is_specified_uses_custom_root_element()
+    {
+        var stream = new MemoryStream();
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, rootElementName: "People");
+
+        var items = new List<PersonRecord>
+        {
+            new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
+        };
+
+        await sut.LoadAsync(items.ToAsyncEnumerable());
+
+        stream.Position = 0;
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+
+        Assert.Contains("<People>", content, StringComparison.Ordinal);
+        Assert.DoesNotContain("ArrayOfPersonRecord", content, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_rootElementName_is_null_uses_default_root_element()
+    {
+        var stream = new MemoryStream();
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, rootElementName: null);
+
+        var items = new List<PersonRecord>
+        {
+            new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
+        };
+
+        await sut.LoadAsync(items.ToAsyncEnumerable());
+
+        stream.Position = 0;
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+
+        Assert.Contains("ArrayOfPersonRecord", content, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public void Constructor_when_rootElementName_is_empty_throws_ArgumentException()
+    {
+        Assert.Throws<ArgumentException>
+        (
+            () => new XmlSingleStreamLoader<PersonRecord>(new MemoryStream(), rootElementName: "")
+        );
+    }
+
+
+
+    [Fact]
+    public void Constructor_when_rootElementName_is_whitespace_throws_ArgumentException()
+    {
+        Assert.Throws<ArgumentException>
+        (
+            () => new XmlSingleStreamLoader<PersonRecord>(new MemoryStream(), rootElementName: "   ")
+        );
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_leaveOpen_is_true_leaves_stream_open_after_loading()
+    {
+        var stream = new MemoryStream();
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, leaveOpen: true);
+
+        await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
+
+        Assert.True(stream.CanWrite);
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_leaveOpen_is_false_closes_stream_after_loading()
+    {
+        var stream = new MemoryStream();
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, leaveOpen: false);
+
+        await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
+
+        Assert.False(stream.CanWrite);
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_with_settings_when_rootElementName_is_specified_uses_custom_root_element()
+    {
+        var stream = new MemoryStream();
+        var sut = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlWriterSettings { Indent = false },
+            NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance,
+            rootElementName: "People"
+        );
+
+        var items = new List<PersonRecord>
+        {
+            new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
+        };
+
+        await sut.LoadAsync(items.ToAsyncEnumerable());
+
+        stream.Position = 0;
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+
+        Assert.Contains("<People>", content, StringComparison.Ordinal);
+        Assert.DoesNotContain("ArrayOfPersonRecord", content, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
     public void Constructor_when_stream_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>
