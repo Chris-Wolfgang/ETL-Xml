@@ -231,6 +231,20 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
             );
         }
 
+        try
+        {
+            System.Xml.XmlConvert.VerifyNCName(rootElementName);
+        }
+        catch (System.Xml.XmlException ex)
+        {
+            throw new ArgumentException
+            (
+                $"Root element name '{rootElementName}' is not a valid XML local name.",
+                nameof(rootElementName),
+                ex
+            );
+        }
+
         return rootElementName;
     }
 
