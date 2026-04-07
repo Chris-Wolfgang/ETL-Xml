@@ -189,7 +189,7 @@ public class XmlSingleStreamExtractorTests
     public async Task ExtractAsync_when_leaveOpen_is_true_leaves_stream_open_after_extraction()
     {
         var stream = CreateXmlStream(2);
-        var sut = new XmlSingleStreamExtractor<PersonRecord>(stream, leaveOpen: true);
+        var sut = new XmlSingleStreamExtractor<PersonRecord>(stream, new XmlSingleStreamExtractorOptions { LeaveOpen = true });
 
         await foreach (var item in sut.ExtractAsync())
         {
@@ -205,7 +205,7 @@ public class XmlSingleStreamExtractorTests
     public async Task ExtractAsync_when_leaveOpen_is_false_closes_stream_after_extraction()
     {
         var stream = CreateXmlStream(2);
-        var sut = new XmlSingleStreamExtractor<PersonRecord>(stream, leaveOpen: false);
+        var sut = new XmlSingleStreamExtractor<PersonRecord>(stream, new XmlSingleStreamExtractorOptions { LeaveOpen = false });
 
         await foreach (var item in sut.ExtractAsync())
         {
