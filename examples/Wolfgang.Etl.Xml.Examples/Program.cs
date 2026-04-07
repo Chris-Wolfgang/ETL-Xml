@@ -96,10 +96,10 @@ static async Task SingleStreamLoadWithCustomRootAsync()
     await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync())).ConfigureAwait(false);
 
     Console.WriteLine($"Loaded {loader.CurrentItemCount} items using root element <People>.");
-    Console.WriteLine($"Stream is closed after load: {!outputStream.CanWrite}");
     Console.WriteLine();
 
-    // Read back the raw bytes (still accessible even after stream is closed).
+    // MemoryStream.ToArray() returns the buffer regardless of disposal state.
+    // For non-MemoryStream targets, read before disposing or use leaveOpen: true.
     var content = System.Text.Encoding.UTF8.GetString(outputStream.ToArray());
     Console.WriteLine(content);
 }
