@@ -22,11 +22,29 @@ namespace Wolfgang.Etl.Xml;
 /// from a <see cref="Stream"/> and yields each deserialized child element as an item
 /// in the async enumerable sequence. Uses <see cref="XmlReader"/> for streaming deserialization
 /// so that the entire document is not buffered in memory.
+/// <para>
+/// By default the stream is left open after extraction completes. To have the stream closed
+/// automatically when extraction finishes, set <see cref="XmlSingleStreamExtractorOptions.LeaveOpen"/>
+/// to <c>false</c>, mirroring the behaviour of <see cref="System.IO.StreamReader"/> and
+/// <see cref="System.IO.BinaryReader"/>.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
+/// // Leave stream open (default) — caller controls stream lifetime:
 /// using var stream = File.OpenRead("data.xml");
 /// var extractor = new XmlSingleStreamExtractor&lt;Person&gt;(stream);
+/// await foreach (var person in extractor.ExtractAsync(cancellationToken))
+/// {
+///     Console.WriteLine(person.Name);
+/// }
+///
+/// // Transfer stream ownership — closed automatically when extraction completes:
+/// var extractor = new XmlSingleStreamExtractor&lt;Person&gt;
+/// (
+///     File.OpenRead("data.xml"),
+///     new XmlSingleStreamExtractorOptions { LeaveOpen = false }
+/// );
 /// await foreach (var person in extractor.ExtractAsync(cancellationToken))
 /// {
 ///     Console.WriteLine(person.Name);
@@ -42,6 +60,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     private readonly ILogger _logger;
     private static readonly string OperationName = $"XML single-stream extraction of {typeof(TRecord).Name}";
     private readonly IProgressTimer? _progressTimer;
+    private readonly bool _leaveOpen;
     private bool _progressTimerWired;
 
 
@@ -50,14 +69,18 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// Initializes a new instance of the <see cref="XmlSingleStreamExtractor{TRecord}"/> class.
     /// </summary>
     /// <param name="stream">The stream containing XML data to read from.</param>
+    /// <param name="options">
+    /// Options that control extractor behaviour. When <c>null</c>, defaults are used.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/> is <c>null</c>.
     /// </exception>
-    public XmlSingleStreamExtractor(Stream stream)
+    public XmlSingleStreamExtractor(Stream stream, XmlSingleStreamExtractorOptions? options = null)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _logger = NullLogger.Instance;
         _readerSettings = null;
+        _leaveOpen = (options ?? new XmlSingleStreamExtractorOptions()).LeaveOpen;
     }
 
 
@@ -69,6 +92,9 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// <param name="stream">The stream containing XML data to read from.</param>
     /// <param name="readerSettings">The XML reader settings to use for deserialization.</param>
     /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="options">
+    /// Options that control extractor behaviour. When <c>null</c>, defaults are used.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/>, <paramref name="readerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
@@ -76,12 +102,14 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     (
         Stream stream,
         XmlReaderSettings readerSettings,
-        ILogger<XmlSingleStreamExtractor<TRecord>> logger
+        ILogger<XmlSingleStreamExtractor<TRecord>> logger,
+        XmlSingleStreamExtractorOptions? options = null
     )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _leaveOpen = (options ?? new XmlSingleStreamExtractorOptions()).LeaveOpen;
     }
 
 
@@ -94,18 +122,23 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// <param name="readerSettings">The XML reader settings to use for deserialization.</param>
     /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
+    /// <param name="options">
+    /// Options that control extractor behaviour. When <c>null</c>, defaults are used.
+    /// </param>
     internal XmlSingleStreamExtractor
     (
         Stream stream,
         XmlReaderSettings readerSettings,
         ILogger? logger,
-        IProgressTimer timer
+        IProgressTimer timer,
+        XmlSingleStreamExtractorOptions? options = null
     )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
         _logger = logger ?? (ILogger)NullLogger.Instance;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+        _leaveOpen = (options ?? new XmlSingleStreamExtractorOptions()).LeaveOpen;
     }
 
 
@@ -120,7 +153,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
 
         var skipBudget = SkipItemCount;
         var settings = _readerSettings?.Clone() ?? new XmlReaderSettings();
-        settings.CloseInput = false;
+        settings.CloseInput = !_leaveOpen;
         settings.Async = true;
 
         using var reader = XmlReader.Create(_stream, settings);

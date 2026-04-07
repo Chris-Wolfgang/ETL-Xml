@@ -20,6 +20,8 @@ await SingleStreamExtractPipelineAsync().ConfigureAwait(false);
 Console.WriteLine();
 await SingleStreamLoadPipelineAsync(loggerFactory).ConfigureAwait(false);
 Console.WriteLine();
+await SingleStreamLoadWithCustomRootAsync().ConfigureAwait(false);
+Console.WriteLine();
 await MultiStreamExtractPipelineAsync().ConfigureAwait(false);
 Console.WriteLine();
 await MultiStreamLoadPipelineAsync(loggerFactory).ConfigureAwait(false);
@@ -57,6 +59,52 @@ static async Task SingleStreamExtractPipelineAsync()
     {
         Console.WriteLine($"  {person.FirstName} {person.LastName}, age {person.Age}");
     }
+}
+
+
+
+/// <summary>
+/// Demonstrates loading to XML with a custom root element name.
+/// By default the root element is <c>ArrayOf{TypeName}</c>; this shows
+/// how to override that with a domain-meaningful name.
+/// Also demonstrates <c>leaveOpen: false</c> so the stream is closed
+/// automatically when loading completes.
+/// </summary>
+static async Task SingleStreamLoadWithCustomRootAsync()
+{
+    Console.WriteLine("=== Single-Stream Load with Custom Root Element ===");
+    Console.WriteLine();
+
+    var people = new List<Person>
+    {
+        new() { FirstName = "Alice", LastName = "Smith", Age = 30, Email = "alice@example.com" },
+        new() { FirstName = "Bob", LastName = "Jones", Age = 25, Email = "bob@example.com" },
+    };
+
+    var extractor = new TestExtractor<Person>(people);
+    var transformer = new TestTransformer<Person>();
+
+    // leaveOpen: false — the MemoryStream is closed automatically after LoadAsync returns.
+    var outputStream = new MemoryStream();
+    var loader = new XmlSingleStreamLoader<Person>
+    (
+        outputStream,
+        new XmlSingleStreamLoaderOptions
+        {
+            RootElementName = "People",
+            LeaveOpen = false,
+        }
+    );
+
+    await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync())).ConfigureAwait(false);
+
+    Console.WriteLine($"Loaded {loader.CurrentItemCount} items using root element <People>.");
+    Console.WriteLine();
+
+    // MemoryStream.ToArray() returns the buffer regardless of disposal state.
+    // For non-MemoryStream targets, read before disposing or use leaveOpen: true.
+    var content = System.Text.Encoding.UTF8.GetString(outputStream.ToArray());
+    Console.WriteLine(content);
 }
 
 

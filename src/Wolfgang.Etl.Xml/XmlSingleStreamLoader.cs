@@ -17,14 +17,35 @@ namespace Wolfgang.Etl.Xml;
 /// </summary>
 /// <typeparam name="TRecord">The type of items to load. Must be <c>notnull</c> and have a parameterless constructor.</typeparam>
 /// <remarks>
-/// Writes an XML document (e.g. <c>&lt;ArrayOfPerson&gt;&lt;Person/&gt;...&lt;/ArrayOfPerson&gt;</c>)
-/// to a <see cref="Stream"/> by serializing each item from the input async enumerable sequence.
-/// Each item is serialized as a child element of the root using <see cref="XmlSerializer"/>.
+/// Writes an XML document to a <see cref="Stream"/> by serializing each item from the input
+/// async enumerable sequence as a child element of a configurable root element. The root
+/// element name defaults to <c>ArrayOf{TypeName}</c> (e.g. <c>ArrayOfPerson</c>) but can be
+/// overridden via <see cref="XmlSingleStreamLoaderOptions.RootElementName"/>.
+/// Each item is serialized using <see cref="XmlSerializer"/>.
+/// <para>
+/// By default the stream is left open after loading completes. To have the stream closed
+/// automatically when loading finishes, set <see cref="XmlSingleStreamLoaderOptions.LeaveOpen"/>
+/// to <c>false</c>, mirroring the behaviour of <see cref="System.IO.StreamWriter"/> and
+/// <see cref="System.IO.BinaryWriter"/>.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
+/// // Default root element name (ArrayOfPerson), stream left open:
 /// using var stream = File.Create("output.xml");
 /// var loader = new XmlSingleStreamLoader&lt;Person&gt;(stream);
+/// await loader.LoadAsync(items, cancellationToken);
+///
+/// // Custom root element name, stream closed automatically:
+/// var loader = new XmlSingleStreamLoader&lt;Person&gt;
+/// (
+///     File.Create("output.xml"),
+///     new XmlSingleStreamLoaderOptions
+///     {
+///         RootElementName = "People",
+///         LeaveOpen = false,
+///     }
+/// );
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
@@ -41,6 +62,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     private readonly string _rootElementName;
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
+    private readonly bool _leaveOpen;
     private bool _progressTimerWired;
 
 
@@ -49,16 +71,24 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class.
     /// </summary>
     /// <param name="stream">The stream to write XML data to.</param>
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/> is <c>null</c>.
     /// </exception>
-    public XmlSingleStreamLoader(Stream stream)
+    /// <exception cref="ArgumentException">
+    /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty
+    /// or whitespace string.
+    /// </exception>
+    public XmlSingleStreamLoader(Stream stream, XmlSingleStreamLoaderOptions? options = null)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _logger = NullLogger.Instance;
         _writerSettings = null;
-
-        _rootElementName = "ArrayOf" + typeof(TRecord).Name;
+        var resolved = options ?? new XmlSingleStreamLoaderOptions();
+        _leaveOpen = resolved.LeaveOpen;
+        _rootElementName = ResolveRootElementName(resolved.RootElementName);
     }
 
 
@@ -70,21 +100,30 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// <param name="stream">The stream to write XML data to.</param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
     /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty
+    /// or whitespace string.
     /// </exception>
     public XmlSingleStreamLoader
     (
         Stream stream,
         XmlWriterSettings writerSettings,
-        ILogger<XmlSingleStreamLoader<TRecord>> logger
+        ILogger<XmlSingleStreamLoader<TRecord>> logger,
+        XmlSingleStreamLoaderOptions? options = null
     )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-        _rootElementName = "ArrayOf" + typeof(TRecord).Name;
+        var resolved = options ?? new XmlSingleStreamLoaderOptions();
+        _leaveOpen = resolved.LeaveOpen;
+        _rootElementName = ResolveRootElementName(resolved.RootElementName);
     }
 
 
@@ -97,20 +136,25 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
     /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
+    /// </param>
     internal XmlSingleStreamLoader
     (
         Stream stream,
         XmlWriterSettings writerSettings,
         ILogger? logger,
-        IProgressTimer timer
+        IProgressTimer timer,
+        XmlSingleStreamLoaderOptions? options = null
     )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
         _logger = logger ?? (ILogger)NullLogger.Instance;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-
-        _rootElementName = "ArrayOf" + typeof(TRecord).Name;
+        var resolved = options ?? new XmlSingleStreamLoaderOptions();
+        _leaveOpen = resolved.LeaveOpen;
+        _rootElementName = ResolveRootElementName(resolved.RootElementName);
     }
 
 
@@ -125,7 +169,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var settings = _writerSettings?.Clone() ?? new XmlWriterSettings { Indent = true };
-        settings.CloseOutput = false;
+        settings.CloseOutput = !_leaveOpen;
         settings.Async = true;
 
         using var writer = XmlWriter.Create(_stream, settings);
@@ -161,6 +205,41 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         await writer.FlushAsync().ConfigureAwait(false);
 
         XmlLogMessages.SingleStreamLoadingCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, null);
+    }
+
+
+
+    private static string ResolveRootElementName(string? rootElementName)
+    {
+        if (rootElementName is null)
+        {
+            return "ArrayOf" + typeof(TRecord).Name;
+        }
+
+        if (string.IsNullOrWhiteSpace(rootElementName))
+        {
+            throw new ArgumentException
+            (
+                "Root element name cannot be empty or whitespace.",
+                nameof(rootElementName)
+            );
+        }
+
+        try
+        {
+            System.Xml.XmlConvert.VerifyNCName(rootElementName);
+        }
+        catch (System.Xml.XmlException ex)
+        {
+            throw new ArgumentException
+            (
+                $"Root element name '{rootElementName}' is not a valid XML local name.",
+                nameof(rootElementName),
+                ex
+            );
+        }
+
+        return rootElementName;
     }
 
 
