@@ -238,7 +238,7 @@ public class XmlSingleStreamLoaderTests
     public async Task LoadAsync_when_rootElementName_is_specified_uses_custom_root_element()
     {
         var stream = new MemoryStream();
-        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, rootElementName: "People");
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, new XmlSingleStreamLoaderOptions { RootElementName = "People" });
 
         var items = new List<PersonRecord>
         {
@@ -260,7 +260,7 @@ public class XmlSingleStreamLoaderTests
     public async Task LoadAsync_when_rootElementName_is_null_uses_default_root_element()
     {
         var stream = new MemoryStream();
-        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, rootElementName: null);
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, new XmlSingleStreamLoaderOptions { RootElementName = null });
 
         var items = new List<PersonRecord>
         {
@@ -282,7 +282,7 @@ public class XmlSingleStreamLoaderTests
     {
         Assert.Throws<ArgumentException>
         (
-            () => new XmlSingleStreamLoader<PersonRecord>(new MemoryStream(), rootElementName: "")
+            () => new XmlSingleStreamLoader<PersonRecord>(new MemoryStream(), new XmlSingleStreamLoaderOptions { RootElementName = "" })
         );
     }
 
@@ -293,7 +293,7 @@ public class XmlSingleStreamLoaderTests
     {
         Assert.Throws<ArgumentException>
         (
-            () => new XmlSingleStreamLoader<PersonRecord>(new MemoryStream(), rootElementName: "   ")
+            () => new XmlSingleStreamLoader<PersonRecord>(new MemoryStream(), new XmlSingleStreamLoaderOptions { RootElementName = "   " })
         );
     }
 
@@ -303,7 +303,7 @@ public class XmlSingleStreamLoaderTests
     public async Task LoadAsync_when_leaveOpen_is_true_leaves_stream_open_after_loading()
     {
         var stream = new MemoryStream();
-        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, leaveOpen: true);
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, new XmlSingleStreamLoaderOptions { LeaveOpen = true });
 
         await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
 
@@ -316,7 +316,7 @@ public class XmlSingleStreamLoaderTests
     public async Task LoadAsync_when_leaveOpen_is_false_closes_stream_after_loading()
     {
         var stream = new MemoryStream();
-        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, leaveOpen: false);
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, new XmlSingleStreamLoaderOptions { LeaveOpen = false });
 
         await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
 
@@ -334,7 +334,7 @@ public class XmlSingleStreamLoaderTests
             stream,
             new XmlWriterSettings { Indent = false },
             NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance,
-            rootElementName: "People"
+            new XmlSingleStreamLoaderOptions { RootElementName = "People" }
         );
 
         var items = new List<PersonRecord>

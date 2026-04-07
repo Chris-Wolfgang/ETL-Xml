@@ -18,28 +18,34 @@ namespace Wolfgang.Etl.Xml;
 /// <typeparam name="TRecord">The type of items to load. Must be <c>notnull</c> and have a parameterless constructor.</typeparam>
 /// <remarks>
 /// Writes an XML document to a <see cref="Stream"/> by serializing each item from the input
-/// async enumerable sequence as a child element of a configurable root element. When no root
-/// element name is specified the name defaults to <c>ArrayOf{TypeName}</c>
-/// (e.g. <c>ArrayOfPerson</c>). Each item is serialized using <see cref="XmlSerializer"/>.
+/// async enumerable sequence as a child element of a configurable root element. The root
+/// element name defaults to <c>ArrayOf{TypeName}</c> (e.g. <c>ArrayOfPerson</c>) but can be
+/// overridden via <see cref="XmlSingleStreamLoaderOptions.RootElementName"/>.
+/// Each item is serialized using <see cref="XmlSerializer"/>.
 /// <para>
-/// By default the stream is left open after loading completes. Pass <c>leaveOpen: false</c>
-/// to have the stream closed when loading finishes, mirroring the behaviour of
-/// <see cref="System.IO.StreamWriter"/> and <see cref="System.IO.BinaryWriter"/>.
+/// By default the stream is left open after loading completes. To have the stream closed
+/// automatically when loading finishes, set <see cref="XmlSingleStreamLoaderOptions.LeaveOpen"/>
+/// to <c>false</c>, mirroring the behaviour of <see cref="System.IO.StreamWriter"/> and
+/// <see cref="System.IO.BinaryWriter"/>.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
-/// // Default root element name (ArrayOfPerson):
+/// // Default root element name (ArrayOfPerson), stream left open:
 /// using var stream = File.Create("output.xml");
 /// var loader = new XmlSingleStreamLoader&lt;Person&gt;(stream);
 /// await loader.LoadAsync(items, cancellationToken);
 ///
-/// // Custom root element name:
-/// var loader = new XmlSingleStreamLoader&lt;Person&gt;(stream, rootElementName: "People");
-/// await loader.LoadAsync(items, cancellationToken);
-///
-/// // Transfer stream ownership — closed automatically when loading completes:
-/// var loader = new XmlSingleStreamLoader&lt;Person&gt;(File.Create("output.xml"), leaveOpen: false);
+/// // Custom root element name, stream closed automatically:
+/// var loader = new XmlSingleStreamLoader&lt;Person&gt;
+/// (
+///     File.Create("output.xml"),
+///     new XmlSingleStreamLoaderOptions
+///     {
+///         RootElementName = "People",
+///         LeaveOpen = false,
+///     }
+/// );
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
@@ -65,27 +71,24 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class.
     /// </summary>
     /// <param name="stream">The stream to write XML data to.</param>
-    /// <param name="rootElementName">
-    /// The name of the XML root element that wraps all items. When <c>null</c> the name
-    /// defaults to <c>ArrayOf{TypeName}</c> (e.g. <c>ArrayOfPerson</c>).
-    /// </param>
-    /// <param name="leaveOpen">
-    /// <c>true</c> to leave <paramref name="stream"/> open after loading completes;
-    /// <c>false</c> to close it. Defaults to <c>true</c>.
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
     /// </param>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/> is <c>null</c>.
     /// </exception>
     /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="rootElementName"/> is an empty or whitespace string.
+    /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty
+    /// or whitespace string.
     /// </exception>
-    public XmlSingleStreamLoader(Stream stream, string? rootElementName = null, bool leaveOpen = true)
+    public XmlSingleStreamLoader(Stream stream, XmlSingleStreamLoaderOptions? options = null)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _logger = NullLogger.Instance;
         _writerSettings = null;
-        _leaveOpen = leaveOpen;
-        _rootElementName = ResolveRootElementName(rootElementName);
+        var resolved = options ?? new XmlSingleStreamLoaderOptions();
+        _leaveOpen = resolved.LeaveOpen;
+        _rootElementName = ResolveRootElementName(resolved.RootElementName);
     }
 
 
@@ -97,34 +100,30 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// <param name="stream">The stream to write XML data to.</param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
     /// <param name="logger">The logger instance for diagnostic output.</param>
-    /// <param name="rootElementName">
-    /// The name of the XML root element that wraps all items. When <c>null</c> the name
-    /// defaults to <c>ArrayOf{TypeName}</c> (e.g. <c>ArrayOfPerson</c>).
-    /// </param>
-    /// <param name="leaveOpen">
-    /// <c>true</c> to leave <paramref name="stream"/> open after loading completes;
-    /// <c>false</c> to close it. Defaults to <c>true</c>.
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
     /// </param>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
     /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="rootElementName"/> is an empty or whitespace string.
+    /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty
+    /// or whitespace string.
     /// </exception>
     public XmlSingleStreamLoader
     (
         Stream stream,
         XmlWriterSettings writerSettings,
         ILogger<XmlSingleStreamLoader<TRecord>> logger,
-        string? rootElementName = null,
-        bool leaveOpen = true
+        XmlSingleStreamLoaderOptions? options = null
     )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _leaveOpen = leaveOpen;
-        _rootElementName = ResolveRootElementName(rootElementName);
+        var resolved = options ?? new XmlSingleStreamLoaderOptions();
+        _leaveOpen = resolved.LeaveOpen;
+        _rootElementName = ResolveRootElementName(resolved.RootElementName);
     }
 
 
@@ -137,13 +136,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
     /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
-    /// <param name="rootElementName">
-    /// The name of the XML root element that wraps all items. When <c>null</c> the name
-    /// defaults to <c>ArrayOf{TypeName}</c> (e.g. <c>ArrayOfPerson</c>).
-    /// </param>
-    /// <param name="leaveOpen">
-    /// <c>true</c> to leave <paramref name="stream"/> open after loading completes;
-    /// <c>false</c> to close it. Defaults to <c>true</c>.
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
     /// </param>
     internal XmlSingleStreamLoader
     (
@@ -151,16 +145,16 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         XmlWriterSettings writerSettings,
         ILogger? logger,
         IProgressTimer timer,
-        string? rootElementName = null,
-        bool leaveOpen = true
+        XmlSingleStreamLoaderOptions? options = null
     )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
         _logger = logger ?? (ILogger)NullLogger.Instance;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _leaveOpen = leaveOpen;
-        _rootElementName = ResolveRootElementName(rootElementName);
+        var resolved = options ?? new XmlSingleStreamLoaderOptions();
+        _leaveOpen = resolved.LeaveOpen;
+        _rootElementName = ResolveRootElementName(resolved.RootElementName);
     }
 
 

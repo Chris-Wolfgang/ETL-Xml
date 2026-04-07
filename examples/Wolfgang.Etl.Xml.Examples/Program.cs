@@ -89,8 +89,11 @@ static async Task SingleStreamLoadWithCustomRootAsync()
     var loader = new XmlSingleStreamLoader<Person>
     (
         outputStream,
-        rootElementName: "People",
-        leaveOpen: false
+        new XmlSingleStreamLoaderOptions
+        {
+            RootElementName = "People",
+            LeaveOpen = false,
+        }
     );
 
     await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync())).ConfigureAwait(false);
