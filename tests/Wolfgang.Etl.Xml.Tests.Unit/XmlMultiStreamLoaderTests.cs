@@ -232,6 +232,21 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
+    public void Constructor_StreamFactory_Logger_when_logger_is_null_throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => new XmlMultiStreamLoader<PersonRecord>
+            (
+                _ => new MemoryStream(),
+                logger: null!
+            )
+        );
+    }
+
+
+
+    [Fact]
     public void Constructor_with_settings_when_settings_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>

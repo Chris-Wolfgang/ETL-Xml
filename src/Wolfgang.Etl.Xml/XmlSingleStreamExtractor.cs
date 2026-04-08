@@ -87,6 +87,28 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamExtractor{TRecord}"/> class
+    /// with a logger.
+    /// </summary>
+    /// <param name="stream">The stream containing XML data to read from.</param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="stream"/> or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    public XmlSingleStreamExtractor
+    (
+        Stream stream,
+        ILogger<XmlSingleStreamExtractor<TRecord>> logger
+    )
+    {
+        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _readerSettings = null;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamExtractor{TRecord}"/> class
     /// with custom reader settings.
     /// </summary>
     /// <param name="stream">The stream containing XML data to read from.</param>

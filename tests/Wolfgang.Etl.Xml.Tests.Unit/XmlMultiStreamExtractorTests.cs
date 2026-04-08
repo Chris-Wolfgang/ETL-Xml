@@ -139,6 +139,21 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
+    public void Constructor_Streams_Logger_when_logger_is_null_throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => new XmlMultiStreamExtractor<PersonRecord>
+            (
+                Array.Empty<Stream>(),
+                logger: null!
+            )
+        );
+    }
+
+
+
+    [Fact]
     public void Constructor_with_settings_when_streams_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>

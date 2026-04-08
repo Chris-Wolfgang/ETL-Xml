@@ -95,6 +95,30 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class
+    /// with a logger.
+    /// </summary>
+    /// <param name="stream">The stream to write XML data to.</param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="stream"/> or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    public XmlSingleStreamLoader
+    (
+        Stream stream,
+        ILogger<XmlSingleStreamLoader<TRecord>> logger
+    )
+    {
+        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _writerSettings = null;
+
+        _rootElementName = "ArrayOf" + typeof(TRecord).Name;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class
     /// with custom writer settings.
     /// </summary>
     /// <param name="stream">The stream to write XML data to.</param>

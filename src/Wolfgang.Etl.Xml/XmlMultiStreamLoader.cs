@@ -65,6 +65,31 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class
+    /// with a logger.
+    /// </summary>
+    /// <param name="streamFactory">
+    /// A factory function that receives the item to be written and returns a <see cref="Stream"/> to write it to.
+    /// The loader will dispose the stream after writing.
+    /// </param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="streamFactory"/> or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    public XmlMultiStreamLoader
+    (
+        Func<TRecord, Stream> streamFactory,
+        ILogger<XmlMultiStreamLoader<TRecord>> logger
+    )
+    {
+        _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _writerSettings = null;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class
     /// with custom writer settings.
     /// </summary>
     /// <param name="streamFactory">
