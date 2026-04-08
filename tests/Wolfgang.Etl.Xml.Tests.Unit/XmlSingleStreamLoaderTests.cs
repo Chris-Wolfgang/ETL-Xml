@@ -365,6 +365,21 @@ public class XmlSingleStreamLoaderTests
 
 
     [Fact]
+    public void Constructor_Stream_Logger_when_logger_is_null_throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => new XmlSingleStreamLoader<PersonRecord>
+            (
+                new MemoryStream(),
+                logger: null!
+            )
+        );
+    }
+
+
+
+    [Fact]
     public void Constructor_with_settings_when_settings_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>

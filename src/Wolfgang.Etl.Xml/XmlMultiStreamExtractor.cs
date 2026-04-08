@@ -68,6 +68,28 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlMultiStreamExtractor{TRecord}"/> class
+    /// with a logger.
+    /// </summary>
+    /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="streams"/> or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    public XmlMultiStreamExtractor
+    (
+        IEnumerable<Stream> streams,
+        ILogger<XmlMultiStreamExtractor<TRecord>> logger
+    )
+    {
+        _streams = streams ?? throw new ArgumentNullException(nameof(streams));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _readerSettings = null;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamExtractor{TRecord}"/> class
     /// with custom reader settings.
     /// </summary>
     /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
