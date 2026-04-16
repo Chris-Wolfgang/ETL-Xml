@@ -18,7 +18,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" Condition="!$(TargetFramework.StartsWith('net5.')) AND !$(TargetFramework.StartsWith('net6.')) AND !$(TargetFramework.StartsWith('net7.')) AND !$(TargetFramework.StartsWith('netcoreapp'))" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" Condition="$(TargetFramework.StartsWith('net5.')) OR $(TargetFramework.StartsWith('net6.')) OR $(TargetFramework.StartsWith('net7.')) OR $(TargetFramework.StartsWith('netcoreapp'))" />
     <PackageReference Include="System.Linq.Async" Version="7.0.0" />
@@ -48,11 +48,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Meziantou.Analyzer" Version="3.0.46">
+    <PackageReference Include="Meziantou.Analyzer" Version="3.0.48">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.22.0.136894">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.23.0.137933">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
