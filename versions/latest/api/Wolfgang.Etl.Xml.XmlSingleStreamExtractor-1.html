@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/new/v.0.1.0/apiSpec/new?filename=Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.Xml.XmlSingleStreamExtractor%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/new/v0.2.0/apiSpec/new?filename=Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.Xml.XmlSingleStreamExtractor%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,7 +75,7 @@
 
 
   <h1 id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1" class="text-break">
-Class XmlSingleStreamExtractor&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L35"><i class="bi bi-code-slash"></i></a>
+Class XmlSingleStreamExtractor&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.2.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L54"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -174,8 +174,20 @@ containing a root element with child elements.</p>
 
 
   <h2 id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1_examples">Examples</h2>
-  <pre><code class="lang-csharp">using var stream = File.OpenRead("data.xml");
-var extractor = new XmlSingleStreamExtractor&lt;Person&gt;(stream, logger);
+  <pre><code class="lang-csharp">// Leave stream open (default) — caller controls stream lifetime:
+using var stream = File.OpenRead("data.xml");
+var extractor = new XmlSingleStreamExtractor&lt;Person&gt;(stream);
+await foreach (var person in extractor.ExtractAsync(cancellationToken))
+{
+    Console.WriteLine(person.Name);
+}
+
+// Transfer stream ownership — closed automatically when extraction completes:
+var extractor = new XmlSingleStreamExtractor&lt;Person&gt;
+(
+    File.OpenRead("data.xml"),
+    new XmlSingleStreamExtractorOptions { LeaveOpen = false }
+);
 await foreach (var person in extractor.ExtractAsync(cancellationToken))
 {
     Console.WriteLine(person.Name);
@@ -187,6 +199,12 @@ await foreach (var person in extractor.ExtractAsync(cancellationToken))
 from a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> and yields each deserialized child element as an item
 in the async enumerable sequence. Uses <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.xml.xmlreader">XmlReader</a> for streaming deserialization
 so that the entire document is not buffered in memory.</p>
+<p>
+By default the stream is left open after extraction completes. To have the stream closed
+automatically when extraction finishes, set <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.html#Wolfgang_Etl_Xml_XmlSingleStreamExtractorOptions_LeaveOpen">LeaveOpen</a>
+to <code>false</code>, mirroring the behaviour of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamreader">StreamReader</a> and
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.binaryreader">BinaryReader</a>.
+</p>
 </div>
 
 
@@ -198,10 +216,11 @@ so that the entire document is not buffered in memory.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamExtractor__0___" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamExtractor{`0}})">
   XmlSingleStreamExtractor(Stream, ILogger&lt;XmlSingleStreamExtractor&lt;TRecord&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.2.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L97"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html">XmlSingleStreamExtractor&lt;TRecord&gt;</a> class.</p>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html">XmlSingleStreamExtractor&lt;TRecord&gt;</a> class
+with a logger.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -238,9 +257,9 @@ so that the entire document is not buffered in memory.</p>
 
   <a id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1__ctor_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor*"></a>
 
-  <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1__ctor_System_IO_Stream_System_Xml_XmlReaderSettings_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamExtractor__0___" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,System.Xml.XmlReaderSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamExtractor{`0}})">
-  XmlSingleStreamExtractor(Stream, XmlReaderSettings, ILogger&lt;XmlSingleStreamExtractor&lt;TRecord&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L79"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1__ctor_System_IO_Stream_System_Xml_XmlReaderSettings_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamExtractor__0___Wolfgang_Etl_Xml_XmlSingleStreamExtractorOptions_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,System.Xml.XmlReaderSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamExtractor{`0}},Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)">
+  XmlSingleStreamExtractor(Stream, XmlReaderSettings, ILogger&lt;XmlSingleStreamExtractor&lt;TRecord&gt;&gt;, XmlSingleStreamExtractorOptions?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.2.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L123"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html">XmlSingleStreamExtractor&lt;TRecord&gt;</a> class
@@ -249,7 +268,7 @@ with custom reader settings.</p>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public XmlSingleStreamExtractor(Stream stream, XmlReaderSettings readerSettings, ILogger&lt;XmlSingleStreamExtractor&lt;TRecord&gt;&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public XmlSingleStreamExtractor(Stream stream, XmlReaderSettings readerSettings, ILogger&lt;XmlSingleStreamExtractor&lt;TRecord&gt;&gt; logger, XmlSingleStreamExtractorOptions? options = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -262,6 +281,9 @@ with custom reader settings.</p>
 </dd>
     <dt><code>logger</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html">XmlSingleStreamExtractor</a>&lt;TRecord&gt;&gt;</dt>
     <dd><p>The logger instance for diagnostic output.</p>
+</dd>
+    <dt><code>options</code> <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.html">XmlSingleStreamExtractorOptions</a></dt>
+    <dd><p>Options that control extractor behaviour. When <code>null</code>, defaults are used.</p>
 </dd>
   </dl>
 
@@ -282,6 +304,48 @@ with custom reader settings.</p>
 
 
 
+  <a id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1__ctor_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor*"></a>
+
+  <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1__ctor_System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamExtractorOptions_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)">
+  XmlSingleStreamExtractor(Stream, XmlSingleStreamExtractorOptions?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.2.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html">XmlSingleStreamExtractor&lt;TRecord&gt;</a> class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public XmlSingleStreamExtractor(Stream stream, XmlSingleStreamExtractorOptions? options = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>The stream containing XML data to read from.</p>
+</dd>
+    <dt><code>options</code> <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.html">XmlSingleStreamExtractorOptions</a></dt>
+    <dd><p>Options that control extractor behaviour. When <code>null</code>, defaults are used.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p>Thrown when <code class="paramref">stream</code> is <code>null</code>.</p>
+</dd>
+  </dl>
+
+
+
   <h2 class="section" id="methods">Methods
 </h2>
 
@@ -290,7 +354,7 @@ with custom reader settings.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1_CreateProgressReport" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L216"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.2.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L267"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a progress report of type TProgress. This gives the derived class the opportunity to
@@ -324,7 +388,7 @@ implement a custom progress report that is specific to the extraction process.</
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1_CreateProgressTimer_System_IProgress_Wolfgang_Etl_Xml_XmlReport__" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.CreateProgressTimer(System.IProgress{Wolfgang.Etl.Xml.XmlReport})">
   CreateProgressTimer(IProgress&lt;XmlReport&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L226"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.2.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L277"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -365,7 +429,7 @@ Override this method in a derived class to inject a custom timer
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1_ExtractWorkerAsync_System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.ExtractWorkerAsync(System.Threading.CancellationToken)">
   ExtractWorkerAsync(CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L118"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.2.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L169"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>This method is the core implementation of the extraction logic and should be
@@ -406,7 +470,7 @@ The result may be an empty sequence if no data is available or if the extraction
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L35" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.2.0/src/Wolfgang.Etl.Xml/XmlSingleStreamExtractor.cs/#L54" class="edit-link">Edit this page</a>
         </div>
 
 

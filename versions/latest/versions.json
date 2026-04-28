@@ -2,5 +2,9 @@
   {
     "version": "latest",
     "url": "/ETL-Xml/versions/latest/"
+  },
+  {
+    "version": "v0.2.0",
+    "url": "/ETL-Xml/versions/v0.2.0/"
   }
 ]

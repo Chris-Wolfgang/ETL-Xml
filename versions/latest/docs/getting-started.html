@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/docfx_project/docs/getting-started.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.2.0/docfx_project/docs/getting-started.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -77,7 +77,7 @@
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
 <li>.NET 8.0 SDK or later (also supports .NET Framework 4.6.2+ and .NET Standard 2.0)</li>
-<li>A logging provider (e.g. <code>Microsoft.Extensions.Logging</code>)</li>
+<li>(Optional) A logging provider (e.g. <code>Microsoft.Extensions.Logging</code>)</li>
 </ul>
 <h2 id="installation">Installation</h2>
 <h3 id="via-net-cli">Via .NET CLI</h3>
@@ -93,11 +93,8 @@
 using Wolfgang.Etl.Xml;
 
 // XmlSingleStreamExtractor reads items from a single XML document
-var extractor = new XmlSingleStreamExtractor&lt;Person&gt;
-(
-    xmlStream,
-    logger
-);
+// ILogger is optional — omit for no logging, or pass settings + logger for full control
+var extractor = new XmlSingleStreamExtractor&lt;Person&gt;(xmlStream);
 
 // Use TestKit placeholders for the rest of the pipeline
 var transformer = new TestTransformer&lt;Person&gt;();
@@ -117,29 +114,19 @@ var extractor = new TestExtractor&lt;Person&gt;(people);
 var transformer = new TestTransformer&lt;Person&gt;();
 
 // XmlSingleStreamLoader writes items to a single XML document
-var loader = new XmlSingleStreamLoader&lt;Person&gt;
-(
-    outputStream,
-    new XmlWriterSettings { Indent = true },
-    logger
-);
+var loader = new XmlSingleStreamLoader&lt;Person&gt;(outputStream);
 
 await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 </code></pre>
 <h3 id="multi-stream-one-item-per-file">Multi-stream (one item per file)</h3>
 <p>For scenarios where each record lives in its own XML file:</p>
 <pre><code class="lang-csharp">// Extract from multiple XML files
-var extractor = new XmlMultiStreamExtractor&lt;Person&gt;
-(
-    xmlStreams,
-    logger
-);
+var extractor = new XmlMultiStreamExtractor&lt;Person&gt;(xmlStreams);
 
 // Load to individual XML files via a stream factory
 var loader = new XmlMultiStreamLoader&lt;Person&gt;
 (
-    person =&gt; File.Create($&quot;{person.Id}.xml&quot;),
-    logger
+    person =&gt; File.Create($&quot;{person.Id}.xml&quot;)
 );
 </code></pre>
 <h2 id="next-steps">Next Steps</h2>
@@ -158,7 +145,7 @@ var loader = new XmlMultiStreamLoader&lt;Person&gt;
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v.0.1.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.2.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
