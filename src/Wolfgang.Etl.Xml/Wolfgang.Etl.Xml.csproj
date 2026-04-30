@@ -40,8 +40,8 @@
 
   <ItemGroup>
     <PackageReference Include="Wolfgang.Etl.Abstractions" Version="0.13.0" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.6" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.7" />
   </ItemGroup>
 
   <!-- Analyzer PackageReferences are centralized in Directory.Build.props -->
