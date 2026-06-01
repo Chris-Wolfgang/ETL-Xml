@@ -1,0 +1,49 @@
+#nullable enable
+Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>
+Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream> streams) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream> streams, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>> logger) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream> streams, System.Xml.XmlReaderSettings readerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>> logger) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream> streamFactory) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream> streamFactory, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>> logger) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream> streamFactory, System.Xml.XmlWriterSettings writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>> logger) -> void
+Wolfgang.Etl.Xml.XmlReport
+Wolfgang.Etl.Xml.XmlReport.CurrentSkippedItemCount.get -> int
+Wolfgang.Etl.Xml.XmlReport.XmlReport(int currentItemCount, int currentSkippedItemCount) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>
+Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>> logger) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream stream, System.Xml.XmlReaderSettings readerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>> logger, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? options = null) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? options = null) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions
+Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.LeaveOpen.get -> bool
+Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.LeaveOpen.set -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>
+Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>> logger) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream stream, System.Xml.XmlWriterSettings writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>> logger, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions
+Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.LeaveOpen.get -> bool
+Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.LeaveOpen.set -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.RootElementName.get -> string?
+Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.RootElementName.set -> void
+override Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.CreateProgressReport() -> Wolfgang.Etl.Xml.XmlReport
+override Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.CreateProgressTimer(System.IProgress<Wolfgang.Etl.Xml.XmlReport> progress) -> Wolfgang.Etl.Abstractions.IProgressTimer
+override Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.ExtractWorkerAsync(System.Threading.CancellationToken token) -> System.Collections.Generic.IAsyncEnumerable<TRecord>
+override Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.CreateProgressReport() -> Wolfgang.Etl.Xml.XmlReport
+override Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.CreateProgressTimer(System.IProgress<Wolfgang.Etl.Xml.XmlReport> progress) -> Wolfgang.Etl.Abstractions.IProgressTimer
+override Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable<TRecord> items, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task
+override Wolfgang.Etl.Xml.XmlReport.<Clone>$() -> Wolfgang.Etl.Abstractions.Report
+override Wolfgang.Etl.Xml.XmlReport.Equals(object? obj) -> bool
+override Wolfgang.Etl.Xml.XmlReport.GetHashCode() -> int
+override Wolfgang.Etl.Xml.XmlReport.PrintMembers(System.Text.StringBuilder builder) -> bool
+override Wolfgang.Etl.Xml.XmlReport.ToString() -> string
+override Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.CreateProgressReport() -> Wolfgang.Etl.Xml.XmlReport
+override Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.CreateProgressTimer(System.IProgress<Wolfgang.Etl.Xml.XmlReport> progress) -> Wolfgang.Etl.Abstractions.IProgressTimer
+override Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.ExtractWorkerAsync(System.Threading.CancellationToken token) -> System.Collections.Generic.IAsyncEnumerable<TRecord>
+override Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.CreateProgressReport() -> Wolfgang.Etl.Xml.XmlReport
+override Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.CreateProgressTimer(System.IProgress<Wolfgang.Etl.Xml.XmlReport> progress) -> Wolfgang.Etl.Abstractions.IProgressTimer
+override Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable<TRecord> items, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task
+override sealed Wolfgang.Etl.Xml.XmlReport.Equals(Wolfgang.Etl.Abstractions.Report? other) -> bool
+static Wolfgang.Etl.Xml.XmlReport.operator !=(Wolfgang.Etl.Xml.XmlReport? left, Wolfgang.Etl.Xml.XmlReport? right) -> bool
+static Wolfgang.Etl.Xml.XmlReport.operator ==(Wolfgang.Etl.Xml.XmlReport? left, Wolfgang.Etl.Xml.XmlReport? right) -> bool
+virtual Wolfgang.Etl.Xml.XmlReport.Equals(Wolfgang.Etl.Xml.XmlReport? other) -> bool
