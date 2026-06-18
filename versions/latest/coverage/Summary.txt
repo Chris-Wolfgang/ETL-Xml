@@ -1,0 +1,30 @@
+Summary
+  Generated on: 6/18/2026 - 10:38:49 PM
+  Coverage date: 6/18/2026 - 10:38:45 PM
+  Parser: Cobertura
+  Assemblies: 1
+  Classes: 8
+  Files: 8
+  Line coverage: 94.2%
+  Covered lines: 374
+  Uncovered lines: 23
+  Coverable lines: 397
+  Total lines: 1267
+  Branch coverage: 82.3% (145 of 176)
+  Covered branches: 145
+  Total branches: 176
+  Method coverage: 100% (43 of 43)
+  Full method coverage: 79% (34 of 43)
+  Covered methods: 43
+  Fully covered methods: 34
+  Total methods: 43
+
+Wolfgang.Etl.Xml                                     94.2%
+  Wolfgang.Etl.Xml.XmlLogMessages                     100%
+  Wolfgang.Etl.Xml.XmlMultiStreamExtractor<T>        93.9%
+  Wolfgang.Etl.Xml.XmlMultiStreamLoader<T>             95%
+  Wolfgang.Etl.Xml.XmlReport                          100%
+  Wolfgang.Etl.Xml.XmlSingleStreamExtractor<T>       95.6%
+  Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions    100%
+  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>          90.4%
+  Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions       100%
