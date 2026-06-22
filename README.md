@@ -8,7 +8,7 @@ Extractors and loaders for working with XML files using the Wolfgang.Etl design 
 
 ---
 
-## Installation
+## 📦 Installation
 
 ```bash
 dotnet add package Wolfgang.Etl.Xml
@@ -16,13 +16,13 @@ dotnet add package Wolfgang.Etl.Xml
 
 ---
 
-## License
+## 📄 License
 
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## Documentation
+## 📚 Documentation
 
 - **GitHub Repository:** [https://github.com/Chris-Wolfgang/ETL-Xml](https://github.com/Chris-Wolfgang/ETL-Xml)
 - **API Documentation:** https://Chris-Wolfgang.github.io/ETL-Xml/
@@ -31,7 +31,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 Extract items from an XML stream through a full ETL pipeline:
 
@@ -64,7 +64,7 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 
 ---
 
-## Features
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
@@ -127,7 +127,7 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 
 ---
 
-## Target Frameworks
+## 🎯 Target Frameworks
 
 | Platform | Versions |
 |----------|----------|
@@ -137,7 +137,7 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 
 ---
 
-## Code Quality & Static Analysis
+## 🔍 Code Quality ## Code Quality & Static Analysis Static Analysis
 
 This project enforces **strict code quality standards** through **7 specialized analyzers** and custom async-first rules:
 
@@ -241,7 +241,7 @@ docfx build --serve
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - Code quality standards

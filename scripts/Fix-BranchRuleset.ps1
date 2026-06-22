@@ -1,12 +1,19 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Fixes branch rulesets by disabling existing ones and recreating with the correct configuration.
+    Disables and renames existing branch rulesets so a fresh canonical ruleset can be created manually afterwards.
 
 .DESCRIPTION
     This script inspects the existing branch rulesets for a repository, disables all of them,
-    and renames any ruleset named "Protect main branch" to "Protect main branch (old)" so that
-    Setup-BranchRuleset.ps1 can create a fresh ruleset without conflicts.
+    and renames any ruleset named "Protect main branch" to "Protect main branch (old)" — clearing
+    the way for a fresh canonical ruleset.
+
+    NOTE: This script does NOT recreate the ruleset itself. The companion Setup-BranchRuleset.ps1
+    was retired in the v0.2.1 canonical maintenance round (post-setup bootstrap files removed
+    from long-lived repos). After this script completes, recreate the canonical ruleset manually:
+      - via the GitHub UI: Settings → Rules → New ruleset, OR
+      - via `gh api POST /repos/<owner>/<repo>/rulesets` with the canonical body (see
+        repo-template/scripts/Setup-BranchRuleset.ps1 for the authoritative definition)
 
     The script presents a plan of all changes before executing and prompts for confirmation.
 
