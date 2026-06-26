@@ -137,7 +137,7 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 
 ---
 
-## 🔍 Code Quality ## Code Quality & Static Analysis Static Analysis
+## 🔍 Code Quality & Static Analysis
 
 This project enforces **strict code quality standards** through **7 specialized analyzers** and custom async-first rules:
 
@@ -168,7 +168,7 @@ This library uses **`BannedSymbols.txt`** to prohibit synchronous APIs and enfor
 ## Building from Source
 
 ### Prerequisites
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download) or later
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download) (older SDKs work for restoring the older TFMs but the build/test matrix targets the full range up to .NET 10.0)
 - Optional: [PowerShell Core](https://github.com/PowerShell/PowerShell) for formatting scripts
 
 ### Build Steps
