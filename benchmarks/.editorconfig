@@ -1,0 +1,60 @@
+# Analyzer rules relaxed for benchmark projects.
+#
+# BenchmarkDotNet drives benchmark code through reflection, so a number of
+# analyzers that are valid for ordinary library or test code produce noise
+# (or outright false positives) here. The rules below are the curated set
+# that is genuinely benchmark-inappropriate. Everything else still trips
+# TreatWarningsAsErrors in Release, the same as the rest of the repo.
+#
+# Canonical copy lives in repo-template/benchmarks/.editorconfig — keep
+# this file in sync when adding new exemptions.
+
+[*.cs]
+
+# CA1822 / S2325: Mark members as static — [Benchmark] methods are invoked
+# by BenchmarkDotNet on instances; they cannot be static.
+dotnet_diagnostic.CA1822.severity = none
+dotnet_diagnostic.S2325.severity = none
+
+# CA1812: Avoid uninstantiated internal classes — benchmark classes are
+# instantiated by BenchmarkDotNet via reflection.
+dotnet_diagnostic.CA1812.severity = none
+
+# S1144: Remove unused private members — benchmark setup fields and ctors
+# are used reflectively by BenchmarkDotNet.
+dotnet_diagnostic.S1144.severity = none
+
+# S1118: Utility class should not have a public constructor — the
+# benchmark entry point class needs Main(string[]).
+dotnet_diagnostic.S1118.severity = none
+
+# CA1031: Do not catch general exception types — benchmarks sometimes
+# measure exception-throwing code paths and need to swallow.
+dotnet_diagnostic.CA1031.severity = none
+
+# S1215: Remove use of GC.GetTotalMemory / GC.Collect — legitimate in
+# allocation/memory benchmarks.
+dotnet_diagnostic.S1215.severity = none
+
+# MA0004: Use ConfigureAwait — benchmark code is application code, not a
+# library, so synchronization-context capture is the desired default.
+dotnet_diagnostic.MA0004.severity = none
+
+# MA0011: Use IFormatProvider overload — formatted output in benchmark
+# scaffolding doesn't need explicit culture.
+dotnet_diagnostic.MA0011.severity = none
+
+# MA0048: File name must match type name — benchmark files commonly
+# group several related [Benchmark] classes plus helpers.
+dotnet_diagnostic.MA0048.severity = none
+
+# MA0051: Method too long — benchmark methods can be long where the
+# measured body is intentionally inlined for fairness.
+dotnet_diagnostic.MA0051.severity = none
+
+# VSTHRD200: Use Async suffix — benchmark naming conventions differ from
+# library/test naming conventions.
+dotnet_diagnostic.VSTHRD200.severity = none
+
+# S2699: Add at least one assertion — benchmarks measure; they do not assert.
+dotnet_diagnostic.S2699.severity = none
