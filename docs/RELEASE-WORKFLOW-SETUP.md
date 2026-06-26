@@ -33,7 +33,7 @@ Complete the following one-time setup so that the workflow can publish releases:
 
 **Location:** Settings → Branches → main (or Settings → Rules → Rulesets)
 
-> **Note:** Repos created from `repo-template` ship with `scripts/Setup-BranchRuleset.ps1`, which configures branch protection interactively (option `[1]` for single-developer mode, `[2]` for multi-developer mode). The script may not be present in older repos — if it is missing, configure the equivalent settings manually using the checklist below.
+> **Note:** Earlier versions of this repo (and `repo-template`) shipped `scripts/Setup-BranchRuleset.ps1` to configure branch protection interactively. That script was retired in v0.2.1 as part of the post-setup bootstrap cleanup — configure the equivalent settings manually using the checklist below.
 
 Ensure the following settings are enabled:
 
@@ -170,7 +170,7 @@ Before creating a production GitHub Release (e.g., `v1.0.0`):
 ┌─────────────────────────────────────────────────────────────┐
 │  Job 1: validate-release (Windows)                          │
 │  • Restore & Build                                          │
-│  • Test all frameworks (net5.0-10.0, net462-481)           │
+│  • Test all frameworks (net462-481, netcoreapp3.1, net5.0-10.0)           │
 │  • Collect coverage                                         │
 │  • Enforce 90% threshold                                    │
 │  • Upload coverage artifacts                                │
@@ -198,7 +198,7 @@ Before creating a production GitHub Release (e.g., `v1.0.0`):
 
 | Issue | Before | After |
 |-------|--------|-------|
-| **Framework Coverage** | Default framework only | All frameworks (net5.0-10.0, net462-481) |
+| **Framework Coverage** | Default framework only | All frameworks (net462-481, netcoreapp3.1, net5.0-10.0) |
 | **Code Coverage** | Not enforced | 90% threshold enforced |
 | **Package Validation** | None | Smoke test installation |
 | **Deployment** | Incomplete publish script | Automatic publishing after validation |
@@ -212,7 +212,7 @@ Before creating a production GitHub Release (e.g., `v1.0.0`):
 
 If you encounter issues not covered in this guide:
 
-1. Check the [Actions tab](../../actions) for detailed logs
+1. Check the Actions tab of this repository on GitHub for detailed logs
 2. Review artifacts uploaded by failed jobs
 3. Consult the [GitHub Actions documentation](https://docs.github.com/en/actions)
 4. Open an issue in this repository with:
