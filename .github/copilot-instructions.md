@@ -2,22 +2,22 @@
 
 ## Repository Summary
 
-This is a **repository template** for creating new .NET repositories. It provides a standardized structure with comprehensive GitHub integration, CI/CD workflows, and development tooling. The template is designed for .NET 8.0 projects using C# and follows Microsoft's recommended project organization patterns.
+`Wolfgang.Etl.Xml` is a shipping .NET library that provides XML extractors and loaders built on the `Wolfgang.Etl.Abstractions` ETL pattern. The public surface is four classes — `XmlSingleStreamExtractor<T>`, `XmlMultiStreamExtractor<T>`, `XmlSingleStreamLoader<T>`, `XmlMultiStreamLoader<T>` — plus the `XmlReport` progress type.
 
-**Repository Type**: Template (not a working project)  
-**Target Platform**: .NET 8.0  
-**Primary Language**: C#  
-**Size**: Small template (~15 configuration files, empty project folders)  
+**Repository Type**: Shipping NuGet library (not a template)
+**Target Frameworks (src)**: `net462`, `net481`, `netstandard2.0`, `net8.0`, `net10.0`
+**Test Frameworks**: full matrix `net462`–`net481`, `netcoreapp3.1`, `net5.0`–`net10.0`
+**Primary Language**: C# (LangVersion `latest`)
+**Size**: One src project, one unit-test project, one benchmarks project, one examples project
 
 ## Build and Validation Instructions
 
 ### Prerequisites
-- .NET 8.0.x SDK (always install if not present)
+- .NET 10.0 SDK (covers the full TFM matrix when paired with the older targeting packs)
 - ReportGenerator tool (installed via `dotnet tool install -g dotnet-reportgenerator-globaltool`)
 - DevSkim CLI (installed via `dotnet tool install --global Microsoft.CST.DevSkim.CLI`)
 
-### Build Process (For Repositories Created from This Template)
-**IMPORTANT**: This template has no buildable projects. These commands apply to repositories created FROM this template.
+### Build Process
 
 1. **Restore Dependencies** (always run first):
    ```powershell
@@ -86,7 +86,6 @@ root/
 ### Key Configuration Files
 - **`.editorconfig`**: Code style rules (C# file-scoped namespaces, var preferences, analyzer severity)
 - **`.gitignore`**: Comprehensive .NET gitignore (Visual Studio, build artifacts, packages)
-- **`REPO-INSTRUCTIONS.md`**: Template setup instructions (delete after setup)
 - **`CONTRIBUTING.md`**: Contribution guidelines
 - **`CODE_OF_CONDUCT.md`**: Standard Contributor Covenant v2.0
 
@@ -100,7 +99,7 @@ root/
 ### Continuous Integration Pipeline (`.github/workflows/pr.yaml`)
 The workflow runs on pull requests to `main` branch and includes:
 
-1. **Environment**: Ubuntu Latest with .NET 8.0.x
+1. **Environment**: Ubuntu / Windows / macOS matrix with the .NET 10.0 SDK (older TFMs use targeting packs)
 2. **Build Steps**: Checkout → Setup .NET → Restore → Build → Test → Coverage → Security
 3. **Artifacts**: Coverage reports and DevSkim results uploaded
 4. **Branch Protection**: Configured to require this workflow to pass before merging
