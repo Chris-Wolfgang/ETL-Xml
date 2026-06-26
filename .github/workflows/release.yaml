@@ -16,6 +16,7 @@ jobs:
   validate-release:
     name: Validate Release Build
     runs-on: windows-latest
+    permissions: {}
     if: github.repository != 'Chris-Wolfgang/repo-template'
     steps:
       - name: Checkout code
@@ -343,6 +344,7 @@ jobs:
     name: Pack & Validate NuGet
     needs: validate-release
     runs-on: windows-latest
+    permissions: {}
     outputs:
       has-packages: ${{ steps.check-packages.outputs.has-packages }}
     steps:
@@ -568,6 +570,7 @@ jobs:
   verify-docs-build:
     name: Verify Documentation Builds
     runs-on: windows-latest
+    permissions: {}
     # Gate on the prior validation jobs so we don't burn ~5-10 min of Windows
     # runner time on a release that's already failing earlier in the pipeline.
     needs: [validate-release, pack-and-validate]
@@ -665,6 +668,7 @@ jobs:
     needs: [pack-and-validate, verify-docs-build]
     if: needs.pack-and-validate.outputs.has-packages == 'true'
     runs-on: windows-latest
+    permissions: {} # NuGet auth uses NUGET_API_KEY, not GITHUB_TOKEN
     steps:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
