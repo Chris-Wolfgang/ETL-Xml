@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<coverage version="1.0" date="2026-07-12_01-58-50" tag="">
+<coverage version="1.0" date="2026-07-12_12-42-03" tag="">
   <assembly name="Wolfgang.Etl.Xml">
     <class name="Wolfgang.Etl.Xml.XmlLogMessages" coveredlines="30" coverablelines="30" totallines="74" coveredbranches="0" totalbranches="0" coveredcodeelements="1" fullcoveredcodeelements="1" totalcodeelements="1" />
     <class name="Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1" coveredlines="77" coverablelines="82" totallines="244" coveredbranches="29" totalbranches="34" coveredcodeelements="9" fullcoveredcodeelements="6" totalcodeelements="9" />
