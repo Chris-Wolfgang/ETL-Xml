@@ -62,6 +62,51 @@ var loader = new XmlSingleStreamLoader<Person>(outputStream);
 await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 ```
 
+### Fluent pipeline (`EtlPipeline`)
+
+For end-to-end wiring, the XML source and sink factories plug straight into the
+`EtlPipeline` chain — no explicit extractor, transformer, or loader variables. The
+factories read the same as the CSV/JSON siblings:
+
+```csharp
+using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.Xml;
+
+// Read a single-root XML file → write a single-root XML file.
+await EtlPipeline
+    .Create()
+    .XmlSingleStreamExtractor<Person>("people.xml")
+    .XmlSingleStreamLoader<Person>("people-copy.xml")
+    .RunAsync();
+```
+
+Insert a `Through` stage to transform or filter records mid-stream:
+
+```csharp
+await EtlPipeline
+    .Create()
+    .XmlSingleStreamExtractor<Person>("people.xml")
+    .Through<Person>(people => people.Where(p => p.Age >= 18))
+    .XmlSingleStreamLoader<Person>("adults.xml")
+    .RunAsync(progress, cancellationToken);
+```
+
+Mix and match the single- and multi-stream shapes — e.g. fan a single XML document
+out to one file per record:
+
+```csharp
+await EtlPipeline
+    .Create()
+    .XmlSingleStreamExtractor<Person>(sourceStream)
+    .XmlMultiStreamLoader<Person>(person => File.Create($"{person.LastName}.xml"))
+    .RunAsync();
+```
+
+**Stream ownership:** path-based factories own the file stream they open and close
+it when the run finishes — on success **and** failure. Stream-based factories leave
+the caller's stream alone (honouring `XmlSingleStream…Options.LeaveOpen`), so the
+caller controls its lifetime.
+
 ---
 
 ## ✨ Features
@@ -87,6 +132,15 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 - **`XmlSingleStreamLoader<T>`** — Loads items into a single XML stream wrapped in a root element.
 - **`XmlMultiStreamLoader<T>`** — Loads items into multiple XML streams via a factory function, one document per stream.
 - **`XmlReport`** — Progress report returned via `IProgress<XmlReport>`. Properties: `CurrentItemCount`, `CurrentSkippedItemCount`.
+
+### `EtlPipeline` factories
+
+Class-named factories over the fluent `EtlPipeline` chain, so XML sources and sinks compose without hand-wiring an extractor/loader:
+
+- **`XmlSingleStreamExtractor<T>(path)` / `(stream, options?)`** — seeds a pipeline from a single-root XML source. The path overload owns and closes the file stream.
+- **`XmlMultiStreamExtractor<T>(streams)`** — seeds a pipeline from a sequence of single-document XML streams (one record each).
+- **`XmlSingleStreamLoader<T>(path, options?)` / `(stream, options?)`** — terminates a pipeline into a single-root XML document. The path overload owns and closes the file stream.
+- **`XmlMultiStreamLoader<T>(streamFactory)`** — terminates a pipeline, writing one XML document per record to a per-record stream.
 
 ### Constructor overloads
 

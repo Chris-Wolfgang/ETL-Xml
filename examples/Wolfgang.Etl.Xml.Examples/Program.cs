@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
+using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.TestKit;
 using Wolfgang.Etl.Xml;
 using Wolfgang.Etl.Xml.Examples;
@@ -25,6 +26,58 @@ Console.WriteLine();
 await MultiStreamExtractPipelineAsync().ConfigureAwait(false);
 Console.WriteLine();
 await MultiStreamLoadPipelineAsync(loggerFactory).ConfigureAwait(false);
+Console.WriteLine();
+await FluentPipelineAsync().ConfigureAwait(false);
+
+
+
+/// <summary>
+/// Demonstrates the fluent <see cref="EtlPipeline"/> chain using the XML source
+/// and sink factories. A single-root XML source is filtered by a Through stage
+/// and written to a single-root XML destination — no explicit extractor,
+/// transformer, or loader variables. This reads the same as the CSV/JSON siblings.
+/// </summary>
+static async Task FluentPipelineAsync()
+{
+    Console.WriteLine("=== Fluent EtlPipeline (XML → filter → XML) ===");
+    Console.WriteLine();
+
+    var source = CreateSampleXmlStream();
+    var destination = new MemoryStream();
+
+    // Extract from XML → keep people aged 30+ → load to XML, all in one chain.
+    await EtlPipeline
+        .Create()
+        .XmlSingleStreamExtractor<Person>(source)
+        .Through<Person>(people => WhereAsync(people, p => p.Age >= 30))
+        .XmlSingleStreamLoader<Person>(destination)
+        .RunAsync()
+        .ConfigureAwait(false);
+
+    Console.WriteLine("Kept people aged 30 or older:");
+    Console.WriteLine();
+
+    destination.Position = 0;
+    using var reader = new StreamReader(destination);
+    Console.WriteLine(await reader.ReadToEndAsync().ConfigureAwait(false));
+}
+
+
+
+/// <summary>
+/// Filters an async sequence in place — a minimal Through stage for the fluent
+/// pipeline example that avoids taking a dependency on System.Linq.Async.
+/// </summary>
+static async IAsyncEnumerable<T> WhereAsync<T>(IAsyncEnumerable<T> items, Func<T, bool> predicate)
+{
+    await foreach (var item in items.ConfigureAwait(false))
+    {
+        if (predicate(item))
+        {
+            yield return item;
+        }
+    }
+}
 
 
 
@@ -228,10 +281,10 @@ static async Task MultiStreamLoadPipelineAsync(ILoggerFactory loggerFactory)
 
     foreach (var (fileName, buffer) in buffers)
     {
-        buffer.Position = 0;
-        using var streamReader = new StreamReader(buffer);
+        // The multi-stream loader closes each factory-supplied stream after writing its record.
+        // MemoryStream.ToArray() still returns the written buffer after disposal, so read it that way.
         Console.WriteLine($"--- {fileName} ---");
-        Console.WriteLine(await streamReader.ReadToEndAsync().ConfigureAwait(false));
+        Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffer.ToArray()));
         Console.WriteLine();
     }
 }
