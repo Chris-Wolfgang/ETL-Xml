@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `EtlPipeline` XML source/sink factories (#66): `XmlSingleStreamExtractor<T>`, `XmlMultiStreamExtractor<T>`, `XmlSingleStreamLoader<T>`, and `XmlMultiStreamLoader<T>` extension methods that plug XML sources and sinks straight into the fluent `EtlPipeline` chain (e.g. `EtlPipeline.Create().XmlSingleStreamExtractor<Person>("in.xml").XmlSingleStreamLoader<Person>("out.xml").RunAsync()`). Path-based factories own and close the file stream (on success and failure); stream-based factories honour the caller's `LeaveOpen`.
+
 ### Changed
+
+- Bumped `Wolfgang.Etl.Abstractions` 0.15.0 → 0.16.0 (ships `EtlPipeline`).
 
 ### Deprecated
 
