@@ -102,6 +102,17 @@ await EtlPipeline
     .RunAsync();
 ```
 
+…or fan the mirror direction — merge many single-document XML files back into one
+root document:
+
+```csharp
+await EtlPipeline
+    .Create()
+    .XmlMultiStreamExtractor<Person>(Directory.EnumerateFiles("inbox", "*.xml").Select(File.OpenRead))
+    .XmlSingleStreamLoader<Person>("people.xml")
+    .RunAsync();
+```
+
 **Stream ownership:** path-based factories own the file stream they open and close
 it when the run finishes — on success **and** failure. Stream-based factories leave
 the caller's stream alone (honouring `XmlSingleStream…Options.LeaveOpen`), so the
