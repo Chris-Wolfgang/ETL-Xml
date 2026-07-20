@@ -244,9 +244,13 @@ jobs:
   # Runs concurrently with Stage 1 / 2 / 3 (no `needs:` on a test job) so it
   # doesn't extend wall-clock — typically 3–5 min vs the slowest stage.
   # SARIF uploads to GitHub Code Scanning (Security tab + inline PR
-  # annotations). `error`-severity findings fail the job; `warning`-severity
-  # surfaces in Code Scanning but doesn't fail (gated by --severity=WARNING
-  # filter). Tune the noise floor via .DotSettings at the repo root.
+  # annotations). Fail-gating is done later by counting SARIF `level=="error"`
+  # entries — `error`-severity findings fail the job, `warning`-severity ones
+  # surface in Code Scanning but are not treated as fatal. `--severity=WARNING`
+  # is a separate lever: it controls what InspectCode EMITS (excluding
+  # SUGGESTION / HINT), i.e. the noise floor for the SARIF payload. Tune the
+  # emit floor via `.DotSettings` at the repo root; tune the fail behavior via
+  # the SARIF `level=="error"` count check below.
   # ============================================================================
   inspectcode:
     name: "ReSharper InspectCode"
