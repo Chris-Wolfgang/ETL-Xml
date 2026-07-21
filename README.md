@@ -118,6 +118,39 @@ it when the run finishes — on success **and** failure. Stream-based factories 
 the caller's stream alone (honouring `XmlSingleStream…Options.LeaveOpen`), so the
 caller controls its lifetime.
 
+### Compressed streams (`.xml.gz`)
+
+Every extractor and loader works against a plain `Stream`, so compression is
+transparent — wrap the underlying stream in a `GZipStream` (or any
+`System.IO.Compression` codec):
+
+```csharp
+using System.IO.Compression;
+
+// Write gzip-compressed XML. LeaveOpen = false lets the loader dispose the
+// GZipStream when the load completes, flushing the gzip footer.
+using (var file = File.Create("people.xml.gz"))
+using (var gzip = new GZipStream(file, CompressionMode.Compress))
+{
+    var loader = new XmlSingleStreamLoader<Person>(gzip);
+    await loader.LoadAsync(people);
+}
+
+// Read it back — decompress on the way in.
+using (var file = File.OpenRead("people.xml.gz"))
+using (var gunzip = new GZipStream(file, CompressionMode.Decompress))
+{
+    var extractor = new XmlSingleStreamExtractor<Person>(gunzip);
+    await foreach (var person in extractor.ExtractAsync())
+    {
+        // ...
+    }
+}
+```
+
+See the runnable `CompressedStreamRoundTripAsync` example in
+[`examples/Wolfgang.Etl.Xml.Examples`](examples/Wolfgang.Etl.Xml.Examples/Program.cs).
+
 ---
 
 ## ✨ Features
@@ -130,6 +163,7 @@ caller controls its lifetime.
 | Progress reporting | Built-in `IProgress<XmlReport>` support with configurable reporting intervals |
 | Skip and maximum | `SkipItemCount` and `MaximumItemCount` for paging through large XML sources |
 | Custom XML settings | Accept `XmlReaderSettings` and `XmlWriterSettings` for full control over XML behavior |
+| Compressed streams | Works over any `Stream`, so gzip/deflate/Brotli is transparent — wrap in `GZipStream` for `.xml.gz` |
 | Structured logging | High-performance `LoggerMessage`-based logging with categorized event IDs |
 | Multi-TFM | Targets .NET Framework 4.6.2+, .NET Standard 2.0, .NET 8.0, and .NET 10.0 |
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
@@ -32,6 +33,75 @@ Console.WriteLine();
 await FluentMultiStreamFanOutAsync().ConfigureAwait(false);
 Console.WriteLine();
 await FluentMultiStreamFanInAsync().ConfigureAwait(false);
+Console.WriteLine();
+await CompressedStreamRoundTripAsync().ConfigureAwait(false);
+
+
+
+/// <summary>
+/// Demonstrates reading and writing <em>compressed</em> XML. Because every
+/// extractor and loader works against a plain <see cref="Stream"/>, gzip (or any
+/// other <see cref="System.IO.Compression"/> codec) is transparent — you simply
+/// wrap the underlying stream in a <see cref="GZipStream"/>. Here sample records
+/// are serialized straight into a gzip stream (compress) and then read back out of
+/// one (decompress), a full <c>.xml.gz</c> round trip.
+/// </summary>
+/// <remarks>
+/// Ownership note: the loader is given <c>LeaveOpen = false</c> so that when the
+/// load completes it disposes the <see cref="GZipStream"/>, which flushes the gzip
+/// footer into the backing buffer. The backing <see cref="MemoryStream"/> is kept
+/// alive via <c>leaveOpen: true</c> on the <see cref="GZipStream"/> so it can be
+/// rewound and read back. A file-based equivalent would swap the
+/// <see cref="MemoryStream"/> for <c>File.Create("people.xml.gz")</c> /
+/// <c>File.OpenRead("people.xml.gz")</c>.
+/// </remarks>
+static async Task CompressedStreamRoundTripAsync()
+{
+    Console.WriteLine("=== Compressed streams (gzip .xml.gz round trip) ===");
+    Console.WriteLine();
+
+    var people = SamplePeople();
+
+    // --- Compress: serialize records straight into a gzip stream ---
+    var compressed = new MemoryStream();
+    using (var gzip = new GZipStream(compressed, CompressionMode.Compress, leaveOpen: true))
+    {
+        var extractor = new TestExtractor<Person>(people);
+        var transformer = new TestTransformer<Person>();
+
+        // LeaveOpen: false — completing the load disposes the GZipStream, which
+        // flushes the gzip footer. leaveOpen: true above keeps `compressed` usable.
+        var loader = new XmlSingleStreamLoader<Person>
+        (
+            gzip,
+            new XmlSingleStreamLoaderOptions { LeaveOpen = false }
+        );
+
+        await loader
+            .LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()))
+            .ConfigureAwait(false);
+    }
+
+    Console.WriteLine($"Wrote {people.Count} records as gzip-compressed XML: {compressed.Length} bytes.");
+    Console.WriteLine();
+
+    // --- Decompress: read the records back out of the gzip stream ---
+    compressed.Position = 0;
+    using var gunzip = new GZipStream(compressed, CompressionMode.Decompress);
+
+    var reader = new XmlSingleStreamExtractor<Person>(gunzip);
+    var collector = new TestLoader<Person>(collectItems: true);
+
+    await collector.LoadAsync(reader.ExtractAsync()).ConfigureAwait(false);
+
+    Console.WriteLine($"Read {reader.CurrentItemCount} records back from the gzip stream:");
+    Console.WriteLine();
+
+    foreach (var person in collector.GetCollectedItems()!)
+    {
+        Console.WriteLine($"  {person.FirstName} {person.LastName}, age {person.Age}");
+    }
+}
 
 
 
