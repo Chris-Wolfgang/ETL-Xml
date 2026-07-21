@@ -28,6 +28,10 @@ Console.WriteLine();
 await MultiStreamLoadPipelineAsync(loggerFactory).ConfigureAwait(false);
 Console.WriteLine();
 await FluentPipelineAsync().ConfigureAwait(false);
+Console.WriteLine();
+await FluentMultiStreamFanOutAsync().ConfigureAwait(false);
+Console.WriteLine();
+await FluentMultiStreamFanInAsync().ConfigureAwait(false);
 
 
 
@@ -55,6 +59,79 @@ static async Task FluentPipelineAsync()
         .ConfigureAwait(false);
 
     Console.WriteLine("Kept people aged 30 or older:");
+    Console.WriteLine();
+
+    destination.Position = 0;
+    using var reader = new StreamReader(destination);
+    Console.WriteLine(await reader.ReadToEndAsync().ConfigureAwait(false));
+}
+
+
+
+/// <summary>
+/// Demonstrates the fluent <see cref="EtlPipeline"/> chain fanning a single XML
+/// source <em>out</em> to many destinations — one XML document per record — via
+/// <c>XmlMultiStreamLoader</c>. The loader disposes each factory-supplied stream
+/// after writing its record, so a real pipeline would return
+/// <see cref="FileStream"/>s here (e.g. <c>File.Create($"{p.LastName}.xml")</c>).
+/// </summary>
+static async Task FluentMultiStreamFanOutAsync()
+{
+    Console.WriteLine("=== Fluent EtlPipeline (XML → fan out to one file per record) ===");
+    Console.WriteLine();
+
+    var source = CreateSampleXmlStream();
+    var buffers = new Dictionary<string, MemoryStream>(StringComparer.Ordinal);
+
+    // One XML source → one destination stream per record, all in one chain.
+    await EtlPipeline
+        .Create()
+        .XmlSingleStreamExtractor<Person>(source)
+        .XmlMultiStreamLoader<Person>(person =>
+        {
+            var ms = new MemoryStream();
+            buffers[$"{person.FirstName}_{person.LastName}.xml"] = ms;
+            return ms;
+        })
+        .RunAsync()
+        .ConfigureAwait(false);
+
+    Console.WriteLine($"Wrote {buffers.Count} XML documents, one per record:");
+    Console.WriteLine();
+
+    foreach (var (fileName, buffer) in buffers)
+    {
+        Console.WriteLine($"--- {fileName} ---");
+        Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffer.ToArray()));
+        Console.WriteLine();
+    }
+}
+
+
+
+/// <summary>
+/// Demonstrates the fluent <see cref="EtlPipeline"/> chain fanning many
+/// single-document XML sources <em>in</em> to one XML destination via
+/// <c>XmlMultiStreamExtractor</c> — the mirror of the fan-out shape. The
+/// extractor disposes each source stream after reading its record.
+/// </summary>
+static async Task FluentMultiStreamFanInAsync()
+{
+    Console.WriteLine("=== Fluent EtlPipeline (fan in many files → one XML) ===");
+    Console.WriteLine();
+
+    var streams = CreateSampleMultiStreams();
+    var destination = new MemoryStream();
+
+    // Many single-document XML streams → one single-root XML document.
+    await EtlPipeline
+        .Create()
+        .XmlMultiStreamExtractor<Person>(streams)
+        .XmlSingleStreamLoader<Person>(destination)
+        .RunAsync()
+        .ConfigureAwait(false);
+
+    Console.WriteLine($"Merged {streams.Count} single-document streams into one XML document:");
     Console.WriteLine();
 
     destination.Position = 0;
