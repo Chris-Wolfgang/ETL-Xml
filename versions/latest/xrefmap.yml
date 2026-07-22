@@ -7,6 +7,100 @@ references:
   commentId: N:Wolfgang.Etl.Xml
   fullName: Wolfgang.Etl.Xml
   nameWithType: Wolfgang.Etl.Xml
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions
+  name: EtlPipelineXmlSinkExtensions
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html
+  commentId: T:Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions
+  nameWithType: EtlPipelineXmlSinkExtensions
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader*
+  name: XmlMultiStreamLoader
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlMultiStreamLoader_
+  commentId: Overload:Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader
+  nameWithType: EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.Func{``0,System.IO.Stream})
+  name: XmlMultiStreamLoader<T>(IEtlPipeline<T>, Func<T, Stream>)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlMultiStreamLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_Func___0_System_IO_Stream__
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.Func{``0,System.IO.Stream})
+  name.vb: XmlMultiStreamLoader(Of T)(IEtlPipeline(Of T), Func(Of T, Stream))
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader<T>(Wolfgang.Etl.Abstractions.IEtlPipeline<T>, System.Func<T, System.IO.Stream>)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), System.Func(Of T, System.IO.Stream))
+  nameWithType: EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader<T>(IEtlPipeline<T>, Func<T, Stream>)
+  nameWithType.vb: EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader(Of T)(IEtlPipeline(Of T), Func(Of T, Stream))
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader*
+  name: XmlSingleStreamLoader
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlSingleStreamLoader_
+  commentId: Overload:Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader
+  nameWithType: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
+  name: XmlSingleStreamLoader<T>(IEtlPipeline<T>, Stream, XmlSingleStreamLoaderOptions?)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlSingleStreamLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
+  name.vb: XmlSingleStreamLoader(Of T)(IEtlPipeline(Of T), Stream, XmlSingleStreamLoaderOptions)
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(Wolfgang.Etl.Abstractions.IEtlPipeline<T>, System.IO.Stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions?)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), System.IO.Stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
+  nameWithType: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(IEtlPipeline<T>, Stream, XmlSingleStreamLoaderOptions?)
+  nameWithType.vb: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader(Of T)(IEtlPipeline(Of T), Stream, XmlSingleStreamLoaderOptions)
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.String,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
+  name: XmlSingleStreamLoader<T>(IEtlPipeline<T>, string, XmlSingleStreamLoaderOptions?)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlSingleStreamLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_String_Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.String,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
+  name.vb: XmlSingleStreamLoader(Of T)(IEtlPipeline(Of T), String, XmlSingleStreamLoaderOptions)
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(Wolfgang.Etl.Abstractions.IEtlPipeline<T>, string, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions?)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), String, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
+  nameWithType: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(IEtlPipeline<T>, string, XmlSingleStreamLoaderOptions?)
+  nameWithType.vb: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader(Of T)(IEtlPipeline(Of T), String, XmlSingleStreamLoaderOptions)
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions
+  name: EtlPipelineXmlSourceExtensions
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html
+  commentId: T:Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions
+  nameWithType: EtlPipelineXmlSourceExtensions
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor*
+  name: XmlMultiStreamExtractor
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSourceExtensions_XmlMultiStreamExtractor_
+  commentId: Overload:Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor
+  nameWithType: EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.Collections.Generic.IEnumerable{System.IO.Stream})
+  name: XmlMultiStreamExtractor<T>(EtlPipeline, IEnumerable<Stream>)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSourceExtensions_XmlMultiStreamExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_System_Collections_Generic_IEnumerable_System_IO_Stream__
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.Collections.Generic.IEnumerable{System.IO.Stream})
+  name.vb: XmlMultiStreamExtractor(Of T)(EtlPipeline, IEnumerable(Of Stream))
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor<T>(Wolfgang.Etl.Abstractions.EtlPipeline, System.Collections.Generic.IEnumerable<System.IO.Stream>)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, System.Collections.Generic.IEnumerable(Of System.IO.Stream))
+  nameWithType: EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor<T>(EtlPipeline, IEnumerable<Stream>)
+  nameWithType.vb: EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor(Of T)(EtlPipeline, IEnumerable(Of Stream))
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor*
+  name: XmlSingleStreamExtractor
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSourceExtensions_XmlSingleStreamExtractor_
+  commentId: Overload:Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor
+  nameWithType: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)
+  name: XmlSingleStreamExtractor<T>(EtlPipeline, Stream, XmlSingleStreamExtractorOptions?)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSourceExtensions_XmlSingleStreamExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamExtractorOptions_
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)
+  name.vb: XmlSingleStreamExtractor(Of T)(EtlPipeline, Stream, XmlSingleStreamExtractorOptions)
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(Wolfgang.Etl.Abstractions.EtlPipeline, System.IO.Stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions?)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, System.IO.Stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)
+  nameWithType: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(EtlPipeline, Stream, XmlSingleStreamExtractorOptions?)
+  nameWithType.vb: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(EtlPipeline, Stream, XmlSingleStreamExtractorOptions)
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.String)
+  name: XmlSingleStreamExtractor<T>(EtlPipeline, string)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSourceExtensions_XmlSingleStreamExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_System_String_
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.String)
+  name.vb: XmlSingleStreamExtractor(Of T)(EtlPipeline, String)
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(Wolfgang.Etl.Abstractions.EtlPipeline, string)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, String)
+  nameWithType: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(EtlPipeline, string)
+  nameWithType.vb: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(EtlPipeline, String)
 - uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1
   name: XmlMultiStreamExtractor<TRecord>
   href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html

@@ -81,6 +81,20 @@
 Classes
 </h3>
     <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html">EtlPipelineXmlSinkExtensions</a></dt>
+      <dd><p>Class-named XML sink terminators for the fluent <span class="xref">Wolfgang.Etl.Abstractions.EtlPipeline</span> chain. Each terminator
+constructs the matching loader and terminates the pipeline, enabling
+<code>… .XmlSingleStreamLoader&lt;Person&gt;(&quot;people.xml&quot;)</code>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html">EtlPipelineXmlSourceExtensions</a></dt>
+      <dd><p>Class-named XML source factories for the fluent <span class="xref">Wolfgang.Etl.Abstractions.EtlPipeline</span> chain. Each factory
+constructs the matching extractor and seeds the pipeline, enabling
+<code>EtlPipeline.Create().XmlSingleStreamExtractor&lt;Invoice&gt;(&quot;invoices.xml&quot;)</code>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html">XmlMultiStreamExtractor&lt;TRecord&gt;</a></dt>
       <dd><p>Extracts items of type <code class="typeparamref">TRecord</code> from multiple streams,
 reading one XML document per stream.</p>

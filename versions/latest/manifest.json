@@ -22,6 +22,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.yml\" sourcestartlinenumber=\"1\">Class-named XML sink terminators for the fluent <xref href=\"Wolfgang.Etl.Abstractions.EtlPipeline\" data-throw-if-not-resolved=\"false\"></xref> chain. Each terminator\nconstructs the matching loader and terminates the pipeline, enabling\n<code>… .XmlSingleStreamLoader&lt;Person&gt;(&quot;people.xml&quot;)</code>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.yml\" sourcestartlinenumber=\"1\">Class-named XML source factories for the fluent <xref href=\"Wolfgang.Etl.Abstractions.EtlPipeline\" data-throw-if-not-resolved=\"false\"></xref> chain. Each factory\nconstructs the matching extractor and seeds the pipeline, enabling\n<code>EtlPipeline.Create().XmlSingleStreamExtractor&lt;Invoice&gt;(&quot;invoices.xml&quot;)</code>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.yml",
       "output": {
         ".html": {
