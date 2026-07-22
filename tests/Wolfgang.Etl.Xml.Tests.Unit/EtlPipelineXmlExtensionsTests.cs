@@ -211,6 +211,85 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
 
+    [Fact]
+    public void XmlSingleStreamExtractor_path_null_pipeline_throws()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => ((EtlPipeline)null!).XmlSingleStreamExtractor<PersonRecord>("people.xml")
+        );
+    }
+
+
+
+    [Fact]
+    public void XmlSingleStreamExtractor_null_stream_throws()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => EtlPipeline.Create().XmlSingleStreamExtractor<PersonRecord>((Stream)null!)
+        );
+    }
+
+
+
+    [Fact]
+    public void XmlMultiStreamExtractor_null_pipeline_throws()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => ((EtlPipeline)null!).XmlMultiStreamExtractor<PersonRecord>(new List<Stream>())
+        );
+    }
+
+
+
+    [Fact]
+    public void XmlSingleStreamLoader_path_null_pipeline_throws()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => ((IEtlPipeline<PersonRecord>)null!).XmlSingleStreamLoader<PersonRecord>("people.xml")
+        );
+    }
+
+
+
+    [Fact]
+    public void XmlSingleStreamLoader_stream_null_pipeline_throws()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => ((IEtlPipeline<PersonRecord>)null!).XmlSingleStreamLoader<PersonRecord>(new MemoryStream())
+        );
+    }
+
+
+
+    [Fact]
+    public void XmlSingleStreamLoader_null_stream_throws()
+    {
+        var pipeline = EtlPipeline.Create().XmlSingleStreamExtractor<PersonRecord>(new MemoryStream());
+
+        Assert.Throws<ArgumentNullException>
+        (
+            () => pipeline.XmlSingleStreamLoader<PersonRecord>((Stream)null!)
+        );
+    }
+
+
+
+    [Fact]
+    public void XmlMultiStreamLoader_null_pipeline_throws()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => ((IEtlPipeline<PersonRecord>)null!).XmlMultiStreamLoader<PersonRecord>(_ => new MemoryStream())
+        );
+    }
+
+
+
     private static async Task<MemoryStream> CreateSingleStreamXmlAsync(IEnumerable<PersonRecord> people)
     {
         var stream = new MemoryStream();
