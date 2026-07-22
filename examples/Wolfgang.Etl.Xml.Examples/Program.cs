@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
+using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.TestKit;
 using Wolfgang.Etl.Xml;
 using Wolfgang.Etl.Xml.Examples;
@@ -25,6 +27,204 @@ Console.WriteLine();
 await MultiStreamExtractPipelineAsync().ConfigureAwait(false);
 Console.WriteLine();
 await MultiStreamLoadPipelineAsync(loggerFactory).ConfigureAwait(false);
+Console.WriteLine();
+await FluentPipelineAsync().ConfigureAwait(false);
+Console.WriteLine();
+await FluentMultiStreamFanOutAsync().ConfigureAwait(false);
+Console.WriteLine();
+await FluentMultiStreamFanInAsync().ConfigureAwait(false);
+Console.WriteLine();
+await CompressedStreamRoundTripAsync().ConfigureAwait(false);
+
+
+
+/// <summary>
+/// Demonstrates reading and writing <em>compressed</em> XML. Because every
+/// extractor and loader works against a plain <see cref="Stream"/>, gzip (or any
+/// other <see cref="System.IO.Compression"/> codec) is transparent — you simply
+/// wrap the underlying stream in a <see cref="GZipStream"/>. Here sample records
+/// are serialized straight into a gzip stream (compress) and then read back out of
+/// one (decompress), a full <c>.xml.gz</c> round trip.
+/// </summary>
+/// <remarks>
+/// Ownership note: the loader is given <c>LeaveOpen = false</c> so that when the
+/// load completes it disposes the <see cref="GZipStream"/>, which flushes the gzip
+/// footer into the backing buffer. The backing <see cref="MemoryStream"/> is kept
+/// alive via <c>leaveOpen: true</c> on the <see cref="GZipStream"/> so it can be
+/// rewound and read back. A file-based equivalent would swap the
+/// <see cref="MemoryStream"/> for <c>File.Create("people.xml.gz")</c> /
+/// <c>File.OpenRead("people.xml.gz")</c>.
+/// </remarks>
+static async Task CompressedStreamRoundTripAsync()
+{
+    Console.WriteLine("=== Compressed streams (gzip .xml.gz round trip) ===");
+    Console.WriteLine();
+
+    var people = SamplePeople();
+
+    // --- Compress: serialize records straight into a gzip stream ---
+    var compressed = new MemoryStream();
+    using (var gzip = new GZipStream(compressed, CompressionMode.Compress, leaveOpen: true))
+    {
+        var extractor = new TestExtractor<Person>(people);
+        var transformer = new TestTransformer<Person>();
+
+        // LeaveOpen: false — completing the load disposes the GZipStream, which
+        // flushes the gzip footer. leaveOpen: true above keeps `compressed` usable.
+        var loader = new XmlSingleStreamLoader<Person>
+        (
+            gzip,
+            new XmlSingleStreamLoaderOptions { LeaveOpen = false }
+        );
+
+        await loader
+            .LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()))
+            .ConfigureAwait(false);
+    }
+
+    Console.WriteLine($"Wrote {people.Count} records as gzip-compressed XML: {compressed.Length} bytes.");
+    Console.WriteLine();
+
+    // --- Decompress: read the records back out of the gzip stream ---
+    compressed.Position = 0;
+    using var gunzip = new GZipStream(compressed, CompressionMode.Decompress);
+
+    var reader = new XmlSingleStreamExtractor<Person>(gunzip);
+    var collector = new TestLoader<Person>(collectItems: true);
+
+    await collector.LoadAsync(reader.ExtractAsync()).ConfigureAwait(false);
+
+    Console.WriteLine($"Read {reader.CurrentItemCount} records back from the gzip stream:");
+    Console.WriteLine();
+
+    foreach (var person in collector.GetCollectedItems()!)
+    {
+        Console.WriteLine($"  {person.FirstName} {person.LastName}, age {person.Age}");
+    }
+}
+
+
+
+/// <summary>
+/// Demonstrates the fluent <see cref="EtlPipeline"/> chain using the XML source
+/// and sink factories. A single-root XML source is filtered by a Through stage
+/// and written to a single-root XML destination — no explicit extractor,
+/// transformer, or loader variables. This reads the same as the CSV/JSON siblings.
+/// </summary>
+static async Task FluentPipelineAsync()
+{
+    Console.WriteLine("=== Fluent EtlPipeline (XML → filter → XML) ===");
+    Console.WriteLine();
+
+    var source = CreateSampleXmlStream();
+    var destination = new MemoryStream();
+
+    // Extract from XML → keep people aged 30+ → load to XML, all in one chain.
+    await EtlPipeline
+        .Create()
+        .XmlSingleStreamExtractor<Person>(source)
+        .Through<Person>(people => WhereAsync(people, p => p.Age >= 30))
+        .XmlSingleStreamLoader<Person>(destination)
+        .RunAsync()
+        .ConfigureAwait(false);
+
+    Console.WriteLine("Kept people aged 30 or older:");
+    Console.WriteLine();
+
+    destination.Position = 0;
+    using var reader = new StreamReader(destination);
+    Console.WriteLine(await reader.ReadToEndAsync().ConfigureAwait(false));
+}
+
+
+
+/// <summary>
+/// Demonstrates the fluent <see cref="EtlPipeline"/> chain fanning a single XML
+/// source <em>out</em> to many destinations — one XML document per record — via
+/// <c>XmlMultiStreamLoader</c>. The loader disposes each factory-supplied stream
+/// after writing its record, so a real pipeline would return
+/// <see cref="FileStream"/>s here (e.g. <c>File.Create($"{p.LastName}.xml")</c>).
+/// </summary>
+static async Task FluentMultiStreamFanOutAsync()
+{
+    Console.WriteLine("=== Fluent EtlPipeline (XML → fan out to one file per record) ===");
+    Console.WriteLine();
+
+    var source = CreateSampleXmlStream();
+    var buffers = new Dictionary<string, MemoryStream>(StringComparer.Ordinal);
+
+    // One XML source → one destination stream per record, all in one chain.
+    await EtlPipeline
+        .Create()
+        .XmlSingleStreamExtractor<Person>(source)
+        .XmlMultiStreamLoader<Person>(person =>
+        {
+            var ms = new MemoryStream();
+            buffers[$"{person.FirstName}_{person.LastName}.xml"] = ms;
+            return ms;
+        })
+        .RunAsync()
+        .ConfigureAwait(false);
+
+    Console.WriteLine($"Wrote {buffers.Count} XML documents, one per record:");
+    Console.WriteLine();
+
+    foreach (var (fileName, buffer) in buffers)
+    {
+        Console.WriteLine($"--- {fileName} ---");
+        Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffer.ToArray()));
+        Console.WriteLine();
+    }
+}
+
+
+
+/// <summary>
+/// Demonstrates the fluent <see cref="EtlPipeline"/> chain fanning many
+/// single-document XML sources <em>in</em> to one XML destination via
+/// <c>XmlMultiStreamExtractor</c> — the mirror of the fan-out shape. The
+/// extractor disposes each source stream after reading its record.
+/// </summary>
+static async Task FluentMultiStreamFanInAsync()
+{
+    Console.WriteLine("=== Fluent EtlPipeline (fan in many files → one XML) ===");
+    Console.WriteLine();
+
+    var streams = CreateSampleMultiStreams();
+    var destination = new MemoryStream();
+
+    // Many single-document XML streams → one single-root XML document.
+    await EtlPipeline
+        .Create()
+        .XmlMultiStreamExtractor<Person>(streams)
+        .XmlSingleStreamLoader<Person>(destination)
+        .RunAsync()
+        .ConfigureAwait(false);
+
+    Console.WriteLine($"Merged {streams.Count} single-document streams into one XML document:");
+    Console.WriteLine();
+
+    destination.Position = 0;
+    using var reader = new StreamReader(destination);
+    Console.WriteLine(await reader.ReadToEndAsync().ConfigureAwait(false));
+}
+
+
+
+/// <summary>
+/// Filters an async sequence in place — a minimal Through stage for the fluent
+/// pipeline example that avoids taking a dependency on System.Linq.Async.
+/// </summary>
+static async IAsyncEnumerable<T> WhereAsync<T>(IAsyncEnumerable<T> items, Func<T, bool> predicate)
+{
+    await foreach (var item in items.ConfigureAwait(false))
+    {
+        if (predicate(item))
+        {
+            yield return item;
+        }
+    }
+}
 
 
 
@@ -228,10 +428,10 @@ static async Task MultiStreamLoadPipelineAsync(ILoggerFactory loggerFactory)
 
     foreach (var (fileName, buffer) in buffers)
     {
-        buffer.Position = 0;
-        using var streamReader = new StreamReader(buffer);
+        // The multi-stream loader closes each factory-supplied stream after writing its record.
+        // MemoryStream.ToArray() still returns the written buffer after disposal, so read it that way.
         Console.WriteLine($"--- {fileName} ---");
-        Console.WriteLine(await streamReader.ReadToEndAsync().ConfigureAwait(false));
+        Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffer.ToArray()));
         Console.WriteLine();
     }
 }

@@ -7,17 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-21
+
 ### Added
+
+- `EtlPipeline` XML source/sink factories (#66): `XmlSingleStreamExtractor<T>`, `XmlMultiStreamExtractor<T>`, `XmlSingleStreamLoader<T>`, and `XmlMultiStreamLoader<T>` extension methods that plug XML sources and sinks straight into the fluent `EtlPipeline` chain (e.g. `EtlPipeline.Create().XmlSingleStreamExtractor<Person>("in.xml").XmlSingleStreamLoader<Person>("out.xml").RunAsync()`). Path-based factories own and close the file stream (on success and failure); stream-based factories honour the caller's `LeaveOpen`.
+- Documentation and a runnable example for reading/writing compressed (`.xml.gz`) streams by wrapping the underlying stream in a `GZipStream` (#13): README "Compressed streams" section, a Features-table row, and the `CompressedStreamRoundTripAsync` example in `examples/Wolfgang.Etl.Xml.Examples`.
 
 ### Changed
 
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
+- Bumped `Wolfgang.Etl.Abstractions` 0.15.0 → 0.16.0 (ships `EtlPipeline`).
 
 ## [0.2.2] - 2026-07-06
 

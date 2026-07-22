@@ -62,6 +62,95 @@ var loader = new XmlSingleStreamLoader<Person>(outputStream);
 await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 ```
 
+### Fluent pipeline (`EtlPipeline`)
+
+For end-to-end wiring, the XML source and sink factories plug straight into the
+`EtlPipeline` chain — no explicit extractor, transformer, or loader variables. The
+factories read the same as the CSV/JSON siblings:
+
+```csharp
+using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.Xml;
+
+// Read a single-root XML file → write a single-root XML file.
+await EtlPipeline
+    .Create()
+    .XmlSingleStreamExtractor<Person>("people.xml")
+    .XmlSingleStreamLoader<Person>("people-copy.xml")
+    .RunAsync();
+```
+
+Insert a `Through` stage to transform or filter records mid-stream:
+
+```csharp
+await EtlPipeline
+    .Create()
+    .XmlSingleStreamExtractor<Person>("people.xml")
+    .Through<Person>(people => people.Where(p => p.Age >= 18))
+    .XmlSingleStreamLoader<Person>("adults.xml")
+    .RunAsync(progress, cancellationToken);
+```
+
+Mix and match the single- and multi-stream shapes — e.g. fan a single XML document
+out to one file per record:
+
+```csharp
+await EtlPipeline
+    .Create()
+    .XmlSingleStreamExtractor<Person>(sourceStream)
+    .XmlMultiStreamLoader<Person>(person => File.Create($"{person.LastName}.xml"))
+    .RunAsync();
+```
+
+…or fan the mirror direction — merge many single-document XML files back into one
+root document:
+
+```csharp
+await EtlPipeline
+    .Create()
+    .XmlMultiStreamExtractor<Person>(Directory.EnumerateFiles("inbox", "*.xml").Select(File.OpenRead))
+    .XmlSingleStreamLoader<Person>("people.xml")
+    .RunAsync();
+```
+
+**Stream ownership:** path-based factories own the file stream they open and close
+it when the run finishes — on success **and** failure. Stream-based factories leave
+the caller's stream alone (honouring `XmlSingleStream…Options.LeaveOpen`), so the
+caller controls its lifetime.
+
+### Compressed streams (`.xml.gz`)
+
+Every extractor and loader works against a plain `Stream`, so compression is
+transparent — wrap the underlying stream in a `GZipStream` (or any
+`System.IO.Compression` codec):
+
+```csharp
+using System.IO.Compression;
+
+// Write gzip-compressed XML. LeaveOpen = false lets the loader dispose the
+// GZipStream when the load completes, flushing the gzip footer.
+using (var file = File.Create("people.xml.gz"))
+using (var gzip = new GZipStream(file, CompressionMode.Compress))
+{
+    var loader = new XmlSingleStreamLoader<Person>(gzip);
+    await loader.LoadAsync(people);
+}
+
+// Read it back — decompress on the way in.
+using (var file = File.OpenRead("people.xml.gz"))
+using (var gunzip = new GZipStream(file, CompressionMode.Decompress))
+{
+    var extractor = new XmlSingleStreamExtractor<Person>(gunzip);
+    await foreach (var person in extractor.ExtractAsync())
+    {
+        // ...
+    }
+}
+```
+
+See the runnable `CompressedStreamRoundTripAsync` example in
+[`examples/Wolfgang.Etl.Xml.Examples`](examples/Wolfgang.Etl.Xml.Examples/Program.cs).
+
 ---
 
 ## ✨ Features
@@ -74,6 +163,7 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 | Progress reporting | Built-in `IProgress<XmlReport>` support with configurable reporting intervals |
 | Skip and maximum | `SkipItemCount` and `MaximumItemCount` for paging through large XML sources |
 | Custom XML settings | Accept `XmlReaderSettings` and `XmlWriterSettings` for full control over XML behavior |
+| Compressed streams | Works over any `Stream`, so gzip/deflate/Brotli is transparent — wrap in `GZipStream` for `.xml.gz` |
 | Structured logging | High-performance `LoggerMessage`-based logging with categorized event IDs |
 | Multi-TFM | Targets .NET Framework 4.6.2+, .NET Standard 2.0, .NET 8.0, and .NET 10.0 |
 
@@ -87,6 +177,15 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 - **`XmlSingleStreamLoader<T>`** — Loads items into a single XML stream wrapped in a root element.
 - **`XmlMultiStreamLoader<T>`** — Loads items into multiple XML streams via a factory function, one document per stream.
 - **`XmlReport`** — Progress report returned via `IProgress<XmlReport>`. Properties: `CurrentItemCount`, `CurrentSkippedItemCount`.
+
+### `EtlPipeline` factories
+
+Class-named factories over the fluent `EtlPipeline` chain, so XML sources and sinks compose without hand-wiring an extractor/loader:
+
+- **`XmlSingleStreamExtractor<T>(path)` / `(stream, options?)`** — seeds a pipeline from a single-root XML source. The path overload owns and closes the file stream.
+- **`XmlMultiStreamExtractor<T>(streams)`** — seeds a pipeline from a sequence of single-document XML streams (one record each).
+- **`XmlSingleStreamLoader<T>(path, options?)` / `(stream, options?)`** — terminates a pipeline into a single-root XML document. The path overload owns and closes the file stream.
+- **`XmlMultiStreamLoader<T>(streamFactory)`** — terminates a pipeline, writing one XML document per record to a per-record stream.
 
 ### Constructor overloads
 
