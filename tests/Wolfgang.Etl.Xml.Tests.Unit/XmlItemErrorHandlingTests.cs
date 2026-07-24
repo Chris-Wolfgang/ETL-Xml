@@ -53,7 +53,7 @@ public class XmlItemErrorHandlingTests
         Assert.Equal(1, extractor.CurrentErrorItemCount);
 
         var error = Assert.Single(extractor.Errors);
-        Assert.Equal(2, error.RecordNumber);                 // Eve is the 2nd element
+        Assert.Equal(2, error.ItemNumber);                 // Eve is the 2nd element
         Assert.Contains("abc", error.RawContent);            // raw XML captured
     }
 
@@ -124,7 +124,7 @@ public class XmlItemErrorHandlingTests
 
         Assert.Equal(new[] { "Carol", "Dan" }, yielded.Select(p => p.FirstName));
         Assert.Equal(1, extractor.CurrentErrorItemCount);
-        Assert.Equal(2, Assert.Single(extractor.Errors).RecordNumber);   // 2nd stream
+        Assert.Equal(2, Assert.Single(extractor.Errors).ItemNumber);   // 2nd stream
     }
 
 

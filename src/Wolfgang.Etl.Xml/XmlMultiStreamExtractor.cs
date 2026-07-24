@@ -176,8 +176,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
         if (ErrorHandling == ErrorHandling.CaptureAndContinue)
         {
             _errors.Add(new XmlDeserializationError(
-                itemIndex: CurrentItemCount + CurrentSkippedItemCount + CurrentErrorItemCount,
-                recordNumber: context.ItemNumber,
+                itemNumber: context.ItemNumber,
                 rawContent: context.RawContent?.Invoke(),
                 exception: context.Exception));
         }

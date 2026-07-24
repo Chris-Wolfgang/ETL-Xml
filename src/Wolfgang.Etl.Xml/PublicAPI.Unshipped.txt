@@ -5,9 +5,8 @@ Wolfgang.Etl.Xml.ErrorHandling.SkipAndLog = 2 -> Wolfgang.Etl.Xml.ErrorHandling
 Wolfgang.Etl.Xml.ErrorHandling.Throw = 0 -> Wolfgang.Etl.Xml.ErrorHandling
 Wolfgang.Etl.Xml.XmlDeserializationError
 Wolfgang.Etl.Xml.XmlDeserializationError.Exception.get -> System.Exception!
-Wolfgang.Etl.Xml.XmlDeserializationError.ItemIndex.get -> long
+Wolfgang.Etl.Xml.XmlDeserializationError.ItemNumber.get -> long
 Wolfgang.Etl.Xml.XmlDeserializationError.RawContent.get -> string?
-Wolfgang.Etl.Xml.XmlDeserializationError.RecordNumber.get -> long?
 Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.ErrorHandling.get -> Wolfgang.Etl.Xml.ErrorHandling
 Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.ErrorHandling.init -> void
 Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.Errors.get -> System.Collections.Generic.IReadOnlyList<Wolfgang.Etl.Xml.XmlDeserializationError!>!

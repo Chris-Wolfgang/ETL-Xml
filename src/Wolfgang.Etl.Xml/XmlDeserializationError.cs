@@ -10,28 +10,22 @@ public sealed class XmlDeserializationError
 {
     internal XmlDeserializationError
     (
-        long itemIndex,
-        long? recordNumber,
+        long itemNumber,
         string? rawContent,
         Exception exception
     )
     {
-        ItemIndex = itemIndex;
-        RecordNumber = recordNumber;
+        ItemNumber = itemNumber;
         RawContent = rawContent;
         Exception = exception;
     }
 
 
-    /// <summary>Gets the zero-based position of the failed element among all elements seen so far.</summary>
-    public long ItemIndex { get; }
-
-
     /// <summary>
-    /// Gets the source record number of the failed element (1-based), or <see langword="null"/> when
-    /// the stage does not track one.
+    /// Gets the 1-based ordinal of the failed item within the extraction — the element's position
+    /// in a single-stream document, or the stream's position in a multi-stream run.
     /// </summary>
-    public long? RecordNumber { get; }
+    public long ItemNumber { get; }
 
 
     /// <summary>Gets the raw XML of the failed element, when the stage captured it; otherwise <see langword="null"/>.</summary>
