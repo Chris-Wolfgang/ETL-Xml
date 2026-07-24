@@ -16,7 +16,7 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// whose value cannot be deserialized (here a non-numeric <c>Age</c>) is routed through the base
 /// <c>OnItemError</c>/<c>HandleItemError</c> policy via the <see cref="ErrorHandling"/> knob, so a
 /// genuine failure is counted in <c>CurrentErrorItemCount</c>, surfaced as pipeline
-/// <see cref="EtlPipelineProgress.RecordsErrored"/>, and (for <see cref="ErrorHandling.CaptureAndContinue"/>)
+/// <see cref="EtlPipelineProgress.ErrorItemCount"/>, and (for <see cref="ErrorHandling.CaptureAndContinue"/>)
 /// collected in <c>Errors</c>. The single-stream case exercises reader repositioning: the bad element
 /// is skipped and the next sibling is still read.
 /// </summary>
@@ -86,7 +86,7 @@ public class XmlItemErrorHandlingTests
 
 
     [Fact]
-    public async Task Pipeline_RecordsErrored_surfaces_single_stream_skips()
+    public async Task Pipeline_ErrorItemCount_surfaces_single_stream_skips()
     {
         var reports = new List<EtlPipelineProgress>();
         var progress = new SyncProgress(reports.Add);
@@ -103,9 +103,9 @@ public class XmlItemErrorHandlingTests
             .RunAsync(progress);
 
         var final = reports[^1];
-        Assert.Equal(2, final.RecordsExtracted);
-        Assert.Equal(2, final.RecordsLoaded);
-        Assert.Equal(1, final.RecordsErrored);
+        Assert.Equal(2, final.ExtractedItemCount);
+        Assert.Equal(2, final.LoadedItemCount);
+        Assert.Equal(1, final.ErrorItemCount);
     }
 
 

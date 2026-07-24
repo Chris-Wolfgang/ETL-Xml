@@ -206,12 +206,12 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         {
             _errors.Add(new XmlDeserializationError(
                 itemIndex: CurrentItemCount + CurrentSkippedItemCount + CurrentErrorItemCount,
-                recordNumber: context.RecordNumber,
+                recordNumber: context.ItemNumber,
                 rawContent: context.RawContent?.Invoke(),
                 exception: context.Exception));
         }
 
-        XmlLogMessages.DeserializationError(_logger, context.RecordNumber, context.Exception);
+        XmlLogMessages.DeserializationError(_logger, context.ItemNumber, context.Exception);
         return ItemErrorAction.Skip;
     }
 
