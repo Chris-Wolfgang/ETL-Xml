@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-25
+
+Minor release: adopts the `Wolfgang.Etl.Abstractions` #84 per-item error-handling mechanism (#11).
+
+### Added
+
+- Per-item error handling on both extractors (#11). `XmlSingleStreamExtractor` and
+  `XmlMultiStreamExtractor` gain an `ErrorHandling` knob (`Throw` / `CaptureAndContinue` /
+  `SkipAndLog`), translated to the base `ItemErrorAction` via `OnItemError`, plus an `Errors`
+  collection of `XmlDeserializationError` (item number, raw content, exception). Single-stream
+  reads each element whole for deterministic reader repositioning after a bad element; multi-stream
+  is isolated per stream. A skipped bad element is counted in `CurrentErrorItemCount` and the
+  pipeline's `ErrorItemCount`.
+
+### Changed
+
+- Bumped `Wolfgang.Etl.Abstractions` 0.16.0 → 0.18.0.
+
 ## [0.3.0] - 2026-07-21
 
 ### Added
