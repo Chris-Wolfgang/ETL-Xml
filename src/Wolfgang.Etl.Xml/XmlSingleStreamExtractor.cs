@@ -186,10 +186,17 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// <see cref="ItemErrorAction.Skip"/> — or <see cref="ItemErrorAction.Abort"/> for
     /// <see cref="ErrorHandling.Throw"/>. The base then counts the skip in <c>CurrentErrorItemCount</c>.
     /// </summary>
-    // context is guaranteed non-null: the base HandleItemError validates it before calling this.
-#pragma warning disable CA1062
+    /// <param name="context">Describes the failed item. Never <see langword="null"/> via the base caller.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <see langword="null"/>.</exception>
     protected override ItemErrorAction OnItemError(ItemErrorContext context)
     {
+        // Stryker disable once all: defensive — HandleItemError (the sole caller) already validates
+        // this; the guard exists only to stay safe if a future caller bypasses it.
+        if (context is null)
+        {
+            throw new ArgumentNullException(nameof(context));
+        }
+
         if (ErrorHandling == ErrorHandling.Throw)
         {
             return ItemErrorAction.Abort;
@@ -207,7 +214,6 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         XmlLogMessages.DeserializationError(_logger, context.RecordNumber, context.Exception);
         return ItemErrorAction.Skip;
     }
-#pragma warning restore CA1062
 
 
     /// <inheritdoc />
