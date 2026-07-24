@@ -62,6 +62,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     private readonly IProgressTimer? _progressTimer;
     private readonly bool _leaveOpen;
     private bool _progressTimerWired;
+    private readonly List<XmlDeserializationError> _errors = new();
 
 
 
@@ -165,6 +166,50 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
 
 
 
+    /// <summary>
+    /// Gets how deserialization errors are handled during extraction.
+    /// Default is <see cref="ErrorHandling.Throw"/>.
+    /// </summary>
+    public ErrorHandling ErrorHandling { get; init; } = ErrorHandling.Throw;
+
+
+    /// <summary>
+    /// Gets the collection of deserialization errors captured during the most recent extraction.
+    /// Only populated when <see cref="ErrorHandling"/> is <see cref="ErrorHandling.CaptureAndContinue"/>.
+    /// </summary>
+    public IReadOnlyList<XmlDeserializationError> Errors => _errors.AsReadOnly();
+
+
+    /// <summary>
+    /// Translates <see cref="ErrorHandling"/> into the base error-handling contract (#84): captures
+    /// the failure (when <see cref="ErrorHandling.CaptureAndContinue"/>), logs it, and returns
+    /// <see cref="ItemErrorAction.Skip"/> — or <see cref="ItemErrorAction.Abort"/> for
+    /// <see cref="ErrorHandling.Throw"/>. The base then counts the skip in <c>CurrentErrorItemCount</c>.
+    /// </summary>
+    // context is guaranteed non-null: the base HandleItemError validates it before calling this.
+#pragma warning disable CA1062
+    protected override ItemErrorAction OnItemError(ItemErrorContext context)
+    {
+        if (ErrorHandling == ErrorHandling.Throw)
+        {
+            return ItemErrorAction.Abort;
+        }
+
+        if (ErrorHandling == ErrorHandling.CaptureAndContinue)
+        {
+            _errors.Add(new XmlDeserializationError(
+                itemIndex: CurrentItemCount + CurrentSkippedItemCount + CurrentErrorItemCount,
+                recordNumber: context.RecordNumber,
+                rawContent: context.RawContent?.Invoke(),
+                exception: context.Exception));
+        }
+
+        XmlLogMessages.DeserializationError(_logger, context.RecordNumber, context.Exception);
+        return ItemErrorAction.Skip;
+    }
+#pragma warning restore CA1062
+
+
     /// <inheritdoc />
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync
     (
@@ -173,6 +218,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     {
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
+        _errors.Clear();
+        var recordNumber = 0L;
         var skipBudget = SkipItemCount;
         var settings = _readerSettings?.Clone() ?? new XmlReaderSettings();
         settings.CloseInput = !_leaveOpen;
@@ -198,14 +245,14 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
                 continue;
             }
 
-            var item = TryDeserializeChildElement(reader);
+            recordNumber++;
+            // Reads the element whole, so the reader is already at the next node — always advance.
+            var item = TryDeserializeChildElement(reader, recordNumber);
+            needsRead = false;
             if (item is null)
             {
                 continue;
             }
-
-            // After Deserialize, the reader is already positioned at the next node
-            needsRead = false;
 
             if (skipBudget > 0)
             {
@@ -223,7 +270,6 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
 
             IncrementCurrentItemCount();
             XmlLogMessages.ExtractedItem(_logger, CurrentItemCount, null);
-
             yield return item;
         }
 
@@ -245,20 +291,42 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
 
 
 
-    private TRecord? TryDeserializeChildElement(XmlReader reader)
+    private TRecord? TryDeserializeChildElement(XmlReader reader, long recordNumber)
     {
         if (reader.NodeType != XmlNodeType.Element || reader.Depth != 1)
         {
             return default;
         }
 
-        var item = (TRecord?)Serializer.Deserialize(reader);
-        if (item is null)
-        {
-            XmlLogMessages.SkippingNullElement(_logger, null);
-        }
+        // Read the whole child element as a self-contained fragment. This advances the reader
+        // deterministically to the next sibling — the property that makes skip-and-continue
+        // possible within a single streaming document — and captures the raw XML for the error
+        // context. A malformed (not well-formed) document throws here, outside the policy, and
+        // aborts: you cannot reliably skip past XML that does not parse.
+        var outerXml = reader.ReadOuterXml();
 
-        return item;
+        try
+        {
+            using var elementReader = XmlReader.Create(new StringReader(outerXml));
+            var item = (TRecord?)Serializer.Deserialize(elementReader);
+            if (item is null)
+            {
+                XmlLogMessages.SkippingNullElement(_logger, null);
+            }
+
+            return item;
+        }
+        catch (InvalidOperationException ex)
+        {
+            // XmlSerializer wraps type/mapping failures (e.g. a non-numeric value for an int
+            // element) in InvalidOperationException. Defer the policy to the base #84 mechanism.
+            if (HandleItemError(new ItemErrorContext(recordNumber, ex, () => outerXml)) == ItemErrorAction.Abort)
+            {
+                throw;
+            }
+
+            return default;
+        }
     }
 
 

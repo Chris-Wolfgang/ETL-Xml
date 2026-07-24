@@ -47,6 +47,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
+    private readonly List<XmlDeserializationError> _errors = new();
 
 
 
@@ -136,6 +137,50 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
 
 
 
+    /// <summary>
+    /// Gets how deserialization errors are handled during extraction.
+    /// Default is <see cref="ErrorHandling.Throw"/>.
+    /// </summary>
+    public ErrorHandling ErrorHandling { get; init; } = ErrorHandling.Throw;
+
+
+    /// <summary>
+    /// Gets the collection of deserialization errors captured during the most recent extraction.
+    /// Only populated when <see cref="ErrorHandling"/> is <see cref="ErrorHandling.CaptureAndContinue"/>.
+    /// </summary>
+    public IReadOnlyList<XmlDeserializationError> Errors => _errors.AsReadOnly();
+
+
+    /// <summary>
+    /// Translates <see cref="ErrorHandling"/> into the base error-handling contract (#84): captures
+    /// the failure (when <see cref="ErrorHandling.CaptureAndContinue"/>), logs it, and returns
+    /// <see cref="ItemErrorAction.Skip"/> — or <see cref="ItemErrorAction.Abort"/> for
+    /// <see cref="ErrorHandling.Throw"/>. The base then counts the skip in <c>CurrentErrorItemCount</c>.
+    /// </summary>
+    // context is guaranteed non-null: the base HandleItemError validates it before calling this.
+#pragma warning disable CA1062
+    protected override ItemErrorAction OnItemError(ItemErrorContext context)
+    {
+        if (ErrorHandling == ErrorHandling.Throw)
+        {
+            return ItemErrorAction.Abort;
+        }
+
+        if (ErrorHandling == ErrorHandling.CaptureAndContinue)
+        {
+            _errors.Add(new XmlDeserializationError(
+                itemIndex: CurrentItemCount + CurrentSkippedItemCount + CurrentErrorItemCount,
+                recordNumber: context.RecordNumber,
+                rawContent: context.RawContent?.Invoke(),
+                exception: context.Exception));
+        }
+
+        XmlLogMessages.DeserializationError(_logger, context.RecordNumber, context.Exception);
+        return ItemErrorAction.Skip;
+    }
+#pragma warning restore CA1062
+
+
     /// <inheritdoc />
 #pragma warning disable CS1998 // Async method lacks 'await' operators — XmlSerializer is synchronous
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync
@@ -146,6 +191,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     {
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
+        _errors.Clear();
         var skipBudget = SkipItemCount;
         var streamIndex = 0;
 
@@ -157,7 +203,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
             TRecord? item;
             try
             {
-                item = DeserializeFromStream(stream);
+                item = DeserializeStreamWithPolicy(stream, streamIndex);
             }
             finally
             {
@@ -199,6 +245,27 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
         XmlLogMessages.MultiStreamExtractionCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, streamIndex, null);
     }
 
+
+
+    // Deserializes one stream, deferring the failure policy to the base #84 mechanism. Each stream is
+    // an independent document, so a failure is isolated; raw content is not captured because the stream
+    // is consumed as it is read and may not be seekable.
+    private TRecord? DeserializeStreamWithPolicy(Stream stream, int streamIndex)
+    {
+        try
+        {
+            return DeserializeFromStream(stream);
+        }
+        catch (InvalidOperationException ex)
+        {
+            if (HandleItemError(new ItemErrorContext(streamIndex + 1, ex)) == ItemErrorAction.Abort)
+            {
+                throw;
+            }
+
+            return default;
+        }
+    }
 
 
     private TRecord? DeserializeFromStream(Stream stream)

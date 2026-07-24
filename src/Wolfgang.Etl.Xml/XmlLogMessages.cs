@@ -33,6 +33,9 @@ internal static class XmlLogMessages
     internal static readonly Action<ILogger, int, int, Exception?> SingleStreamExtractionCompleted =
         LoggerMessage.Define<int, int>(LogLevel.Information, new EventId(102, nameof(SingleStreamExtractionCompleted)), "XML single-stream extraction completed. Extracted: {ItemCount}, skipped: {SkippedCount}.");
 
+    internal static readonly Action<ILogger, long, Exception?> DeserializationError =
+        LoggerMessage.Define<long>(LogLevel.Warning, new EventId(103, nameof(DeserializationError)), "Failed to deserialize element at record {RecordNumber}.");
+
 
 
     // ── SingleStream Loader ──────────────────────────────────────────
