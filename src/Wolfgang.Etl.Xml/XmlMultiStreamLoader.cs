@@ -148,6 +148,10 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         CancellationToken token
     )
     {
+        // Honour a token that is already cancelled before pulling the first item from the
+        // source or opening any destination stream — a pre-cancelled load must consume nothing.
+        token.ThrowIfCancellationRequested();
+
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var streamIndex = 0;

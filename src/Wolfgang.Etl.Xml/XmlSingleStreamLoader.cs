@@ -190,6 +190,10 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         CancellationToken token
     )
     {
+        // Honour a token that is already cancelled before pulling the first item from the
+        // source or writing anything — a pre-cancelled load must consume nothing.
+        token.ThrowIfCancellationRequested();
+
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var settings = _writerSettings?.Clone() ?? new XmlWriterSettings { Indent = true };
