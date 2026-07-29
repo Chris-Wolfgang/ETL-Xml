@@ -37,7 +37,7 @@ namespace Wolfgang.Etl.Xml;
 /// await loader.LoadAsync(items, cancellationToken);
 ///
 /// // Custom root element name, stream closed automatically:
-/// var loader = new XmlSingleStreamLoader&lt;Person&gt;
+/// var owningLoader = new XmlSingleStreamLoader&lt;Person&gt;
 /// (
 ///     File.Create("output.xml"),
 ///     new XmlSingleStreamLoaderOptions
@@ -46,7 +46,7 @@ namespace Wolfgang.Etl.Xml;
 ///         LeaveOpen = false,
 ///     }
 /// );
-/// await loader.LoadAsync(items, cancellationToken);
+/// await owningLoader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
 public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>

@@ -45,6 +45,7 @@
     <Project Path="src/Wolfgang.Etl.Xml/Wolfgang.Etl.Xml.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Wolfgang.Etl.Xml.Tests.DocExamples/Wolfgang.Etl.Xml.Tests.DocExamples.csproj" />
     <Project Path="tests/Wolfgang.Etl.Xml.Tests.Unit/Wolfgang.Etl.Xml.Tests.Unit.csproj" />
   </Folder>
 </Solution>
