@@ -1,0 +1,20 @@
+﻿[
+  <?xml version="1.0" encoding="utf-8"?>,
+  <ArrayOfPersonRecord>,
+    <PersonRecord>,
+      <FirstName>Alice</FirstName>,
+      <LastName>Smith</LastName>,
+      <Age>30</Age>,
+    </PersonRecord>,
+    <PersonRecord>,
+      <FirstName>Bob</FirstName>,
+      <LastName>Jones</LastName>,
+      <Age>25</Age>,
+    </PersonRecord>,
+    <PersonRecord>,
+      <FirstName>Carol</FirstName>,
+      <LastName>White</LastName>,
+      <Age>42</Age>,
+    </PersonRecord>,
+  </ArrayOfPersonRecord>
+]
