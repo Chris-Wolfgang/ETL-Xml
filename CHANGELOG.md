@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Upgraded `Wolfgang.Etl.Abstractions` 0.16.1 → 0.20.0 (adds the use-after-dispose contract, per-item error-handling hooks, and the overflow-safe `long` `EtlPipelineProgress` counters). Test project upgraded to `Wolfgang.Etl.TestKit` / `Wolfgang.Etl.TestKit.Xunit` 0.13.0.
 
+- Documentation, an example, and tests for XSD validation during extraction (#10): passing an `XmlReaderSettings` with `ValidationType.Schema` and a loaded `XmlSchemaSet` to `XmlSingleStreamExtractor<T>` validates the source against the schema as it is read. A violation surfaces from `ExtractAsync` as an `InvalidOperationException` wrapping the `XmlSchemaValidationException`.
+
 ### Fixed
 
 - `XmlSingleStreamLoader` and `XmlMultiStreamLoader` now honour a `CancellationToken` that is already cancelled when `LoadAsync` is called by consuming nothing from the source — the cancellation is observed before the first item is pulled, matching the extractors and the `LoaderBase` contract in TestKit 0.13.
