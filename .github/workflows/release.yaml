@@ -760,13 +760,24 @@ jobs:
     if: needs.pack-and-validate.outputs.has-packages == 'true'
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Required to upload assets to the GitHub Release
+      contents: write       # Required to upload assets to the GitHub Release
+      id-token: write       # OIDC token for the SLSA build-provenance attestation (#130)
+      attestations: write   # Write the provenance to the repo's attestation store (#130)
     steps:
       - name: Download NuGet packages artifact
         uses: actions/download-artifact@v8.0.1
         with:
           name: nuget-packages
           path: ./nuget-packages
+
+      - name: Generate SLSA build-provenance attestation
+        # Attests each packed .nupkg — records a signed, verifiable statement that
+        # these artifacts were built by this workflow from this commit. Consumers
+        # verify with `gh attestation verify <file> --repo Chris-Wolfgang/ETL-Xml`.
+        # Complements the CycloneDX SBOM already produced by pack-and-validate.
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        with:
+          subject-path: './nuget-packages/*.nupkg'
 
       - name: Download coverage report artifact
         uses: actions/download-artifact@v8.0.1
