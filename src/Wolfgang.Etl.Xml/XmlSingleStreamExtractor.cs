@@ -40,12 +40,12 @@ namespace Wolfgang.Etl.Xml;
 /// }
 ///
 /// // Transfer stream ownership — closed automatically when extraction completes:
-/// var extractor = new XmlSingleStreamExtractor&lt;Person&gt;
+/// var owningExtractor = new XmlSingleStreamExtractor&lt;Person&gt;
 /// (
 ///     File.OpenRead("data.xml"),
 ///     new XmlSingleStreamExtractorOptions { LeaveOpen = false }
 /// );
-/// await foreach (var person in extractor.ExtractAsync(cancellationToken))
+/// await foreach (var person in owningExtractor.ExtractAsync(cancellationToken))
 /// {
 ///     Console.WriteLine(person.Name);
 /// }
