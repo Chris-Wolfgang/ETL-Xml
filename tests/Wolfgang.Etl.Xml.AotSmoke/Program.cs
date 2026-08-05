@@ -7,7 +7,7 @@ using Wolfgang.Etl.Xml;
 
 namespace Wolfgang.Etl.Xml.AotSmoke;
 
-// A public record with a parameterless ctor — what a consumer would round-trip.
+// A public class with a parameterless ctor — what a consumer would round-trip.
 public sealed class Person
 {
     public string FirstName { get; set; } = string.Empty;

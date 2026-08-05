@@ -1,11 +1,13 @@
 # Trim / Native-AOT compatibility smoke (#135). The library targets net8.0/net10.0
 # and is annotated [RequiresUnreferencedCode] (XmlSerializer reflection), so its AOT
 # behavior was asserted only on paper. This publishes a tiny console consumer with
-# <PublishAot>true</PublishAot> that exercises the extract/load round trip plus the
-# POCO/options surface, then RUNS the native binary. A MissingMethodException /
-# NotSupportedException (or a failed ILC publish) is the failure this hunts for;
-# a clean exit proves the DynamicallyAccessedMembers annotations are sufficient
-# for a simple record under AOT.
+# <PublishAot>true</PublishAot> that exercises the trim-safe POCO/options surface
+# AND the reflection-based extract/load path, then RUNS the native binary. Because
+# the library is [RequiresUnreferencedCode], extract/load is EXPECTED to fail under
+# AOT — the smoke asserts that boundary: it treats the expected extract/load
+# failure as success and only fails the job on a failed ILC publish, the trim-safe
+# POCO surface throwing, or an *unexpected* extract/load success (which would mean
+# the [RequiresUnreferencedCode] marker may now be removable).
 #
 # Runs on Linux only — the Native-AOT toolchain (clang/ILC) isn't available on the
 # Windows runners, and the consumer is deliberately out of ETL-Xml.slnx so the
