@@ -48,5 +48,8 @@
     <Project Path="tests/Wolfgang.Etl.Xml.Tests.DocExamples/Wolfgang.Etl.Xml.Tests.DocExamples.csproj" />
     <Project Path="tests/Wolfgang.Etl.Xml.Tests.Unit/Wolfgang.Etl.Xml.Tests.Unit.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/GcProfileWorkload/GcProfileWorkload.csproj" />
+  </Folder>
 </Solution>
 
