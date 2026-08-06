@@ -15,8 +15,9 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// custom <see cref="XmlReaderSettings"/> and clones it before use, so setting
 /// <see cref="XmlReaderSettings.ValidationType"/> to <see cref="ValidationType.Schema"/> with a
 /// loaded <see cref="XmlSchemaSet"/> validates the source against the schema as it is read — no
-/// validation handler is attached, so a schema violation surfaces as an
-/// <see cref="XmlSchemaValidationException"/> from <c>ExtractAsync</c>.
+/// validation handler is attached, so a schema violation surfaces from <c>ExtractAsync</c> as an
+/// <see cref="InvalidOperationException"/> wrapping the <see cref="XmlSchemaValidationException"/>
+/// (the <see cref="System.Xml.Serialization.XmlSerializer"/> wraps read errors).
 /// </summary>
 public sealed class XmlSingleStreamExtractorXsdValidationTests
 {
