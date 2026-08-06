@@ -8,8 +8,8 @@ for byte, that the assembly we shipped is the one the source produces.
 
 Our CI already proves the build is reproducible *internally* — `.github/workflows/reproducible-build.yaml`
 builds the library twice in independent directories and fails if the two
-assemblies' hashes differ (#216). This page is the **consumer side**: how *you*
-verify it independently (#225).
+assemblies' hashes differ (#138). This page is the **consumer side**: how *you*
+verify it independently (#147).
 
 ## What is verified
 
