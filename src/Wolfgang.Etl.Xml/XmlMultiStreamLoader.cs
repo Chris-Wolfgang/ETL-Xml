@@ -180,7 +180,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
                 break;
             }
 
-            if (await SerializeItemOrHandleErrorAsync(item, itemNumber, token).ConfigureAwait(false))
+            if (await SerializeItemOrHandleErrorAsync(item, itemNumber, streamIndex, token).ConfigureAwait(false))
             {
                 streamIndex++;
             }
@@ -195,14 +195,14 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     // through the configurable ErrorPolicy. Returns true when the item was loaded, false when the
     // policy skipped a failed item — each item writes an independent document, so Skip genuinely
     // skips and continues; re-throws the original exception when the policy aborts.
-    private async System.Threading.Tasks.Task<bool> SerializeItemOrHandleErrorAsync(TRecord item, int oneBasedItemNumber, CancellationToken token)
+    private async System.Threading.Tasks.Task<bool> SerializeItemOrHandleErrorAsync(TRecord item, int oneBasedItemNumber, int streamIndex, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
         var stream = _streamFactory(item);
         if (stream is null)
         {
-            XmlLogMessages.StreamFactoryReturnedNull(_logger, oneBasedItemNumber - 1, null);
+            XmlLogMessages.StreamFactoryReturnedNull(_logger, streamIndex, null);
             throw new InvalidOperationException($"Stream factory returned null for item number {oneBasedItemNumber}.");
         }
 
@@ -236,7 +236,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         if (error is null)
         {
             IncrementCurrentItemCount();
-            XmlLogMessages.LoadedItemToStream(_logger, CurrentItemCount, oneBasedItemNumber - 1, null);
+            XmlLogMessages.LoadedItemToStream(_logger, CurrentItemCount, streamIndex, null);
             return true;
         }
 

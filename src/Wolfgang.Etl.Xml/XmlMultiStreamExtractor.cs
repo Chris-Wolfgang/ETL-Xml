@@ -194,9 +194,9 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
 
 
     // Deserializes one stream (disposing it), routing a deserialization failure through the
-    // configurable ErrorPolicy. Returns Skipped=true when the policy skipped a failed stream (each
-    // stream is one independent record, so Skip genuinely skips and continues), and re-throws the
-    // original exception when the policy aborts.
+    // configurable ErrorPolicy. Returns the deserialized record, or null when the policy skipped a
+    // failed stream (each stream is one independent record, so Skip genuinely skips and continues);
+    // re-throws the original exception when the policy aborts.
     private async System.Threading.Tasks.Task<TRecord?> DeserializeStreamOrHandleErrorAsync(Stream stream, int oneBasedStreamNumber)
     {
         TRecord? item = default;
