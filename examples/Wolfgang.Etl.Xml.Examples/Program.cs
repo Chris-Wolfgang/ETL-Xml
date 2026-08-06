@@ -143,7 +143,8 @@ static async Task XsdValidationAsync(ILoggerFactory loggerFactory)
     var logger = loggerFactory.CreateLogger<XmlSingleStreamExtractor<Person>>();
 
     // Valid source — validates cleanly and yields the records.
-    var validExtractor = new XmlSingleStreamExtractor<Person>(CreateSampleXmlStream(), ValidatingSettings(), logger);
+    using var validStream = CreateSampleXmlStream();
+    var validExtractor = new XmlSingleStreamExtractor<Person>(validStream, ValidatingSettings(), logger);
     var validated = 0;
     await foreach (var person in validExtractor.ExtractAsync().ConfigureAwait(false))
     {

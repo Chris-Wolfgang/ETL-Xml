@@ -184,7 +184,8 @@ runnable `XsdValidationAsync` example in
 
 ### Customizing the serialized XML
 
-Both the extractors and loaders serialize with `new XmlSerializer(typeof(T))`, so
+Both the extractors and loaders build an `XmlSerializer` from your record type
+(`new XmlSerializer(typeof(T))`) — loaders to serialize, extractors to deserialize — so
 they honour the standard [`System.Xml.Serialization`](https://learn.microsoft.com/dotnet/api/system.xml.serialization)
 attributes on your record type — element/attribute names, ignored members, the
 root element, collection shaping, and namespaces:

@@ -106,15 +106,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # BDN emits one *-report.json per benchmark class under
-          # <artifacts>/results/. Merge the class-level reports into a
-          # single (name, meanNs, allocBytes) map per side, then diff.
+          # BDN's json exporter emits one *-report-full-compressed.json per
+          # benchmark class under <artifacts>/results/. Merge the class-level
+          # reports into a single (name, meanNs, allocBytes) map per side, then diff.
           python3 - <<'PY' > delta.md
           import glob, json, os, sys
 
           def load(root):
               out = {}
-              for path in glob.glob(f"{root}/results/*-report.json"):
+              for path in glob.glob(f"{root}/results/*-report-full-compressed.json"):
                   with open(path, encoding="utf-8") as fp:
                       d = json.load(fp)
                   for b in d.get("Benchmarks", []):
@@ -183,7 +183,7 @@ jobs:
               for r in rows:
                   print("| " + " | ".join([esc(short(r[0]))] + [esc(x) for x in r[1:]]) + " |")
               print()
-              print("_Job: Short (fast, ~5% variance). Filter: `*ColumnAttributeTypeMapper*|*DbCommandBuilder*` — DB-free benchmarks only. Gate mode: informational; see `#154` for threshold-gate follow-up._")
+              print("_Job: Short (fast, ~5% variance). Filter: `*` (all benchmarks). Gate mode: informational (no pass/fail threshold)._")
           PY
           echo "---delta.md---"
           cat delta.md
