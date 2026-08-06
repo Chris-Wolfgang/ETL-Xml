@@ -70,8 +70,23 @@ jobs:
 
       - name: Normalize outcomes
         shell: bash
+        # Emit a deterministic "test name -> outcome" list from the TRX files.
+        # Sorted + fixed LF so cross-platform ordering / line-ending differences
+        # never masquerade as a real divergence — only outcome changes surface.
         run: |
-          python scripts/normalize-trx.py trx "outcomes-${{ matrix.label }}.txt"
+          python - "trx" "outcomes-${{ matrix.label }}.txt" <<'PY'
+          import glob, os, sys, xml.etree.ElementTree as ET
+          src, dest = sys.argv[1], sys.argv[2]
+          ns = "{http://microsoft.com/schemas/VisualStudio/TeamTest/2010}"
+          rows = set()
+          for path in glob.glob(os.path.join(src, "**", "*.trx"), recursive=True):
+              for r in ET.parse(path).getroot().iter(ns + "UnitTestResult"):
+                  rows.add(f"{r.get('testName') or ''} -> {r.get('outcome') or 'Unknown'}")
+          rows = sorted(rows)
+          with open(dest, "w", encoding="utf-8", newline="\n") as f:
+              f.write("\n".join(rows) + ("\n" if rows else ""))
+          print(f"normalized {len(rows)} test outcomes -> {dest}")
+          PY
 
       - name: Upload outcomes
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
