@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Per-item error handling / dead-lettering on the multi-stream extractor and loader (#11). `XmlMultiStreamExtractor<T>` and `XmlMultiStreamLoader<T>` now honour the assignable `ErrorPolicy` inherited from the Abstractions base stages (0.21+): assign one of `Wolfgang.Etl.ErrorPolicies.ItemErrorPolicy`'s ready-made policies (`Skip`, `SkipAndLog`, `SkipAndDeadLetter`, `SkipDeadLetterAndLog`) to skip or dead-letter a stream/record that fails to deserialize/serialize and keep going, with the count surfaced via `CurrentErrorItemCount`. The default remains fail-fast. The single-stream classes keep fail-fast semantics (a shared streaming document cannot resume mid-record) — use the multi-stream variants for per-record error capture.
+
 ### Changed
 
 - Upgraded `Wolfgang.Etl.Abstractions` 0.16.1 → 0.22.0 (adds the use-after-dispose contract, per-item error-handling hooks incl. the assignable `ErrorPolicy`, and the overflow-safe `long` `EtlPipelineProgress` counters). Test project upgraded to `Wolfgang.Etl.TestKit` / `Wolfgang.Etl.TestKit.Xunit` 0.22.0. (0.21 added the base-stage `ErrorPolicy` + the `Wolfgang.Etl.ErrorPolicies` package; 0.22 is a repository-consolidation release with no public API change.)
