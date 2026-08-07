@@ -41,6 +41,9 @@
   <Folder Name="/examples/">
     <Project Path="examples/Wolfgang.Etl.Xml.Examples/Wolfgang.Etl.Xml.Examples.csproj" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Wolfgang.Etl.Xml.ShadowWorkloads/Wolfgang.Etl.Xml.ShadowWorkloads.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Wolfgang.Etl.Xml/Wolfgang.Etl.Xml.csproj" />
   </Folder>
