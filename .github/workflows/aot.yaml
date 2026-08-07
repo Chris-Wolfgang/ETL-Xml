@@ -1,0 +1,59 @@
+# Trim / Native-AOT compatibility smoke (#135). The library targets net8.0/net10.0
+# and is annotated [RequiresUnreferencedCode] (XmlSerializer reflection), so its AOT
+# behavior was asserted only on paper. This publishes a tiny console consumer with
+# <PublishAot>true</PublishAot> that exercises the trim-safe POCO/options surface
+# AND the reflection-based extract/load path, then RUNS the native binary. Because
+# the library is [RequiresUnreferencedCode], extract/load is EXPECTED to fail under
+# AOT — the smoke asserts that boundary: it treats the expected extract/load
+# failure as success and only fails the job on a failed ILC publish, the trim-safe
+# POCO surface throwing, or an *unexpected* extract/load success (which would mean
+# the [RequiresUnreferencedCode] marker may now be removable).
+#
+# Runs on Linux only — the Native-AOT toolchain (clang/ILC) isn't available on the
+# Windows runners, and the consumer is deliberately out of ETL-Xml.slnx so the
+# multi-TFM/Windows build never tries to AOT-compile it.
+name: AOT smoke
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PROJECT: tests/Wolfgang.Etl.Xml.AotSmoke/Wolfgang.Etl.Xml.AotSmoke.csproj
+  PUBLISH_DIR: tests/Wolfgang.Etl.Xml.AotSmoke/bin/Release/net10.0/linux-x64/publish
+
+jobs:
+  aot-smoke:
+    name: PublishAot + run (linux-x64)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install Native AOT prerequisites
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      - name: Publish Native AOT (linux-x64)
+        run: dotnet publish "$PROJECT" -c Release -r linux-x64
+
+      - name: Run the published native binary
+        run: |
+          bin="$PUBLISH_DIR/Wolfgang.Etl.Xml.AotSmoke"
+          if [ ! -x "$bin" ]; then
+            echo "::error::Native AOT binary not produced at $bin"
+            exit 1
+          fi
+          echo "Running $bin"
+          "$bin"
