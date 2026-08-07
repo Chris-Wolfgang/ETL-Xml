@@ -151,6 +151,37 @@ using (var gunzip = new GZipStream(file, CompressionMode.Decompress))
 See the runnable `CompressedStreamRoundTripAsync` example in
 [`examples/Wolfgang.Etl.Xml.Examples`](examples/Wolfgang.Etl.Xml.Examples/Program.cs).
 
+### XSD validation during extraction
+
+`XmlSingleStreamExtractor<T>` accepts a custom `XmlReaderSettings` (and clones it
+before use), so an XSD is validated as the document is read — no extra pass:
+
+```csharp
+using System.Xml;
+using System.Xml.Schema;
+
+var schemas = new XmlSchemaSet();
+schemas.Add(targetNamespace: null, "person.xsd");
+
+var settings = new XmlReaderSettings
+{
+    ValidationType = ValidationType.Schema,
+    Schemas = schemas,
+};
+
+var extractor = new XmlSingleStreamExtractor<Person>(stream, settings, logger);
+await foreach (var person in extractor.ExtractAsync())
+{
+    // only schema-valid records reach here
+}
+```
+
+A schema violation surfaces from `ExtractAsync` as an `InvalidOperationException`
+whose `InnerException` is the `XmlSchemaValidationException` (with the offending
+line and reason) — `XmlSerializer` wraps the reader's validation error. See the
+runnable `XsdValidationAsync` example in
+[`examples/Wolfgang.Etl.Xml.Examples`](examples/Wolfgang.Etl.Xml.Examples/Program.cs).
+
 ---
 
 ## ✨ Features
