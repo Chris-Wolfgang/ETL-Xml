@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace Wolfgang.Etl.Xml;
 /// await loader.LoadAsync(items, cancellationToken);
 ///
 /// // Custom root element name, stream closed automatically:
-/// var loader = new XmlSingleStreamLoader&lt;Person&gt;
+/// var owningLoader = new XmlSingleStreamLoader&lt;Person&gt;
 /// (
 ///     File.Create("output.xml"),
 ///     new XmlSingleStreamLoaderOptions
@@ -46,7 +47,7 @@ namespace Wolfgang.Etl.Xml;
 ///         LeaveOpen = false,
 ///     }
 /// );
-/// await loader.LoadAsync(items, cancellationToken);
+/// await owningLoader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
 public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
@@ -81,6 +82,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty
     /// or whitespace string.
     /// </exception>
+    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamLoader(Stream stream, XmlSingleStreamLoaderOptions? options = null)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
@@ -102,6 +104,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/> or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
+    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamLoader
     (
         Stream stream,
@@ -134,6 +137,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty
     /// or whitespace string.
     /// </exception>
+    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamLoader
     (
         Stream stream,
@@ -190,6 +194,10 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         CancellationToken token
     )
     {
+        // Honour a token that is already cancelled before pulling the first item from the
+        // source or writing anything — a pre-cancelled load must consume nothing.
+        token.ThrowIfCancellationRequested();
+
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var settings = _writerSettings?.Clone() ?? new XmlWriterSettings { Indent = true };

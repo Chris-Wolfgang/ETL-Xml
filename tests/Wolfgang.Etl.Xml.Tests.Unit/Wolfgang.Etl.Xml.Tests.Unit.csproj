@@ -30,6 +30,20 @@
     </PackageReference>
   </ItemGroup>
 
+  <!-- Verify snapshot/approval testing (XmlSnapshotTests, #132), net10.0 only: the XML
+       output is TFM-independent so one snapshot suffices, and Verify's transitive deps
+       (Argon, DiffEngine) are not compatible with the older TFMs in this matrix. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Verify.Xunit" Version="31.12.5" />
+  </ItemGroup>
+
+  <!-- CsCheck property/fuzz testing (XmlFuzzTests, #120), net8.0+ only (CsCheck
+       targets net8.0). fuzz.yaml scales the case count via the CsCheck_Time /
+       CsCheck_Iter environment variables CsCheck reads at runtime. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0' OR '$(TargetFramework)' == 'net9.0' OR '$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="CsCheck" Version="4.7.0" />
+  </ItemGroup>
+
   <!-- Analyzer PackageReferences are centralized in Directory.Build.props -->
 
 

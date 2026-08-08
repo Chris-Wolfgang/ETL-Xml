@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -40,12 +41,12 @@ namespace Wolfgang.Etl.Xml;
 /// }
 ///
 /// // Transfer stream ownership — closed automatically when extraction completes:
-/// var extractor = new XmlSingleStreamExtractor&lt;Person&gt;
+/// var owningExtractor = new XmlSingleStreamExtractor&lt;Person&gt;
 /// (
 ///     File.OpenRead("data.xml"),
 ///     new XmlSingleStreamExtractorOptions { LeaveOpen = false }
 /// );
-/// await foreach (var person in extractor.ExtractAsync(cancellationToken))
+/// await foreach (var person in owningExtractor.ExtractAsync(cancellationToken))
 /// {
 ///     Console.WriteLine(person.Name);
 /// }
@@ -75,6 +76,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/> is <c>null</c>.
     /// </exception>
+    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamExtractor(Stream stream, XmlSingleStreamExtractorOptions? options = null)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
@@ -94,6 +96,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/> or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
+    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamExtractor
     (
         Stream stream,
@@ -120,6 +123,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/>, <paramref name="readerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
+    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamExtractor
     (
         Stream stream,

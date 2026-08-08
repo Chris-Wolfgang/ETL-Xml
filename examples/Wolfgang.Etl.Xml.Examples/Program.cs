@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
 using Wolfgang.Etl.Abstractions;
@@ -35,6 +36,89 @@ Console.WriteLine();
 await FluentMultiStreamFanInAsync().ConfigureAwait(false);
 Console.WriteLine();
 await CompressedStreamRoundTripAsync().ConfigureAwait(false);
+Console.WriteLine();
+await XsdValidationAsync(loggerFactory).ConfigureAwait(false);
+
+
+
+/// <summary>
+/// Demonstrates validating the source XML against an XSD <em>during</em> extraction. Because
+/// <see cref="XmlSingleStreamExtractor{TRecord}"/> accepts a custom <see cref="XmlReaderSettings"/>
+/// (and clones it before use), setting <see cref="XmlReaderSettings.ValidationType"/> to
+/// <see cref="ValidationType.Schema"/> with a loaded <see cref="XmlSchemaSet"/> validates each
+/// element as it is read — no extra pass over the document. A schema violation surfaces from
+/// <c>ExtractAsync</c> as an <see cref="InvalidOperationException"/> whose inner exception is the
+/// <see cref="XmlSchemaValidationException"/> with the offending line and reason.
+/// </summary>
+static async Task XsdValidationAsync(ILoggerFactory loggerFactory)
+{
+    Console.WriteLine("=== XSD validation during extraction ===");
+    Console.WriteLine();
+
+    const string schemaXsd = """
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          <xs:element name="ArrayOfPerson">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Person" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="FirstName" type="xs:string" minOccurs="0" />
+                      <xs:element name="LastName" type="xs:string" minOccurs="0" />
+                      <xs:element name="Age" type="xs:int" />
+                      <xs:element name="Email" type="xs:string" minOccurs="0" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:schema>
+        """;
+
+    var schemas = new XmlSchemaSet();
+    using (var schemaReader = XmlReader.Create(new StringReader(schemaXsd)))
+    {
+        schemas.Add(targetNamespace: null, schemaReader);
+    }
+
+    XmlReaderSettings ValidatingSettings() => new()
+    {
+        ValidationType = ValidationType.Schema,
+        Schemas = schemas,
+    };
+
+    var logger = loggerFactory.CreateLogger<XmlSingleStreamExtractor<Person>>();
+
+    // Valid source — validates cleanly and yields the records.
+    using var validStream = CreateSampleXmlStream();
+    var validExtractor = new XmlSingleStreamExtractor<Person>(validStream, ValidatingSettings(), logger);
+    var validated = 0;
+    await foreach (var person in validExtractor.ExtractAsync().ConfigureAwait(false))
+    {
+        validated++;
+    }
+
+    Console.WriteLine($"Valid document: extracted and schema-validated {validated} people.");
+
+    // Invalid source — Age is not an integer, so the schema-validating reader rejects it.
+    var invalidXml =
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+        + "<ArrayOfPerson><Person><FirstName>Dave</FirstName><Age>middle-aged</Age></Person></ArrayOfPerson>";
+    using var invalidStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(invalidXml));
+    var invalidExtractor = new XmlSingleStreamExtractor<Person>(invalidStream, ValidatingSettings(), logger);
+
+    try
+    {
+        await foreach (var _ in invalidExtractor.ExtractAsync().ConfigureAwait(false))
+        {
+        }
+    }
+    catch (InvalidOperationException ex) when (ex.InnerException is XmlSchemaValidationException schemaError)
+    {
+        Console.WriteLine($"Invalid document rejected during extraction: {schemaError.Message}");
+    }
+}
 
 
 

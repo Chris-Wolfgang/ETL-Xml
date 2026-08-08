@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,6 +55,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streamFactory"/> is <c>null</c>.
     /// </exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader(Func<TRecord, Stream> streamFactory)
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
@@ -75,6 +77,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streamFactory"/> or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
@@ -101,6 +104,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streamFactory"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
@@ -148,6 +152,10 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         CancellationToken token
     )
     {
+        // Honour a token that is already cancelled before pulling the first item from the
+        // source or opening any destination stream — a pre-cancelled load must consume nothing.
+        token.ThrowIfCancellationRequested();
+
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var streamIndex = 0;
