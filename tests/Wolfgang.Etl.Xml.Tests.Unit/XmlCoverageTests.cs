@@ -87,14 +87,18 @@ public sealed class XmlCoverageTests
         var loader = new XmlMultiStreamLoader<PersonRecord>
         (
             _ => Capture(buffers),
-            new XmlWriterSettings { Indent = true },
+            new XmlWriterSettings { OmitXmlDeclaration = true },
             NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
         );
 
         await loader.LoadAsync(ToAsync(Sample)).ConfigureAwait(false);
 
         Assert.Equal(1, loader.CurrentItemCount);
-        Assert.Single(buffers);
+        var xml = Encoding.UTF8.GetString(Assert.Single(buffers).ToArray());
+        // OmitXmlDeclaration = true suppresses the <?xml ?> prolog — proof the custom
+        // writer settings were actually applied, not silently discarded (the default
+        // serialize path emits the declaration).
+        Assert.DoesNotContain("<?xml", xml, StringComparison.Ordinal);
     }
 
 
