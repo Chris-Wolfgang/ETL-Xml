@@ -1,0 +1,46 @@
+# Continuous fuzz (#120). The [Trait("Category","Fuzz")] CsCheck property tests
+# also run in PR CI at their fast default case count; this workflow runs the
+# same tests for CI-time minutes per property by raising the CsCheck_Time budget
+# (CsCheck reads CsCheck_Time / CsCheck_Iter from the environment at runtime).
+name: Fuzz
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # Mondays 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: 'CsCheck_Time budget per property, in seconds'
+        required: false
+        default: '300'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fuzz-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fuzz:
+    name: CsCheck fuzz (Category=Fuzz)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Run fuzz suite
+        env:
+          # workflow_dispatch input when present, else the weekly default.
+          CsCheck_Time: ${{ github.event.inputs.seconds || '300' }}
+        run: >-
+          dotnet test tests/Wolfgang.Etl.Xml.Tests.Unit/Wolfgang.Etl.Xml.Tests.Unit.csproj
+          -c Release -f net10.0 --filter "Category=Fuzz"
