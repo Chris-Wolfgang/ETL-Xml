@@ -15,13 +15,14 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// Snapshot / approval tests (Verify) for <see cref="XmlSingleStreamLoader{TRecord}"/>'s and
 /// <see cref="XmlMultiStreamLoader{TRecord}"/>'s output (#132). These lock the exact serialized
 /// shape — XML declaration, root-element wrapper, element names, indentation, and line
-/// terminators — so accidental format drift a targeted assertion would miss fails loudly
+/// structure — so accidental format drift a targeted assertion would miss fails loudly
 /// against the committed <c>Snapshots/*.verified.txt</c> baseline.
 ///
-/// The XML string is split on its line terminators and the resulting line array is verified,
+/// The XML string is normalized (CRLF → LF) and split into a line array, which is verified
 /// rather than the raw string. Verify then owns the on-disk serialization (LF-terminated), which
-/// keeps the snapshot files git/OS-portable while still capturing terminator regressions — a
-/// <c>\n</c>-instead-of-<c>\r\n</c> change alters how the string splits and so changes the snapshot.
+/// keeps the snapshot files git/OS-portable. A bare <c>\n</c>-vs-<c>\r\n</c> terminator change is
+/// therefore intentionally NOT flagged; what the snapshot captures is structural drift — added,
+/// removed, or reordered lines, changed indentation, or changed element content.
 ///
 /// Restricted to net10.0 (see the csproj) — the output is TFM-independent, so one modern-TFM pass
 /// is sufficient and keeps a single shared snapshot per test.

@@ -24,7 +24,7 @@ Each release attaches a **`reproducible-build-manifest.json`** listing the expec
 ```json
 {
   "package": "Wolfgang.Etl.Xml",
-  "version": "0.16.1",
+  "version": "X.Y.Z",
   "algorithm": "sha256",
   "assemblies": {
     "lib/net10.0/Wolfgang.Etl.Xml.dll": "d34db33f…",
@@ -35,8 +35,8 @@ Each release attaches a **`reproducible-build-manifest.json`** listing the expec
 
 ## Verify a published package
 
-You need the same **major .NET SDK** the release was built with (see the release's
-`global.json` / the SDK line in `release.yaml` — `10.0.x` for current releases).
+You need the same **major .NET SDK** the release was built with (see the SDK line in
+`release.yaml` — `10.0.x` for current releases — plus `global.json` if the repo pins one).
 
 ```bash
 # 1. Get the exact published assembly hash (from the package on nuget.org)
