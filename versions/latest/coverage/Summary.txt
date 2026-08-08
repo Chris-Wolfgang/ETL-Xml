@@ -1,15 +1,15 @@
 Summary
-  Generated on: 7/22/2026 - 2:07:57 AM
-  Coverage date: 7/22/2026 - 2:07:54 AM
-  Parser: Cobertura
+  Generated on: 8/8/2026 - 1:24:26 PM
+  Coverage date: 8/8/2026 - 1:24:19 PM - 8/8/2026 - 1:24:22 PM
+  Parser: MultiReport (2x Cobertura)
   Assemblies: 1
   Classes: 10
   Files: 10
   Line coverage: 94.7%
-  Covered lines: 412
+  Covered lines: 414
   Uncovered lines: 23
-  Coverable lines: 435
-  Total lines: 1500
+  Coverable lines: 437
+  Total lines: 1524
   Branch coverage: 84.5% (169 of 200)
   Covered branches: 169
   Total branches: 200
@@ -28,5 +28,5 @@ Wolfgang.Etl.Xml                                     94.7%
   Wolfgang.Etl.Xml.XmlReport                          100%
   Wolfgang.Etl.Xml.XmlSingleStreamExtractor<T>       95.6%
   Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions    100%
-  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>          90.4%
+  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>          90.5%
   Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions       100%
