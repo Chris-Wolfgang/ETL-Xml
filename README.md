@@ -2,6 +2,10 @@
 
 Extractors and loaders for working with XML files using the Wolfgang.Etl design pattern
 
+[![NuGet](https://img.shields.io/nuget/v/Wolfgang.Etl.Xml.svg?logo=nuget&label=NuGet)](https://www.nuget.org/packages/Wolfgang.Etl.Xml/)
+[![Downloads](https://img.shields.io/nuget/dt/Wolfgang.Etl.Xml.svg?logo=nuget&label=downloads)](https://www.nuget.org/packages/Wolfgang.Etl.Xml/)
+[![PR build](https://img.shields.io/github/actions/workflow/status/Chris-Wolfgang/ETL-Xml/pr.yaml?event=pull_request_target&label=PR%20build&logo=github)](https://github.com/Chris-Wolfgang/ETL-Xml/actions/workflows/pr.yaml)
+[![release](https://img.shields.io/github/actions/workflow/status/Chris-Wolfgang/ETL-Xml/release.yaml?event=release&label=release&logo=github)](https://github.com/Chris-Wolfgang/ETL-Xml/actions/workflows/release.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-Multi--Targeted-purple.svg)](https://dotnet.microsoft.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/Chris-Wolfgang/ETL-Xml)
