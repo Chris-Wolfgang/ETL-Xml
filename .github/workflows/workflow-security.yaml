@@ -1,0 +1,89 @@
+name: Workflow Security
+
+# Lints the GitHub Actions YAML files themselves for:
+#   - syntax errors and common mistakes (actionlint)
+#   - workflow-security vulnerabilities — untrusted-input injection, missing
+#     permissions blocks, expression-context secret expansion, unpinned
+#     third-party actions (zizmor)
+#
+# Complementary to CodeQL (which scans .cs source) and to the manual
+# Actions-hardening review. Strictly additive; does not gate merge today,
+# but a high-severity new finding will surface as a PR annotation.
+# Closes #145.
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/actionlint.yaml'
+      - '.zizmor.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - '.github/actionlint.yaml'
+      - '.zizmor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Run actionlint
+        # Pinned to v1.7.7. Download via official script from the version tag
+        # for content-pinning — not from main — so a future change can't
+        # retroactively alter what this CI does.
+        run: |
+          curl -sSfLo /tmp/download-actionlint.bash \
+            https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash
+          bash /tmp/download-actionlint.bash 1.7.7 /tmp
+          /tmp/actionlint
+        shell: bash
+
+  zizmor:
+    name: zizmor
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write   # SARIF upload to the Security tab
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install zizmor
+        run: pip install --user 'zizmor==1.5.2'
+
+      - name: Run zizmor (SARIF output)
+        # --offline avoids GitHub API calls during the lint.
+        # --persona auditor enables stricter rules appropriate for a library
+        # shipping to the public NuGet feed.
+        run: |
+          zizmor --offline --persona auditor --format sarif \
+            .github/workflows/ > zizmor.sarif || true
+
+      - name: Upload SARIF to code-scanning
+        uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a # v4
+        if: always()
+        with:
+          sarif_file: zizmor.sarif
+          category: zizmor

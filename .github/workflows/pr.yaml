@@ -360,23 +360,26 @@ jobs:
         run: dotnet tool install -g JetBrains.ReSharper.GlobalTools
 
       - name: Run InspectCode
+        shell: pwsh
         run: |
-          # Find a solution to inspect. Prefer .slnx (new format) then .sln.
-          # InspectCode requires SOMETHING solution-shaped — fail loudly if neither exists.
-          SLN=$(ls *.slnx 2>/dev/null | head -n1)
-          if [ -z "$SLN" ]; then
-            SLN=$(ls *.sln 2>/dev/null | head -n1)
-          fi
-          if [ -z "$SLN" ]; then
-            echo "::error::No .slnx or .sln found at repo root — InspectCode needs one to run."
+          # Prefer .slnx (new format), fall back to .sln. Fail loudly if neither.
+          # pwsh (not bash) so the SLN detection is shellcheck-clean — no `ls`
+          # parsing (SC2012) or unquoted glob (SC2035) for workflow-security to flag.
+          $sln = (Get-ChildItem -Filter '*.slnx' -File | Select-Object -First 1).Name
+          if (-not $sln) {
+            $sln = (Get-ChildItem -Filter '*.sln' -File | Select-Object -First 1).Name
+          }
+          if (-not $sln) {
+            Write-Host "::error::No .slnx or .sln found at repo root — InspectCode needs one to run."
             exit 1
-          fi
-          echo "Inspecting: $SLN"
-          jb inspectcode "$SLN" \
-            --output=inspect.sarif \
-            --format=sarif \
-            --severity=WARNING \
+          }
+          Write-Host "Inspecting: $sln"
+          jb inspectcode $sln `
+            --output=inspect.sarif `
+            --format=sarif `
+            --severity=WARNING `
             --no-build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Upload SARIF to Code Scanning
         uses: github/codeql-action/upload-sarif@v4

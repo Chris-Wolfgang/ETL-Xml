@@ -1,0 +1,205 @@
+name: Shadow workloads (perf regression)
+
+# Nightly production-traffic shadow testing (issue #121).
+#
+# Replays the realistic consumer workloads in
+# samples/Wolfgang.Etl.Xml.ShadowWorkloads (BenchmarkDotNet over in-memory
+# streams — no external services) against the current main HEAD, publishes the
+# results to gh-pages under dev/shadow/, and FAILS + opens an issue when a
+# tracked metric regresses beyond the alert threshold versus the accumulated
+# baseline.
+#
+# Why nightly (not pr.yaml / release.yaml):
+#   - Each run pulls + starts a SQL Server container and runs BDN over 1k/100k
+#     row loads — minutes of runtime and heavy IO, far too slow for per-PR CI.
+#   - GitHub-hosted runners are noisy, so single measurements wobble; comparing
+#     against an accumulated nightly baseline is far more reliable than gating
+#     one noisy PR run.
+#   - A perf regression means "we merged something slow", not "the build is
+#     broken" — it belongs on a daily cadence, off the merge/release critical
+#     path. workflow_dispatch is provided for on-demand checks.
+#
+# Latency (Mean time) is the gated metric. Allocation/GC stats are captured and
+# charted (MemoryDiagnoser) but not yet auto-gated — allocation-threshold gating
+# is a tracked follow-up.
+
+on:
+  schedule:
+    - cron: '0 4 * * *' # daily 04:00 UTC
+  workflow_dispatch:
+
+# Top-level read-only default; the shadow job widens where it must.
+permissions:
+  contents: read
+
+# Serialize gh-pages writes so this can't race docfx.yaml / benchmarks.yaml.
+concurrency:
+  group: gh-pages
+  cancel-in-progress: false
+
+jobs:
+  # --------------------------------------------------------------------------
+  # GATE: skip the expensive run when nothing perf-relevant changed since the
+  # last successful run. Manual dispatch always runs.
+  # --------------------------------------------------------------------------
+  gate:
+    name: Decide whether to run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read # `gh run list` reads the Actions API
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0 # need history to diff HEAD against the last measured commit
+          persist-credentials: false
+
+      - name: Decide
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          HEAD_SHA: ${{ github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Manual dispatch always runs, even with no changes.
+          if [ "$EVENT_NAME" != "schedule" ]; then
+            echo "Manual dispatch — running."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # SHA of the commit the last SUCCESSFUL run measured. Empty on the
+          # first ever run, or after only-failing runs — either way, run.
+          last=$(gh run list --workflow shadow.yaml --branch main --status success \
+                   --limit 1 --json headSha --jq '.[0].headSha // ""' \
+                   -R "$GITHUB_REPOSITORY")
+          if [ -z "$last" ]; then
+            echo "No prior successful run — running."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "$last" = "$HEAD_SHA" ]; then
+            echo "HEAD ($HEAD_SHA) unchanged since last successful run — skipping."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Only run if a perf-relevant path changed since the last measured
+          # commit. `git diff --quiet` exits 0 (no diff → skip) or 1 (diff → run).
+          if git diff --quiet "$last" "$HEAD_SHA" -- src samples .github/workflows/shadow.yaml; then
+            echo "No perf-relevant changes since $last — skipping."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Perf-relevant changes since $last — running."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # --------------------------------------------------------------------------
+  # SHADOW: run the workloads, publish the chart, gate on latency regression.
+  # --------------------------------------------------------------------------
+  shadow:
+    name: Run shadow workloads & publish
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push chart + history to gh-pages
+      issues: write # open an issue on regression
+    env:
+      SAMPLE_DIR: samples/Wolfgang.Etl.Xml.ShadowWorkloads
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: |
+            10.0.x
+
+      - name: Build (Release)
+        shell: bash
+        run: dotnet build -c Release "$SAMPLE_DIR/Wolfgang.Etl.Xml.ShadowWorkloads.csproj"
+
+      - name: Run shadow workloads
+        working-directory: ${{ env.SAMPLE_DIR }}
+        shell: bash
+        # --job short bounds runtime on noisy hosted runners; it is reliable for
+        # the double-digit regressions this gate targets. No external services —
+        # the workloads run entirely over in-memory streams.
+        run: dotnet run -c Release --no-build -- --filter "*" --job short --memory --exporters json
+
+      - name: Locate BDN report
+        id: locate
+        working-directory: ${{ env.SAMPLE_DIR }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compressed.json)
+          if [ ${#reports[@]} -eq 0 ]; then
+            echo "::error::No BenchmarkDotNet JSON report found"
+            exit 1
+          fi
+          # One benchmark class → one report; merge defensively in case more are
+          # added later so github-action-benchmark still gets a single file.
+          jq -s '{
+            Title: "Xml shadow workloads",
+            HostEnvironmentInfo: .[0].HostEnvironmentInfo,
+            Benchmarks: [.[].Benchmarks[]]
+          }' "${reports[@]}" > shadow-result.json
+          echo "report=$SAMPLE_DIR/shadow-result.json" >> "$GITHUB_OUTPUT"
+
+      - name: Publish chart & gate on latency regression
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1.22.1
+        with:
+          name: Xml shadow workloads
+          tool: 'benchmarkdotnet'
+          output-file-path: ${{ steps.locate.outputs.report }}
+          gh-pages-branch: gh-pages
+          benchmark-data-dir-path: dev/shadow
+          auto-push: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # >20% slower than the baseline best fails the run (AC: >20% latency).
+          alert-threshold: '120%'
+          comment-on-alert: true
+          fail-on-alert: true
+
+      - name: Open regression issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY%/*}"
+          repo="${GITHUB_REPOSITORY#*/}"
+          short="${HEAD_SHA:0:7}"
+          # Write the body via heredoc (dedented to column 0) so no stray leading
+          # whitespace turns Markdown lines into code blocks.
+          cat > regression-body.md <<EOF
+          The nightly shadow-workload run failed — a tracked latency metric regressed past the alert threshold, or the run itself errored.
+
+          - Commit: \`$HEAD_SHA\`
+          - Run: $RUN_URL
+          - Chart: https://${owner}.github.io/${repo}/dev/shadow/
+
+          Compare the flagged benchmark against the baseline in the chart, then either fix the regression or, if it is intentional, note it here and let the new baseline stand.
+          EOF
+          gh issue create -R "$GITHUB_REPOSITORY" \
+            --title "Shadow-workload perf regression on $short" \
+            --label "performance-regression" \
+            --body-file regression-body.md
