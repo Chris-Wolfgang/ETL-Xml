@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -57,6 +58,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streams"/> is <c>null</c>.
     /// </exception>
+    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamExtractor(IEnumerable<Stream> streams)
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
@@ -75,6 +77,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streams"/> or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
+    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
@@ -98,6 +101,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streams"/>, <paramref name="readerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
+    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,

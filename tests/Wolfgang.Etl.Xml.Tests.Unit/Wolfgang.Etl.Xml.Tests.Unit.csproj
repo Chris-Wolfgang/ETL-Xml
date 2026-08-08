@@ -21,13 +21,27 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" Condition="!$(TargetFramework.StartsWith('net5.')) AND !$(TargetFramework.StartsWith('net6.')) AND !$(TargetFramework.StartsWith('net7.')) AND !$(TargetFramework.StartsWith('netcoreapp'))" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" Condition="$(TargetFramework.StartsWith('net5.')) OR $(TargetFramework.StartsWith('net6.')) OR $(TargetFramework.StartsWith('net7.')) OR $(TargetFramework.StartsWith('netcoreapp'))" />
     <PackageReference Include="System.Linq.Async" Version="7.0.1" />
-    <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.10.0" />
-    <PackageReference Include="Wolfgang.Etl.TestKit.Xunit" Version="0.10.0" />
+    <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.13.0" />
+    <PackageReference Include="Wolfgang.Etl.TestKit.Xunit" Version="0.13.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" NoWarn="NU1701">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <!-- Verify snapshot/approval testing (XmlSnapshotTests, #132), net10.0 only: the XML
+       output is TFM-independent so one snapshot suffices, and Verify's transitive deps
+       (Argon, DiffEngine) are not compatible with the older TFMs in this matrix. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Verify.Xunit" Version="31.12.5" />
+  </ItemGroup>
+
+  <!-- CsCheck property/fuzz testing (XmlFuzzTests, #120), net8.0+ only (CsCheck
+       targets net8.0). fuzz.yaml scales the case count via the CsCheck_Time /
+       CsCheck_Iter environment variables CsCheck reads at runtime. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0' OR '$(TargetFramework)' == 'net9.0' OR '$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="CsCheck" Version="4.7.0" />
   </ItemGroup>
 
   <!-- Analyzer PackageReferences are centralized in Directory.Build.props -->

@@ -155,6 +155,67 @@ using (var gunzip = new GZipStream(file, CompressionMode.Decompress))
 See the runnable `CompressedStreamRoundTripAsync` example in
 [`examples/Wolfgang.Etl.Xml.Examples`](examples/Wolfgang.Etl.Xml.Examples/Program.cs).
 
+### XSD validation during extraction
+
+`XmlSingleStreamExtractor<T>` accepts a custom `XmlReaderSettings` (and clones it
+before use), so an XSD is validated as the document is read — no extra pass:
+
+```csharp
+using System.Xml;
+using System.Xml.Schema;
+
+var schemas = new XmlSchemaSet();
+schemas.Add(targetNamespace: null, "person.xsd");
+
+var settings = new XmlReaderSettings
+{
+    ValidationType = ValidationType.Schema,
+    Schemas = schemas,
+};
+
+var extractor = new XmlSingleStreamExtractor<Person>(stream, settings, logger);
+await foreach (var person in extractor.ExtractAsync())
+{
+    // only schema-valid records reach here
+}
+```
+
+A schema violation surfaces from `ExtractAsync` as an `InvalidOperationException`
+whose `InnerException` is the `XmlSchemaValidationException` (with the offending
+line and reason) — `XmlSerializer` wraps the reader's validation error. See the
+runnable `XsdValidationAsync` example in
+[`examples/Wolfgang.Etl.Xml.Examples`](examples/Wolfgang.Etl.Xml.Examples/Program.cs).
+
+### Customizing the serialized XML
+
+Both the extractors and loaders build an `XmlSerializer` from your record type
+(`new XmlSerializer(typeof(T))`) — loaders to serialize, extractors to deserialize — so
+they honour the standard [`System.Xml.Serialization`](https://learn.microsoft.com/dotnet/api/system.xml.serialization)
+attributes on your record type — element/attribute names, ignored members, the
+root element, collection shaping, and namespaces:
+
+```csharp
+[XmlRoot("Employee")]
+public sealed class Person
+{
+    [XmlElement("FullName")]          // <FullName> instead of <FirstName>
+    public string FirstName { get; set; } = "";
+
+    [XmlAttribute("years")]           // age as an attribute: <Employee years="30">
+    public int Age { get; set; }
+
+    [XmlIgnore]                        // never serialized
+    public string InternalId { get; set; } = "";
+}
+```
+
+**Attribute-free customization (`XmlAttributeOverrides`) is not currently
+supported.** Because the serializer is constructed from the type alone, there is
+no hook to inject an `XmlAttributeOverrides` instance. If you don't own the type
+or want to keep it attribute-free, project it onto a small DTO you *do* control
+(and decorate that), or open an issue for first-class `XmlAttributeOverrides`
+support.
+
 ---
 
 ## ✨ Features

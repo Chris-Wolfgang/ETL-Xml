@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-07
+
+### Changed
+
+- Marked the public extractor/loader constructors (`XmlSingleStreamExtractor<T>`, `XmlMultiStreamExtractor<T>`, `XmlSingleStreamLoader<T>`, `XmlMultiStreamLoader<T>`) with `[RequiresUnreferencedCode]` (#135): the library (de)serializes via `System.Xml.Serialization.XmlSerializer`, which relies on runtime reflection / `Reflection.Emit` and is not trim / Native-AOT safe. Consumers running trim or AOT analysis now get an explicit diagnostic at these call sites rather than a silent runtime failure.
+- Upgraded `Wolfgang.Etl.Abstractions` 0.16.1 → 0.20.0 (adds the use-after-dispose contract, per-item error-handling hooks, and the overflow-safe `long` `EtlPipelineProgress` counters). Test project upgraded to `Wolfgang.Etl.TestKit` / `Wolfgang.Etl.TestKit.Xunit` 0.13.0.
+
+- Documentation for customizing the serialized XML (#14): a README "Customizing the serialized XML" section covering the standard `System.Xml.Serialization` attributes the extractors/loaders honour (`XmlRoot`, `XmlElement`, `XmlAttribute`, `XmlIgnore`, …), and a note that attribute-free customization via `XmlAttributeOverrides` is not currently supported (the serializer is built from the type alone).
+- Documentation, an example, and tests for XSD validation during extraction (#10): passing an `XmlReaderSettings` with `ValidationType.Schema` and a loaded `XmlSchemaSet` to `XmlSingleStreamExtractor<T>` validates the source against the schema as it is read. A violation surfaces from `ExtractAsync` as an `InvalidOperationException` wrapping the `XmlSchemaValidationException`.
+
+### Fixed
+
+- `XmlSingleStreamLoader` and `XmlMultiStreamLoader` now honour a `CancellationToken` that is already cancelled when `LoadAsync` is called by consuming nothing from the source — the cancellation is observed before the first item is pulled, matching the extractors and the `LoaderBase` contract in TestKit 0.13.
+
 ## [0.3.0] - 2026-07-21
 
 ### Added
