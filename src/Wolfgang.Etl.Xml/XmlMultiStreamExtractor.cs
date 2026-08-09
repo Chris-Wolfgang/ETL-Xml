@@ -43,6 +43,12 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML multi-stream extraction of {typeof(TRecord).Name}";
+    private static readonly KeyValuePair<string, object?>[] MetricTags =
+    {
+        new("etl.operation", "extract"),
+        new("etl.component", "XmlMultiStream"),
+        new("etl.record_type", typeof(TRecord).Name),
+    };
     private readonly IEnumerable<Stream> _streams;
     private readonly XmlReaderSettings? _readerSettings;
     private static readonly XmlSerializer Serializer = new(typeof(TRecord));
@@ -150,6 +156,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
 #pragma warning restore CS1998
     {
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
+        using var operationScope = XmlMetrics.StartOperation(MetricTags);
 
         var skipBudget = SkipItemCount;
         var streamIndex = 0;
@@ -172,6 +179,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
             {
                 skipBudget--;
                 IncrementCurrentSkippedItemCount();
+                XmlMetrics.RecordSkipped(MetricTags);
                 XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
                 continue;
             }
@@ -183,6 +191,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
             }
 
             IncrementCurrentItemCount();
+            XmlMetrics.RecordExtracted(MetricTags);
             XmlLogMessages.ExtractedItemFromStream(_logger, CurrentItemCount, streamIndex - 1, null);
 
             yield return item;

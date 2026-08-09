@@ -256,6 +256,33 @@ The dead-letter policies are also overloaded for a
 
 ---
 
+### Metrics & observability
+
+Every extractor and loader emits `System.Diagnostics.Metrics` measurements to the
+**`Wolfgang.Etl.Xml`** meter — no configuration required, and zero measurable
+overhead when nothing is listening. Point OpenTelemetry (or any `MeterListener`) at
+the meter to get throughput, skip/error rates, and operation latency:
+
+```csharp
+using var meterProvider = Sdk.CreateMeterProviderBuilder()
+    .AddMeter("Wolfgang.Etl.Xml")
+    .AddPrometheusExporter()
+    .Build();
+```
+
+| Instrument | Type | Description |
+|---|---|---|
+| `wolfgang.etl.xml.items.extracted` | Counter | Items successfully extracted |
+| `wolfgang.etl.xml.items.loaded` | Counter | Items successfully loaded |
+| `wolfgang.etl.xml.items.skipped` | Counter | Items skipped by the skip budget |
+| `wolfgang.etl.xml.items.errored` | Counter | Items skipped / dead-lettered by the error policy |
+| `wolfgang.etl.xml.operation.duration` | Histogram (ms) | Duration of an extract / load operation |
+
+Every measurement is tagged with `etl.operation` (`extract` / `load`),
+`etl.component` (`XmlSingleStream` / `XmlMultiStream`), and `etl.record_type`.
+
+---
+
 ## ✨ Features
 
 | Feature | Description |

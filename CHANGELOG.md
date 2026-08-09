@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Built-in OpenTelemetry / `System.Diagnostics.Metrics` instrumentation (#12). Every extractor and loader emits to the **`Wolfgang.Etl.Xml`** meter — counters `wolfgang.etl.xml.items.extracted` / `.loaded` / `.skipped` / `.errored` and the `wolfgang.etl.xml.operation.duration` histogram (ms) — each tagged with `etl.operation` (`extract`/`load`), `etl.component` (`XmlSingleStream`/`XmlMultiStream`), and `etl.record_type`. Subscribe with a `MeterListener` or OpenTelemetry; instruments are no-ops (zero measurable overhead) when no listener is registered, and no configuration is required from the caller.
+
 ## [0.5.0] - 2026-08-09
 
 ### Added

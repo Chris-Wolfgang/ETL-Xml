@@ -54,6 +54,12 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML single-stream loading of {typeof(TRecord).Name}";
+    private static readonly KeyValuePair<string, object?>[] MetricTags =
+    {
+        new("etl.operation", "load"),
+        new("etl.component", "XmlSingleStream"),
+        new("etl.record_type", typeof(TRecord).Name),
+    };
     private static readonly XmlSerializerNamespaces EmptyNamespaces =
         new(new[] { new XmlQualifiedName(name: "", ns: "") });
 
@@ -211,6 +217,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         token.ThrowIfCancellationRequested();
 
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
+        using var operationScope = XmlMetrics.StartOperation(MetricTags);
 
         // Dry run (#176): enumerate, count, and log exactly as a real load, but write
         // nothing to the output stream — no writer is created, so the document (including
@@ -225,6 +232,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
                 if (CurrentSkippedItemCount < SkipItemCount)
                 {
                     IncrementCurrentSkippedItemCount();
+                    XmlMetrics.RecordSkipped(MetricTags);
                     XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
                     continue;
                 }
@@ -241,6 +249,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
                 }
 
                 IncrementCurrentItemCount();
+                XmlMetrics.RecordLoaded(MetricTags);
                 XmlLogMessages.LoadedItem(_logger, CurrentItemCount, null);
             }
 
