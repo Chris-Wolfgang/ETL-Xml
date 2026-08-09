@@ -1,1 +1,5 @@
 #nullable enable
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.IsDryRun.get -> bool
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.IsDryRun.set -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.IsDryRun.get -> bool
+Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.IsDryRun.set -> void

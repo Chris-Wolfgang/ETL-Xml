@@ -33,7 +33,7 @@ namespace Wolfgang.Etl.Xml;
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
-public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
+public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>, ISupportDryRun
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML multi-stream loading of {typeof(TRecord).Name}";
@@ -146,6 +146,18 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
 
 
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
+    /// When <see langword="true"/>, the load enumerates the source, honours
+    /// <see cref="LoaderBase{TRecord, TProgress}.SkipItemCount"/> /
+    /// <see cref="LoaderBase{TRecord, TProgress}.MaximumItemCount"/>, advances the progress
+    /// counters, and logs as usual, but never invokes the destination-stream factory and
+    /// writes nothing. Defaults to <see langword="false"/>.
+    /// </summary>
+    public bool IsDryRun { get; set; }
+
+
+
     /// <inheritdoc />
     protected override async Task LoadWorkerAsync
     (
@@ -178,6 +190,14 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
             {
                 XmlLogMessages.ReachedMaximumItemCount(_logger, MaximumItemCount, null);
                 break;
+            }
+
+            // Dry run (#176): count the item but never invoke the stream factory or write —
+            // no destination stream is opened, so nothing is emitted.
+            if (IsDryRun)
+            {
+                IncrementCurrentItemCount();
+                continue;
             }
 
             if (await SerializeItemOrHandleErrorAsync(item, itemNumber, streamIndex, token).ConfigureAwait(false))
