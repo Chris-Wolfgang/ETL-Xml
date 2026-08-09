@@ -83,7 +83,12 @@ internal static class XmlMetrics
     internal static OperationScope StartOperation(KeyValuePair<string, object?>[] tags) => new(tags);
 
 
-    internal sealed class OperationScope : IDisposable
+    // A value type so a real run allocates nothing on the hot path; the only cost when no listener
+    // is subscribed is a cheap timestamp read at start and an Enabled check on dispose — the
+    // duration is recorded only if the histogram is enabled.
+#pragma warning disable S3898 // a one-shot timing scope has no meaningful equality
+    internal readonly struct OperationScope : IDisposable
+#pragma warning restore S3898
     {
         private readonly long _startTimestamp;
         private readonly KeyValuePair<string, object?>[] _tags;
@@ -98,6 +103,11 @@ internal static class XmlMetrics
 
         public void Dispose()
         {
+            if (!OperationDuration.Enabled)
+            {
+                return;
+            }
+
             var elapsedMs = (Stopwatch.GetTimestamp() - _startTimestamp) * 1000.0 / Stopwatch.Frequency;
             OperationDuration.Record(elapsedMs, _tags);
         }
