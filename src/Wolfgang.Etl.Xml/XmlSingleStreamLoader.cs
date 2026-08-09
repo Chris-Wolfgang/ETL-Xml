@@ -50,7 +50,7 @@ namespace Wolfgang.Etl.Xml;
 /// await owningLoader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
-public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
+public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>, ISupportDryRun
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML single-stream loading of {typeof(TRecord).Name}";
@@ -187,6 +187,18 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
 
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
+    /// When <see langword="true"/>, the load enumerates the source, honours
+    /// <see cref="LoaderBase{TRecord, TProgress}.SkipItemCount"/> /
+    /// <see cref="LoaderBase{TRecord, TProgress}.MaximumItemCount"/>, advances the progress
+    /// counters, and logs as usual, but writes nothing to the output stream. Defaults to
+    /// <see langword="false"/>.
+    /// </summary>
+    public bool IsDryRun { get; set; }
+
+
+
     /// <inheritdoc />
     protected override async Task LoadWorkerAsync
     (
@@ -200,43 +212,92 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
+        // Dry run (#176): enumerate, count, and log exactly as a real load, but write
+        // nothing to the output stream — no writer is created, so the document (including
+        // the root-element wrapper) is never emitted and the stream is left untouched.
+        var writer = IsDryRun ? null : await CreateDocumentWriterAsync().ConfigureAwait(false);
+        try
+        {
+            await foreach (var item in items.WithCancellation(token).ConfigureAwait(false))
+            {
+                token.ThrowIfCancellationRequested();
+
+                if (CurrentSkippedItemCount < SkipItemCount)
+                {
+                    IncrementCurrentSkippedItemCount();
+                    XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
+                    continue;
+                }
+
+                if (CurrentItemCount >= MaximumItemCount)
+                {
+                    XmlLogMessages.ReachedMaximumItemCount(_logger, MaximumItemCount, null);
+                    break;
+                }
+
+                if (writer is not null)
+                {
+                    Serializer.Serialize(writer, item, EmptyNamespaces);
+                }
+
+                IncrementCurrentItemCount();
+                XmlLogMessages.LoadedItem(_logger, CurrentItemCount, null);
+            }
+
+            if (writer is not null)
+            {
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+                await writer.WriteEndDocumentAsync().ConfigureAwait(false);
+                await writer.FlushAsync().ConfigureAwait(false);
+            }
+        }
+        finally
+        {
+            if (writer is not null)
+            {
+#if NETSTANDARD2_0 || NET462 || NET481
+                writer.Dispose();
+#else
+                await writer.DisposeAsync().ConfigureAwait(false);
+#endif
+            }
+        }
+
+        XmlLogMessages.SingleStreamLoadingCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, null);
+    }
+
+
+
+    // Creates the output XmlWriter over the destination stream and writes the document
+    // prolog + root-element start. Only called for a real (non-dry-run) load.
+    private async Task<XmlWriter> CreateDocumentWriterAsync()
+    {
         var settings = _writerSettings?.Clone() ?? new XmlWriterSettings { Indent = true };
         settings.CloseOutput = !_leaveOpen;
         settings.Async = true;
 
-        using var writer = XmlWriter.Create(_stream, settings);
-
-        await writer.WriteStartDocumentAsync().ConfigureAwait(false);
-        await writer.WriteStartElementAsync(prefix: null, localName: _rootElementName, ns: null).ConfigureAwait(false);
-
-        await foreach (var item in items.WithCancellation(token).ConfigureAwait(false))
+        var writer = XmlWriter.Create(_stream, settings);
+        var ready = false;
+        try
         {
-            token.ThrowIfCancellationRequested();
-
-            if (CurrentSkippedItemCount < SkipItemCount)
-            {
-                IncrementCurrentSkippedItemCount();
-                XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
-                continue;
-            }
-
-            if (CurrentItemCount >= MaximumItemCount)
-            {
-                XmlLogMessages.ReachedMaximumItemCount(_logger, MaximumItemCount, null);
-                break;
-            }
-
-            Serializer.Serialize(writer, item, EmptyNamespaces);
-            IncrementCurrentItemCount();
-
-            XmlLogMessages.LoadedItem(_logger, CurrentItemCount, null);
+            await writer.WriteStartDocumentAsync().ConfigureAwait(false);
+            await writer.WriteStartElementAsync(prefix: null, localName: _rootElementName, ns: null).ConfigureAwait(false);
+            ready = true;
+            return writer;
         }
-
-        await writer.WriteEndElementAsync().ConfigureAwait(false);
-        await writer.WriteEndDocumentAsync().ConfigureAwait(false);
-        await writer.FlushAsync().ConfigureAwait(false);
-
-        XmlLogMessages.SingleStreamLoadingCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, null);
+        finally
+        {
+            // If a prolog write threw, the writer never reaches LoadWorkerAsync's finally —
+            // dispose it here so the (possibly stream-owning) writer doesn't leak.
+            if (!ready)
+            {
+#if NETSTANDARD2_0 || NET462 || NET481
+                writer.Dispose();
+#else
+                await writer.DisposeAsync().ConfigureAwait(false);
+#endif
+            }
+        }
     }
 
 
