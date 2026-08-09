@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -122,6 +123,89 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class whose
+    /// factory returns an <see cref="IBufferWriter{T}"/> of bytes per item instead of a
+    /// <see cref="Stream"/> (#8) — serialized bytes flow straight into each buffer writer.
+    /// </summary>
+    /// <param name="bufferWriterFactory">
+    /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
+    /// of bytes to write it to.
+    /// </param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="bufferWriterFactory"/> is <c>null</c>.</exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>> bufferWriterFactory)
+        : this(ToStreamFactory(bufferWriterFactory))
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class with an
+    /// <see cref="IBufferWriter{T}"/>-of-bytes factory (#8) and a logger.
+    /// </summary>
+    /// <param name="bufferWriterFactory">
+    /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
+    /// of bytes to write it to.
+    /// </param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="bufferWriterFactory"/> or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlMultiStreamLoader
+    (
+        Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
+        ILogger<XmlMultiStreamLoader<TRecord>> logger
+    )
+        : this(ToStreamFactory(bufferWriterFactory), logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class with an
+    /// <see cref="IBufferWriter{T}"/>-of-bytes factory (#8) and custom writer settings.
+    /// </summary>
+    /// <param name="bufferWriterFactory">
+    /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
+    /// of bytes to write it to.
+    /// </param>
+    /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="bufferWriterFactory"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlMultiStreamLoader
+    (
+        Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
+        XmlWriterSettings writerSettings,
+        ILogger<XmlMultiStreamLoader<TRecord>> logger
+    )
+        : this(ToStreamFactory(bufferWriterFactory), writerSettings, logger)
+    {
+    }
+
+
+
+    // Wraps a per-item IBufferWriter<byte> factory as a Stream factory (each buffer writer wrapped
+    // in a write-only BufferWriterStream). Validated here so the ArgumentNullException reports the
+    // public 'bufferWriterFactory' parameter name.
+    private static Func<TRecord, Stream> ToStreamFactory(Func<TRecord, IBufferWriter<byte>> bufferWriterFactory)
+    {
+        if (bufferWriterFactory is null)
+        {
+            throw new ArgumentNullException(nameof(bufferWriterFactory));
+        }
+
+        return item => new BufferWriterStream(bufferWriterFactory(item));
     }
 
 
