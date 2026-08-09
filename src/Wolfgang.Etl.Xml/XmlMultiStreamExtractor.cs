@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Xml;
 using System.Xml.Serialization;
@@ -158,25 +159,12 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
             token.ThrowIfCancellationRequested();
             XmlLogMessages.ReadingStream(_logger, streamIndex, null);
 
-            TRecord? item;
-            try
-            {
-                item = DeserializeFromStream(stream);
-            }
-            finally
-            {
-#if NETSTANDARD2_0 || NET462 || NET481
-                stream.Dispose();
-#else
-                await stream.DisposeAsync().ConfigureAwait(false);
-#endif
-            }
-
             streamIndex++;
 
+            var item = await DeserializeStreamOrHandleErrorAsync(stream, streamIndex).ConfigureAwait(false);
             if (item is null)
             {
-                XmlLogMessages.StreamDeserializedToNull(_logger, streamIndex - 1, null);
+                // Either skipped by the ErrorPolicy or deserialized to null (both logged in the helper).
                 continue;
             }
 
@@ -201,6 +189,53 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
         }
 
         XmlLogMessages.MultiStreamExtractionCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, streamIndex, null);
+    }
+
+
+
+    // Deserializes one stream (disposing it), routing a deserialization failure through the
+    // configurable ErrorPolicy. Returns the deserialized record, or null when the policy skipped a
+    // failed stream (each stream is one independent record, so Skip genuinely skips and continues);
+    // re-throws the original exception when the policy aborts.
+    private async System.Threading.Tasks.Task<TRecord?> DeserializeStreamOrHandleErrorAsync(Stream stream, int oneBasedStreamNumber)
+    {
+        TRecord? item = default;
+        Exception? error = null;
+        try
+        {
+            item = DeserializeFromStream(stream);
+        }
+#pragma warning disable CA1031 // catch general exception to route it through the error policy
+        catch (Exception ex) when (ex is not OperationCanceledException)
+#pragma warning restore CA1031
+        {
+            error = ex;
+        }
+        finally
+        {
+#if NETSTANDARD2_0 || NET462 || NET481
+            stream.Dispose();
+#else
+            await stream.DisposeAsync().ConfigureAwait(false);
+#endif
+        }
+
+        if (error is not null)
+        {
+            if (HandleItemError(new ItemErrorContext(oneBasedStreamNumber, error)) == ItemErrorAction.Abort)
+            {
+                ExceptionDispatchInfo.Capture(error).Throw();
+            }
+
+            return default;
+        }
+
+        if (item is null)
+        {
+            XmlLogMessages.StreamDeserializedToNull(_logger, oneBasedStreamNumber - 1, null);
+        }
+
+        return item;
     }
 
 
