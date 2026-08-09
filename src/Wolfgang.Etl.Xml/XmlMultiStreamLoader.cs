@@ -192,11 +192,13 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
                 break;
             }
 
-            // Dry run (#176): count the item but never invoke the stream factory or write —
-            // no destination stream is opened, so nothing is emitted.
+            // Dry run (#176): count and log the item exactly as a real load would, but never
+            // invoke the stream factory or write — no destination stream is opened.
             if (IsDryRun)
             {
                 IncrementCurrentItemCount();
+                XmlLogMessages.LoadedItemToStream(_logger, CurrentItemCount, streamIndex, null);
+                streamIndex++;
                 continue;
             }
 

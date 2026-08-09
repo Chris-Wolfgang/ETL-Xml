@@ -277,9 +277,27 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         settings.Async = true;
 
         var writer = XmlWriter.Create(_stream, settings);
-        await writer.WriteStartDocumentAsync().ConfigureAwait(false);
-        await writer.WriteStartElementAsync(prefix: null, localName: _rootElementName, ns: null).ConfigureAwait(false);
-        return writer;
+        var ready = false;
+        try
+        {
+            await writer.WriteStartDocumentAsync().ConfigureAwait(false);
+            await writer.WriteStartElementAsync(prefix: null, localName: _rootElementName, ns: null).ConfigureAwait(false);
+            ready = true;
+            return writer;
+        }
+        finally
+        {
+            // If a prolog write threw, the writer never reaches LoadWorkerAsync's finally —
+            // dispose it here so the (possibly stream-owning) writer doesn't leak.
+            if (!ready)
+            {
+#if NETSTANDARD2_0 || NET462 || NET481
+                writer.Dispose();
+#else
+                await writer.DisposeAsync().ConfigureAwait(false);
+#endif
+            }
+        }
     }
 
 
