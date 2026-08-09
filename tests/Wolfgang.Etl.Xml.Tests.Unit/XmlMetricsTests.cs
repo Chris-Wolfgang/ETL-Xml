@@ -4,6 +4,7 @@ using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Wolfgang.Etl.ErrorPolicies;
 using Xunit;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit;
@@ -18,6 +19,23 @@ public sealed class MetricProbe
     public string Name { get; set; } = string.Empty;
 
     public int Value { get; set; }
+}
+
+
+/// <summary>
+/// A record used only by the metrics error-path test — its <see cref="Value"/> getter throws so the
+/// multi-stream loader's error policy fires. A dedicated type keeps its <c>etl.record_type</c> tag
+/// unique to this test class.
+/// </summary>
+public sealed class ExplodingMetricProbe
+{
+    public bool Explode { get; set; }
+
+    public string Value
+    {
+        get => Explode ? throw new InvalidOperationException("boom") : "ok";
+        set { }
+    }
 }
 
 
@@ -56,18 +74,16 @@ public sealed class XmlMetricsTests
 
         var extracted = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.extracted")).ToList();
         Assert.Equal(2, extracted.Sum(m => m.Value));
-        Assert.All(extracted, m =>
-        {
-            Assert.Equal("extract", m.Tags["etl.operation"]);
-            Assert.Equal("XmlSingleStream", m.Tags["etl.component"]);
-            Assert.Equal(ProbeType, m.Tags["etl.record_type"]);
-        });
-        Assert.Contains(measurements, m => Is(m, "wolfgang.etl.xml.operation.duration"));
+        Assert.All(extracted, m => AssertTags(m, "extract", "XmlSingleStream"));
+        Assert.Contains(measurements, m => Is(m, "wolfgang.etl.xml.operation.duration")
+            && Tag(m, "etl.operation", "extract")
+            && Tag(m, "etl.component", "XmlSingleStream")
+            && Tag(m, "etl.record_type", ProbeType));
     }
 
 
     [Fact]
-    public async Task SingleStreamLoader_emits_items_loaded_counter_tagged_load()
+    public async Task SingleStreamLoader_emits_items_loaded_counter_and_duration_with_tags()
     {
         var measurements = await CollectAsync(async () =>
         {
@@ -82,8 +98,10 @@ public sealed class XmlMetricsTests
 
         var loaded = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.loaded")).ToList();
         Assert.Equal(2, loaded.Sum(m => m.Value));
-        Assert.All(loaded, m => Assert.Equal("load", m.Tags["etl.operation"]));
-        Assert.Contains(measurements, m => Is(m, "wolfgang.etl.xml.operation.duration"));
+        Assert.All(loaded, m => AssertTags(m, "load", "XmlSingleStream"));
+        Assert.Contains(measurements, m => Is(m, "wolfgang.etl.xml.operation.duration")
+            && Tag(m, "etl.operation", "load")
+            && Tag(m, "etl.component", "XmlSingleStream"));
     }
 
 
@@ -108,11 +126,43 @@ public sealed class XmlMetricsTests
     }
 
 
+    [Fact]
+    public async Task MultiStreamLoader_error_policy_emits_items_errored_counter_tagged_multistream()
+    {
+        var measurements = await CollectAsync(
+            async () =>
+            {
+                var loader = new XmlMultiStreamLoader<ExplodingMetricProbe>(_ => new MemoryStream())
+                {
+                    ErrorPolicy = ItemErrorPolicy.Skip,
+                };
+                await loader.LoadAsync(new[] { new ExplodingMetricProbe { Explode = true } }.ToAsyncEnumerable())
+                    .ConfigureAwait(false);
+            },
+            recordType: nameof(ExplodingMetricProbe)).ConfigureAwait(false);
+
+        var errored = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.errored")).ToList();
+        Assert.Equal(1, errored.Sum(m => m.Value));
+        Assert.All(errored, m => Assert.Equal("XmlMultiStream", m.Tags["etl.component"]));
+    }
+
+
     private static bool Is(Measurement measurement, string instrumentName) =>
         string.Equals(measurement.Instrument, instrumentName, StringComparison.Ordinal);
 
 
-    private static async Task<List<Measurement>> CollectAsync(Func<Task> action)
+    private static bool Tag(Measurement measurement, string key, string value) =>
+        measurement.Tags.TryGetValue(key, out var actual) && string.Equals(actual as string, value, StringComparison.Ordinal);
+
+
+    private static void AssertTags(Measurement measurement, string operation, string component)
+    {
+        Assert.Equal(operation, measurement.Tags["etl.operation"]);
+        Assert.Equal(component, measurement.Tags["etl.component"]);
+    }
+
+
+    private static async Task<List<Measurement>> CollectAsync(Func<Task> action, string recordType = ProbeType)
     {
         var measurements = new List<Measurement>();
 
@@ -128,9 +178,9 @@ public sealed class XmlMetricsTests
         };
 
         listener.SetMeasurementEventCallback<long>((instrument, value, tags, _) =>
-            Add(measurements, instrument.Name, value, tags));
+            Add(measurements, recordType, instrument.Name, value, tags));
         listener.SetMeasurementEventCallback<double>((instrument, value, tags, _) =>
-            Add(measurements, instrument.Name, value, tags));
+            Add(measurements, recordType, instrument.Name, value, tags));
         listener.Start();
 
         await action().ConfigureAwait(false);
@@ -139,10 +189,11 @@ public sealed class XmlMetricsTests
     }
 
 
-    // Only records measurements tagged with this test's probe record type, ignoring metrics from
-    // other test classes emitting to the same process-global meter in parallel.
+    // Only records measurements tagged with this test's record type, ignoring metrics from other
+    // test classes emitting to the same process-global meter in parallel.
     private static void Add(
         List<Measurement> sink,
+        string recordType,
         string name,
         double value,
         ReadOnlySpan<KeyValuePair<string, object?>> tags)
@@ -153,8 +204,8 @@ public sealed class XmlMetricsTests
             dict[tag.Key] = tag.Value;
         }
 
-        if (!dict.TryGetValue("etl.record_type", out var recordType)
-            || !string.Equals(recordType as string, ProbeType, StringComparison.Ordinal))
+        if (!dict.TryGetValue("etl.record_type", out var actual)
+            || !string.Equals(actual as string, recordType, StringComparison.Ordinal))
         {
             return;
         }
