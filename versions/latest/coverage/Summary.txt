@@ -1,32 +1,32 @@
 Summary
-  Generated on: 8/8/2026 - 1:24:26 PM
-  Coverage date: 8/8/2026 - 1:24:19 PM - 8/8/2026 - 1:24:22 PM
+  Generated on: 8/9/2026 - 9:29:15 PM
+  Coverage date: 8/9/2026 - 9:29:08 PM - 8/9/2026 - 9:29:11 PM
   Parser: MultiReport (2x Cobertura)
   Assemblies: 1
   Classes: 10
   Files: 10
-  Line coverage: 94.7%
-  Covered lines: 414
-  Uncovered lines: 23
-  Coverable lines: 437
-  Total lines: 1524
-  Branch coverage: 84.5% (169 of 200)
-  Covered branches: 169
-  Total branches: 200
-  Method coverage: 100% (49 of 49)
-  Full method coverage: 81.6% (40 of 49)
-  Covered methods: 49
-  Fully covered methods: 40
-  Total methods: 49
+  Line coverage: 95.6%
+  Covered lines: 464
+  Uncovered lines: 21
+  Coverable lines: 485
+  Total lines: 1704
+  Branch coverage: 85.3% (193 of 226)
+  Covered branches: 193
+  Total branches: 226
+  Method coverage: 100% (55 of 55)
+  Full method coverage: 87.2% (48 of 55)
+  Covered methods: 55
+  Fully covered methods: 48
+  Total methods: 55
 
-Wolfgang.Etl.Xml                                     94.7%
+Wolfgang.Etl.Xml                                     95.6%
   Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions       100%
   Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions     100%
   Wolfgang.Etl.Xml.XmlLogMessages                     100%
-  Wolfgang.Etl.Xml.XmlMultiStreamExtractor<T>        93.9%
-  Wolfgang.Etl.Xml.XmlMultiStreamLoader<T>             95%
+  Wolfgang.Etl.Xml.XmlMultiStreamExtractor<T>        95.7%
+  Wolfgang.Etl.Xml.XmlMultiStreamLoader<T>             96%
   Wolfgang.Etl.Xml.XmlReport                          100%
-  Wolfgang.Etl.Xml.XmlSingleStreamExtractor<T>       95.6%
+  Wolfgang.Etl.Xml.XmlSingleStreamExtractor<T>       91.3%
   Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions    100%
-  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>          90.5%
+  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>          95.9%
   Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions       100%

@@ -280,6 +280,23 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).CreateProgressTimer
   nameWithType: XmlMultiStreamLoader<TRecord>.CreateProgressTimer
   nameWithType.vb: XmlMultiStreamLoader(Of TRecord).CreateProgressTimer
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.IsDryRun
+  name: IsDryRun
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1_IsDryRun
+  commentId: P:Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.IsDryRun
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.IsDryRun
+  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).IsDryRun
+  nameWithType: XmlMultiStreamLoader<TRecord>.IsDryRun
+  nameWithType.vb: XmlMultiStreamLoader(Of TRecord).IsDryRun
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.IsDryRun*
+  name: IsDryRun
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1_IsDryRun_
+  commentId: Overload:Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.IsDryRun
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.IsDryRun
+  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).IsDryRun
+  nameWithType: XmlMultiStreamLoader<TRecord>.IsDryRun
+  nameWithType.vb: XmlMultiStreamLoader(Of TRecord).IsDryRun
 - uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Threading.CancellationToken)
   name: LoadWorkerAsync(IAsyncEnumerable<TRecord>, CancellationToken)
   href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1_LoadWorkerAsync_System_Collections_Generic_IAsyncEnumerable__0__System_Threading_CancellationToken_
@@ -566,6 +583,23 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord).CreateProgressTimer
   nameWithType: XmlSingleStreamLoader<TRecord>.CreateProgressTimer
   nameWithType.vb: XmlSingleStreamLoader(Of TRecord).CreateProgressTimer
+- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.IsDryRun
+  name: IsDryRun
+  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_IsDryRun
+  commentId: P:Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.IsDryRun
+  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.IsDryRun
+  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord).IsDryRun
+  nameWithType: XmlSingleStreamLoader<TRecord>.IsDryRun
+  nameWithType.vb: XmlSingleStreamLoader(Of TRecord).IsDryRun
+- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.IsDryRun*
+  name: IsDryRun
+  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_IsDryRun_
+  commentId: Overload:Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.IsDryRun
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.IsDryRun
+  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord).IsDryRun
+  nameWithType: XmlSingleStreamLoader<TRecord>.IsDryRun
+  nameWithType.vb: XmlSingleStreamLoader(Of TRecord).IsDryRun
 - uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Threading.CancellationToken)
   name: LoadWorkerAsync(IAsyncEnumerable<TRecord>, CancellationToken)
   href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_LoadWorkerAsync_System_Collections_Generic_IAsyncEnumerable__0__System_Threading_CancellationToken_
