@@ -41,6 +41,26 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
 
         return stream.ToArray().Length > 0;
     }
+
+
+    [Xunit.Fact]
+    public async Task DryRun_with_LeaveOpen_false_still_closes_the_destination_stream()
+    {
+        var stream = new MemoryStream();
+        var loader = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlSingleStreamLoaderOptions { LeaveOpen = false }
+        )
+        {
+            IsDryRun = true,
+        };
+
+        await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
+
+        // Nothing was written, but LeaveOpen = false must still close the stream on completion.
+        Xunit.Assert.Throws<System.ObjectDisposedException>(() => stream.Position);
+    }
 }
 
 

@@ -253,18 +253,43 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         }
         finally
         {
-            if (writer is not null)
-            {
-#if NETSTANDARD2_0 || NET462 || NET481
-                writer.Dispose();
-#else
-                await writer.DisposeAsync().ConfigureAwait(false);
-#endif
-            }
+            await DisposeOutputAsync(writer).ConfigureAwait(false);
         }
 
         XmlLogMessages.SingleStreamLoadingCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, null);
     }
+
+
+
+    // Disposes the output at the end of a load. For a real load that is the writer, whose
+    // CloseOutput (== !_leaveOpen) closes the stream. A dry run creates no writer, so the
+    // destination stream is closed directly when LeaveOpen = false — close-on-complete is
+    // honoured either way.
+#if NETSTANDARD2_0 || NET462 || NET481
+#pragma warning disable CS1998 // only synchronous disposal is available on this TFM
+#endif
+    private async Task DisposeOutputAsync(XmlWriter? writer)
+    {
+        if (writer is not null)
+        {
+#if NETSTANDARD2_0 || NET462 || NET481
+            writer.Dispose();
+#else
+            await writer.DisposeAsync().ConfigureAwait(false);
+#endif
+        }
+        else if (!_leaveOpen)
+        {
+#if NETSTANDARD2_0 || NET462 || NET481
+            _stream.Dispose();
+#else
+            await _stream.DisposeAsync().ConfigureAwait(false);
+#endif
+        }
+    }
+#if NETSTANDARD2_0 || NET462 || NET481
+#pragma warning restore CS1998
+#endif
 
 
 
