@@ -38,6 +38,58 @@ Console.WriteLine();
 await CompressedStreamRoundTripAsync().ConfigureAwait(false);
 Console.WriteLine();
 await XsdValidationAsync(loggerFactory).ConfigureAwait(false);
+Console.WriteLine();
+await ErrorPolicyDeadLetterAsync().ConfigureAwait(false);
+
+
+
+/// <summary>
+/// Demonstrates per-item error handling / dead-lettering (#11) on the multi-stream extractor.
+/// Each stream is an independent record, so assigning an <see cref="XmlMultiStreamExtractor{TRecord}"/>
+/// an <c>ErrorPolicy</c> lets a stream that fails to deserialize be captured (dead-lettered) and
+/// skipped instead of aborting the whole run. Ready-made policies come from
+/// <see cref="Wolfgang.Etl.ErrorPolicies.ItemErrorPolicy"/>.
+/// </summary>
+static async Task ErrorPolicyDeadLetterAsync()
+{
+    Console.WriteLine("=== Per-item error handling / dead-lettering ===");
+    Console.WriteLine();
+
+    static Stream PersonStream(Person person)
+    {
+        var serializer = new XmlSerializer(typeof(Person));
+        var emptyNs = new XmlSerializerNamespaces(new[] { new XmlQualifiedName("", "") });
+        var ms = new MemoryStream();
+        serializer.Serialize(ms, person, emptyNs);
+        ms.Position = 0;
+        return ms;
+    }
+
+    // Three streams: a valid person, a stream that does not deserialize to Person, then a valid person.
+    var streams = new List<Stream>
+    {
+        PersonStream(new Person { FirstName = "Alice", LastName = "Smith", Age = 30 }),
+        new MemoryStream(System.Text.Encoding.UTF8.GetBytes("<NotAPerson><garbage/></NotAPerson>")),
+        PersonStream(new Person { FirstName = "Bob", LastName = "Jones", Age = 25 }),
+    };
+
+    var deadLetters = new List<Wolfgang.Etl.Abstractions.ItemErrorContext>();
+    var extractor = new XmlMultiStreamExtractor<Person>(streams)
+    {
+        ErrorPolicy = Wolfgang.Etl.ErrorPolicies.ItemErrorPolicy.SkipAndDeadLetter(deadLetters),
+    };
+
+    await foreach (var person in extractor.ExtractAsync().ConfigureAwait(false))
+    {
+        Console.WriteLine($"  extracted: {person.FirstName} {person.LastName}");
+    }
+
+    Console.WriteLine($"Dead-lettered {deadLetters.Count} failed record(s) (skipped), extracted {extractor.CurrentItemCount}:");
+    foreach (var failure in deadLetters)
+    {
+        Console.WriteLine($"  item #{failure.ItemNumber}: {failure.Exception.GetType().Name} — {failure.Exception.Message.Split('\n')[0]}");
+    }
+}
 
 
 

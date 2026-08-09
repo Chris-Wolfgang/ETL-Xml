@@ -216,6 +216,44 @@ or want to keep it attribute-free, project it onto a small DTO you *do* control
 (and decorate that), or open an issue for first-class `XmlAttributeOverrides`
 support.
 
+### Per-item error handling & dead-lettering
+
+By default a stream/record that fails to deserialize or serialize aborts the run.
+On the **multi-stream** classes — where each stream is an independent record — you
+can instead skip or **dead-letter** the failed record and keep going by assigning
+an `ErrorPolicy` (inherited from the Abstractions base stages). Ready-made policies
+live in the `Wolfgang.Etl.ErrorPolicies` package:
+
+```csharp
+using Wolfgang.Etl.ErrorPolicies;
+
+var deadLetters = new List<ItemErrorContext>();
+
+var extractor = new XmlMultiStreamExtractor<Person>(streams)
+{
+    // Skip / SkipAndLog(logger) / SkipAndDeadLetter(...) / SkipDeadLetterAndLog(...)
+    ErrorPolicy = ItemErrorPolicy.SkipAndDeadLetter(deadLetters),
+};
+
+await foreach (var person in extractor.ExtractAsync())
+{
+    // only successfully-deserialized records reach here
+}
+
+// extractor.CurrentErrorItemCount == deadLetters.Count;
+// each ItemErrorContext carries the 1-based item number and the exception.
+```
+
+The dead-letter policies are also overloaded for a
+`System.Threading.Channels.ChannelWriter<ItemErrorContext>`. See the runnable
+`ErrorPolicyDeadLetterAsync` example in
+[`examples/Wolfgang.Etl.Xml.Examples`](examples/Wolfgang.Etl.Xml.Examples/Program.cs).
+
+> **Single-stream classes keep fail-fast semantics.** `XmlSingleStreamExtractor<T>`
+> and `XmlSingleStreamLoader<T>` read/write one shared streaming document, which
+> cannot resume mid-record after a partial failure, so a bad record aborts the
+> run. Use the multi-stream variants for per-record error capture.
+
 ---
 
 ## ✨ Features
