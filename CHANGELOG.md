@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-09
+
+### Added
+
+- Per-item error handling / dead-lettering on the multi-stream extractor and loader (#11). `XmlMultiStreamExtractor<T>` and `XmlMultiStreamLoader<T>` now honour the assignable `ErrorPolicy` inherited from the Abstractions base stages (0.21+): assign one of `Wolfgang.Etl.ErrorPolicies.ItemErrorPolicy`'s ready-made policies (`Skip`, `SkipAndLog`, `SkipAndDeadLetter`, `SkipDeadLetterAndLog`) to skip or dead-letter a stream/record that fails to deserialize/serialize and keep going, with the count surfaced via `CurrentErrorItemCount`. The default remains fail-fast. The single-stream classes keep fail-fast semantics (a shared streaming document cannot resume mid-record) — use the multi-stream variants for per-record error capture.
+- Dry-run support on the loaders (#176). `XmlSingleStreamLoader<T>` and `XmlMultiStreamLoader<T>` implement `ISupportDryRun`: set `IsDryRun = true` to enumerate the source, honour `SkipItemCount` / `MaximumItemCount`, advance progress counters, and log exactly as a real load, but write nothing to the output stream(s) (the single-stream loader emits no document at all; the multi-stream loader never invokes the destination-stream factory). Defaults to `false` (fail-safe: real writes).
+
 ## [0.4.0] - 2026-08-07
 
 ### Changed

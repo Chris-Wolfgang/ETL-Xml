@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -32,7 +33,7 @@ namespace Wolfgang.Etl.Xml;
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
-public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
+public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>, ISupportDryRun
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML multi-stream loading of {typeof(TRecord).Name}";
@@ -145,6 +146,18 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
 
 
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
+    /// When <see langword="true"/>, the load enumerates the source, honours
+    /// <see cref="LoaderBase{TRecord, TProgress}.SkipItemCount"/> /
+    /// <see cref="LoaderBase{TRecord, TProgress}.MaximumItemCount"/>, advances the progress
+    /// counters, and logs as usual, but never invokes the destination-stream factory and
+    /// writes nothing. Defaults to <see langword="false"/>.
+    /// </summary>
+    public bool IsDryRun { get; set; }
+
+
+
     /// <inheritdoc />
     protected override async Task LoadWorkerAsync
     (
@@ -159,10 +172,12 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
 
         var streamIndex = 0;
+        var itemNumber = 0;
 
         await foreach (var item in items.WithCancellation(token).ConfigureAwait(false))
         {
             token.ThrowIfCancellationRequested();
+            itemNumber++;
 
             if (CurrentSkippedItemCount < SkipItemCount)
             {
@@ -177,38 +192,82 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
                 break;
             }
 
-            var stream = _streamFactory(item);
-            if (stream is null)
+            // Dry run (#176): count and log the item exactly as a real load would, but never
+            // invoke the stream factory or write — no destination stream is opened.
+            if (IsDryRun)
             {
-                XmlLogMessages.StreamFactoryReturnedNull(_logger, streamIndex, null);
-                throw new InvalidOperationException($"Stream factory returned null for item at index {streamIndex}.");
+                IncrementCurrentItemCount();
+                XmlLogMessages.LoadedItemToStream(_logger, CurrentItemCount, streamIndex, null);
+                streamIndex++;
+                continue;
             }
 
-            try
+            if (await SerializeItemOrHandleErrorAsync(item, itemNumber, streamIndex, token).ConfigureAwait(false))
             {
-                SerializeToStream(stream, item);
-#if NETSTANDARD2_0 || NET462 || NET481
-#pragma warning disable CA2016, MA0040 // FlushAsync(CancellationToken) not available on this TFM
-                await stream.FlushAsync().ConfigureAwait(false);
-#pragma warning restore CA2016, MA0040
-#else
-                await stream.FlushAsync(token).ConfigureAwait(false);
-#endif
-                IncrementCurrentItemCount();
                 streamIndex++;
-                XmlLogMessages.LoadedItemToStream(_logger, CurrentItemCount, streamIndex - 1, null);
-            }
-            finally
-            {
-#if NETSTANDARD2_0 || NET462 || NET481
-                stream.Dispose();
-#else
-                await stream.DisposeAsync().ConfigureAwait(false);
-#endif
             }
         }
 
         XmlLogMessages.MultiStreamLoadingCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, streamIndex, null);
+    }
+
+
+
+    // Writes one item to a factory-supplied stream (disposing it), routing a serialization failure
+    // through the configurable ErrorPolicy. Returns true when the item was loaded, false when the
+    // policy skipped a failed item — each item writes an independent document, so Skip genuinely
+    // skips and continues; re-throws the original exception when the policy aborts.
+    private async System.Threading.Tasks.Task<bool> SerializeItemOrHandleErrorAsync(TRecord item, int oneBasedItemNumber, int streamIndex, CancellationToken token)
+    {
+        token.ThrowIfCancellationRequested();
+
+        var stream = _streamFactory(item);
+        if (stream is null)
+        {
+            XmlLogMessages.StreamFactoryReturnedNull(_logger, streamIndex, null);
+            throw new InvalidOperationException($"Stream factory returned null for item number {oneBasedItemNumber}.");
+        }
+
+        Exception? error = null;
+        try
+        {
+            SerializeToStream(stream, item);
+#if NETSTANDARD2_0 || NET462 || NET481
+#pragma warning disable CA2016, MA0040 // FlushAsync(CancellationToken) not available on this TFM
+            await stream.FlushAsync().ConfigureAwait(false);
+#pragma warning restore CA2016, MA0040
+#else
+            await stream.FlushAsync(token).ConfigureAwait(false);
+#endif
+        }
+#pragma warning disable CA1031 // catch general exception to route it through the error policy
+        catch (Exception ex) when (ex is not OperationCanceledException)
+#pragma warning restore CA1031
+        {
+            error = ex;
+        }
+        finally
+        {
+#if NETSTANDARD2_0 || NET462 || NET481
+            stream.Dispose();
+#else
+            await stream.DisposeAsync().ConfigureAwait(false);
+#endif
+        }
+
+        if (error is null)
+        {
+            IncrementCurrentItemCount();
+            XmlLogMessages.LoadedItemToStream(_logger, CurrentItemCount, streamIndex, null);
+            return true;
+        }
+
+        if (HandleItemError(new ItemErrorContext(oneBasedItemNumber, error)) == ItemErrorAction.Abort)
+        {
+            ExceptionDispatchInfo.Capture(error).Throw();
+        }
+
+        return false;
     }
 
 
