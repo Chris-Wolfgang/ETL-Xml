@@ -81,6 +81,19 @@ public sealed class XmlLoaderBufferWriterTests
 
 
     [Fact]
+    public async Task MultiStreamLoader_when_factory_returns_null_buffer_writer_throws_InvalidOperationException()
+    {
+        var loader = new XmlMultiStreamLoader<PersonRecord>(_ => (IBufferWriter<byte>)null!);
+
+        // A null buffer writer routes through the loader's existing null-stream guard.
+        await Assert.ThrowsAsync<InvalidOperationException>
+        (
+            () => loader.LoadAsync(Sample.ToAsyncEnumerable())
+        ).ConfigureAwait(false);
+    }
+
+
+    [Fact]
     public void MultiStreamLoader_when_bufferWriterFactory_is_null_throws_ArgumentNullException()
     {
         var ex = Assert.Throws<ArgumentNullException>

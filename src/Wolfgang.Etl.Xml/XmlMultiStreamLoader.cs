@@ -205,7 +205,14 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
             throw new ArgumentNullException(nameof(bufferWriterFactory));
         }
 
-        return item => new BufferWriterStream(bufferWriterFactory(item));
+        // Map a null buffer writer to a null Stream so the loader's existing StreamFactoryReturnedNull
+        // guard runs (logging + a consistent InvalidOperationException), rather than the adapter
+        // throwing a different exception from a different place.
+        return item =>
+        {
+            var bufferWriter = bufferWriterFactory(item);
+            return bufferWriter is null ? null! : new BufferWriterStream(bufferWriter);
+        };
     }
 
 
