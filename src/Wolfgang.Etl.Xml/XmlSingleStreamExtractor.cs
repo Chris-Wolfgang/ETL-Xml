@@ -60,6 +60,12 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     private static readonly XmlSerializer Serializer = new(typeof(TRecord));
     private readonly ILogger _logger;
     private static readonly string OperationName = $"XML single-stream extraction of {typeof(TRecord).Name}";
+    private static readonly KeyValuePair<string, object?>[] MetricTags =
+    {
+        new("etl.operation", "extract"),
+        new("etl.component", "XmlSingleStream"),
+        new("etl.record_type", typeof(TRecord).Name),
+    };
     private readonly IProgressTimer? _progressTimer;
     private readonly bool _leaveOpen;
     private bool _progressTimerWired;
@@ -176,13 +182,11 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     )
     {
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
+        using var operationScope = XmlMetrics.StartOperation(MetricTags);
 
         var skipBudget = SkipItemCount;
-        var settings = _readerSettings?.Clone() ?? new XmlReaderSettings();
-        settings.CloseInput = !_leaveOpen;
-        settings.Async = true;
 
-        using var reader = XmlReader.Create(_stream, settings);
+        using var reader = XmlReader.Create(_stream, CreateReaderSettings());
 
         await AdvancePastRootElementAsync(reader).ConfigureAwait(false);
 
@@ -215,6 +219,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
             {
                 skipBudget--;
                 IncrementCurrentSkippedItemCount();
+                XmlMetrics.RecordSkipped(MetricTags);
                 XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
                 continue;
             }
@@ -226,12 +231,23 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
             }
 
             IncrementCurrentItemCount();
+            XmlMetrics.RecordExtracted(MetricTags);
             XmlLogMessages.ExtractedItem(_logger, CurrentItemCount, null);
 
             yield return item;
         }
 
         XmlLogMessages.SingleStreamExtractionCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, null);
+    }
+
+
+
+    private XmlReaderSettings CreateReaderSettings()
+    {
+        var settings = _readerSettings?.Clone() ?? new XmlReaderSettings();
+        settings.CloseInput = !_leaveOpen;
+        settings.Async = true;
+        return settings;
     }
 
 

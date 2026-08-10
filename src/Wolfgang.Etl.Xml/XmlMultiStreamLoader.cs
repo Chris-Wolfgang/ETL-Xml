@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -37,6 +38,12 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML multi-stream loading of {typeof(TRecord).Name}";
+    private static readonly KeyValuePair<string, object?>[] MetricTags =
+    {
+        new("etl.operation", "load"),
+        new("etl.component", "XmlMultiStream"),
+        new("etl.record_type", typeof(TRecord).Name),
+    };
     private readonly Func<TRecord, Stream> _streamFactory;
     private readonly XmlWriterSettings? _writerSettings;
     private static readonly XmlSerializer Serializer = new(typeof(TRecord));
@@ -121,6 +128,96 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
 
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class whose
+    /// factory returns an <see cref="IBufferWriter{T}"/> of bytes per item instead of a
+    /// <see cref="Stream"/> (#8) — serialized bytes flow straight into each buffer writer.
+    /// </summary>
+    /// <param name="bufferWriterFactory">
+    /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
+    /// of bytes to write it to.
+    /// </param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="bufferWriterFactory"/> is <c>null</c>.</exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>> bufferWriterFactory)
+        : this(ToStreamFactory(bufferWriterFactory))
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class with an
+    /// <see cref="IBufferWriter{T}"/>-of-bytes factory (#8) and a logger.
+    /// </summary>
+    /// <param name="bufferWriterFactory">
+    /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
+    /// of bytes to write it to.
+    /// </param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="bufferWriterFactory"/> or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlMultiStreamLoader
+    (
+        Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
+        ILogger<XmlMultiStreamLoader<TRecord>> logger
+    )
+        : this(ToStreamFactory(bufferWriterFactory), logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class with an
+    /// <see cref="IBufferWriter{T}"/>-of-bytes factory (#8) and custom writer settings.
+    /// </summary>
+    /// <param name="bufferWriterFactory">
+    /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
+    /// of bytes to write it to.
+    /// </param>
+    /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="bufferWriterFactory"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlMultiStreamLoader
+    (
+        Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
+        XmlWriterSettings writerSettings,
+        ILogger<XmlMultiStreamLoader<TRecord>> logger
+    )
+        : this(ToStreamFactory(bufferWriterFactory), writerSettings, logger)
+    {
+    }
+
+
+
+    // Wraps a per-item IBufferWriter<byte> factory as a Stream factory (each buffer writer wrapped
+    // in a write-only BufferWriterStream). Validated here so the ArgumentNullException reports the
+    // public 'bufferWriterFactory' parameter name.
+    private static Func<TRecord, Stream> ToStreamFactory(Func<TRecord, IBufferWriter<byte>> bufferWriterFactory)
+    {
+        if (bufferWriterFactory is null)
+        {
+            throw new ArgumentNullException(nameof(bufferWriterFactory));
+        }
+
+        // Map a null buffer writer to a null Stream so the loader's existing StreamFactoryReturnedNull
+        // guard runs (logging + a consistent InvalidOperationException), rather than the adapter
+        // throwing a different exception from a different place.
+        return item =>
+        {
+            var bufferWriter = bufferWriterFactory(item);
+            return bufferWriter is null ? null! : new BufferWriterStream(bufferWriter);
+        };
+    }
+
+
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class
     /// with an injected progress timer for testing.
     /// </summary>
@@ -170,6 +267,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         token.ThrowIfCancellationRequested();
 
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
+        using var operationScope = XmlMetrics.StartOperation(MetricTags);
 
         var streamIndex = 0;
         var itemNumber = 0;
@@ -182,6 +280,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
             if (CurrentSkippedItemCount < SkipItemCount)
             {
                 IncrementCurrentSkippedItemCount();
+                XmlMetrics.RecordSkipped(MetricTags);
                 XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
                 continue;
             }
@@ -197,6 +296,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
             if (IsDryRun)
             {
                 IncrementCurrentItemCount();
+                XmlMetrics.RecordLoaded(MetricTags);
                 XmlLogMessages.LoadedItemToStream(_logger, CurrentItemCount, streamIndex, null);
                 streamIndex++;
                 continue;
@@ -258,6 +358,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         if (error is null)
         {
             IncrementCurrentItemCount();
+            XmlMetrics.RecordLoaded(MetricTags);
             XmlLogMessages.LoadedItemToStream(_logger, CurrentItemCount, streamIndex, null);
             return true;
         }
@@ -267,6 +368,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
             ExceptionDispatchInfo.Capture(error).Throw();
         }
 
+        // The policy skipped / dead-lettered a failed item.
+        XmlMetrics.RecordErrored(MetricTags);
         return false;
     }
 

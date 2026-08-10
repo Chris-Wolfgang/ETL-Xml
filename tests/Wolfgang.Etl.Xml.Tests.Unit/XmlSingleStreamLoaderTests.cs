@@ -358,7 +358,7 @@ public class XmlSingleStreamLoaderTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => new XmlSingleStreamLoader<PersonRecord>(null!)
+            () => new XmlSingleStreamLoader<PersonRecord>((Stream)null!)
         );
     }
 
