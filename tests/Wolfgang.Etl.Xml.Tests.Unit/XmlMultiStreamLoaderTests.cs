@@ -95,7 +95,7 @@ public class XmlMultiStreamLoaderTests
     [Fact]
     public Task LoadAsync_when_stream_factory_returns_null_throws_InvalidOperationException()
     {
-        var sut = new XmlMultiStreamLoader<PersonRecord>(_ => null!);
+        var sut = new XmlMultiStreamLoader<PersonRecord>(_ => (Stream)null!);
 
         var items = new List<PersonRecord>
         {
@@ -225,7 +225,7 @@ public class XmlMultiStreamLoaderTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => new XmlMultiStreamLoader<PersonRecord>(null!)
+            () => new XmlMultiStreamLoader<PersonRecord>((Func<PersonRecord, Stream>)null!)
         );
     }
 

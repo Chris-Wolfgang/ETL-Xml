@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -158,6 +159,68 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         var resolved = options ?? new XmlSingleStreamLoaderOptions();
         _leaveOpen = resolved.LeaveOpen;
         _rootElementName = ResolveRootElementName(resolved.RootElementName);
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class that
+    /// writes to an <see cref="IBufferWriter{T}"/> of bytes instead of a <see cref="Stream"/> (#8) —
+    /// serialized bytes flow straight into the buffer writer with no intermediate stream buffering.
+    /// </summary>
+    /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
+    /// </param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="bufferWriter"/> is <c>null</c>.</exception>
+    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlSingleStreamLoader(IBufferWriter<byte> bufferWriter, XmlSingleStreamLoaderOptions? options = null)
+        : this(new BufferWriterStream(bufferWriter ?? throw new ArgumentNullException(nameof(bufferWriter))), options)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class writing
+    /// to an <see cref="IBufferWriter{T}"/> of bytes (#8) with a logger.
+    /// </summary>
+    /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="bufferWriter"/> or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlSingleStreamLoader(IBufferWriter<byte> bufferWriter, ILogger<XmlSingleStreamLoader<TRecord>> logger)
+        : this(new BufferWriterStream(bufferWriter ?? throw new ArgumentNullException(nameof(bufferWriter))), logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class writing
+    /// to an <see cref="IBufferWriter{T}"/> of bytes (#8) with custom writer settings.
+    /// </summary>
+    /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
+    /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="bufferWriter"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// </exception>
+    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlSingleStreamLoader
+    (
+        IBufferWriter<byte> bufferWriter,
+        XmlWriterSettings writerSettings,
+        ILogger<XmlSingleStreamLoader<TRecord>> logger,
+        XmlSingleStreamLoaderOptions? options = null
+    )
+        : this(new BufferWriterStream(bufferWriter ?? throw new ArgumentNullException(nameof(bufferWriter))), writerSettings, logger, options)
+    {
     }
 
 
