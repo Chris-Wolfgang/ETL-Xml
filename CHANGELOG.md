@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-10
+
 ### Added
 
 - `IBufferWriter<byte>` loader overloads (#8) for zero intermediate buffering. `XmlSingleStreamLoader<T>` accepts an `IBufferWriter<byte>` and `XmlMultiStreamLoader<T>` accepts a per-item `Func<TRecord, IBufferWriter<byte>>` — serialized bytes flow straight into the caller's buffer writer (e.g. a `System.IO.Pipelines.PipeWriter` or `ArrayBufferWriter<byte>`) through an internal write-only stream adapter, avoiding a `MemoryStream` round-trip. Output is byte-for-byte identical to the `Stream` overloads.

@@ -1,7 +1,1 @@
 #nullable enable
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>! logger) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>! logger) -> void
-Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>! bufferWriter, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>! logger) -> void
-Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>! bufferWriter, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>! logger, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> void
-Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>! bufferWriter, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> void
