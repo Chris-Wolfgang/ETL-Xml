@@ -37,6 +37,12 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML multi-stream loading of {typeof(TRecord).Name}";
+    private static readonly KeyValuePair<string, object?>[] MetricTags =
+    {
+        new("etl.operation", "load"),
+        new("etl.component", "XmlMultiStream"),
+        new("etl.record_type", typeof(TRecord).Name),
+    };
     private readonly Func<TRecord, Stream> _streamFactory;
     private readonly XmlWriterSettings? _writerSettings;
     private static readonly XmlSerializer Serializer = new(typeof(TRecord));
@@ -170,6 +176,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         token.ThrowIfCancellationRequested();
 
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
+        using var operationScope = XmlMetrics.StartOperation(MetricTags);
 
         var streamIndex = 0;
         var itemNumber = 0;
@@ -182,6 +189,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
             if (CurrentSkippedItemCount < SkipItemCount)
             {
                 IncrementCurrentSkippedItemCount();
+                XmlMetrics.RecordSkipped(MetricTags);
                 XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
                 continue;
             }
@@ -197,6 +205,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
             if (IsDryRun)
             {
                 IncrementCurrentItemCount();
+                XmlMetrics.RecordLoaded(MetricTags);
                 XmlLogMessages.LoadedItemToStream(_logger, CurrentItemCount, streamIndex, null);
                 streamIndex++;
                 continue;
@@ -258,6 +267,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         if (error is null)
         {
             IncrementCurrentItemCount();
+            XmlMetrics.RecordLoaded(MetricTags);
             XmlLogMessages.LoadedItemToStream(_logger, CurrentItemCount, streamIndex, null);
             return true;
         }
@@ -267,6 +277,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
             ExceptionDispatchInfo.Capture(error).Throw();
         }
 
+        // The policy skipped / dead-lettered a failed item.
+        XmlMetrics.RecordErrored(MetricTags);
         return false;
     }
 

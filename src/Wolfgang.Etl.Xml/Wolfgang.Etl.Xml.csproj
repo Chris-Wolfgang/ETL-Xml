@@ -55,6 +55,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
   </ItemGroup>
 
+  <!-- System.Diagnostics.Metrics (Meter, #12) is in-box on net8.0+; the .NET Framework and
+       netstandard2.0 TFMs need the DiagnosticSource package for it. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net481' OR '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.10" />
+  </ItemGroup>
+
   <!-- Analyzer PackageReferences are centralized in Directory.Build.props -->
 
 
