@@ -1,32 +1,34 @@
 Summary
-  Generated on: 8/9/2026 - 9:29:15 PM
-  Coverage date: 8/9/2026 - 9:29:08 PM - 8/9/2026 - 9:29:11 PM
+  Generated on: 8/10/2026 - 5:25:38 PM
+  Coverage date: 8/10/2026 - 5:25:31 PM - 8/10/2026 - 5:25:33 PM
   Parser: MultiReport (2x Cobertura)
   Assemblies: 1
-  Classes: 10
-  Files: 10
-  Line coverage: 95.6%
-  Covered lines: 464
-  Uncovered lines: 21
-  Coverable lines: 485
-  Total lines: 1704
-  Branch coverage: 85.3% (193 of 226)
-  Covered branches: 193
-  Total branches: 226
-  Method coverage: 100% (55 of 55)
-  Full method coverage: 87.2% (48 of 55)
-  Covered methods: 55
-  Fully covered methods: 48
-  Total methods: 55
+  Classes: 12
+  Files: 12
+  Line coverage: 94.8%
+  Covered lines: 570
+  Uncovered lines: 31
+  Coverable lines: 601
+  Total lines: 2136
+  Branch coverage: 84.1% (212 of 252)
+  Covered branches: 212
+  Total branches: 252
+  Method coverage: 94.3% (83 of 88)
+  Full method coverage: 85.2% (75 of 88)
+  Covered methods: 83
+  Fully covered methods: 75
+  Total methods: 88
 
-Wolfgang.Etl.Xml                                     95.6%
+Wolfgang.Etl.Xml                                     94.8%
+  Wolfgang.Etl.Xml.BufferWriterStream                93.5%
   Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions       100%
   Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions     100%
   Wolfgang.Etl.Xml.XmlLogMessages                     100%
-  Wolfgang.Etl.Xml.XmlMultiStreamExtractor<T>        95.7%
-  Wolfgang.Etl.Xml.XmlMultiStreamLoader<T>             96%
+  Wolfgang.Etl.Xml.XmlMetrics                         100%
+  Wolfgang.Etl.Xml.XmlMultiStreamExtractor<T>        96.1%
+  Wolfgang.Etl.Xml.XmlMultiStreamLoader<T>           93.6%
   Wolfgang.Etl.Xml.XmlReport                          100%
-  Wolfgang.Etl.Xml.XmlSingleStreamExtractor<T>       91.3%
+  Wolfgang.Etl.Xml.XmlSingleStreamExtractor<T>       92.2%
   Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions    100%
-  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>          95.9%
+  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>          93.4%
   Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions       100%
