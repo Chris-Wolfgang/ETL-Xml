@@ -431,3 +431,6 @@ nuget-packages/
 docfx_project/_site/
 docfx_project/obj/
 
+
+# Stryker mutation-testing output
+StrykerOutput/
