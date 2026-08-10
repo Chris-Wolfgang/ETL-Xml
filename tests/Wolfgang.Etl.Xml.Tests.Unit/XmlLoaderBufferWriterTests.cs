@@ -12,6 +12,51 @@ using Xunit;
 namespace Wolfgang.Etl.Xml.Tests.Unit;
 
 /// <summary>
+/// A minimal growable <see cref="IBufferWriter{T}"/> of bytes for the tests — used instead of
+/// <c>System.Buffers.ArrayBufferWriter&lt;byte&gt;</c>, which does not exist on the .NET Framework
+/// test TFMs (net462–net481). <c>IBufferWriter&lt;byte&gt;</c> itself is available everywhere via
+/// <c>System.Memory</c>.
+/// </summary>
+internal sealed class TestBufferWriter : IBufferWriter<byte>
+{
+    private byte[] _buffer = new byte[256];
+
+
+    public int WrittenCount { get; private set; }
+
+
+    public ReadOnlySpan<byte> WrittenSpan => _buffer.AsSpan(0, WrittenCount);
+
+
+    public void Advance(int count) => WrittenCount += count;
+
+
+    public Memory<byte> GetMemory(int sizeHint = 0)
+    {
+        EnsureCapacity(sizeHint);
+        return _buffer.AsMemory(WrittenCount);
+    }
+
+
+    public Span<byte> GetSpan(int sizeHint = 0)
+    {
+        EnsureCapacity(sizeHint);
+        return _buffer.AsSpan(WrittenCount);
+    }
+
+
+    private void EnsureCapacity(int sizeHint)
+    {
+        var needed = WrittenCount + Math.Max(1, sizeHint);
+        if (needed > _buffer.Length)
+        {
+            Array.Resize(ref _buffer, Math.Max(_buffer.Length * 2, needed));
+        }
+    }
+}
+
+
+/// <summary>
 /// Verifies the <see cref="IBufferWriter{T}"/>-of-bytes loader overloads (#8): serialized bytes flow
 /// into the caller's buffer writer and produce exactly the same XML as the stream overloads, and the
 /// <c>BufferWriterStream</c> adapter honours its write-only contract.
@@ -28,7 +73,7 @@ public sealed class XmlLoaderBufferWriterTests
     [Fact]
     public async Task SingleStreamLoader_buffer_writer_produces_same_xml_as_stream()
     {
-        var bufferWriter = new ArrayBufferWriter<byte>();
+        var bufferWriter = new TestBufferWriter();
         var loader = new XmlSingleStreamLoader<PersonRecord>(bufferWriter);
         await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
         var viaBuffer = Encoding.UTF8.GetString(bufferWriter.WrittenSpan.ToArray());
@@ -50,12 +95,12 @@ public sealed class XmlLoaderBufferWriterTests
     [Fact]
     public async Task MultiStreamLoader_buffer_writer_factory_writes_each_record()
     {
-        var buffers = new List<ArrayBufferWriter<byte>>();
+        var buffers = new List<TestBufferWriter>();
         var loader = new XmlMultiStreamLoader<PersonRecord>
         (
             _ =>
             {
-                var bufferWriter = new ArrayBufferWriter<byte>();
+                var bufferWriter = new TestBufferWriter();
                 buffers.Add(bufferWriter);
                 return bufferWriter;
             }
@@ -108,7 +153,7 @@ public sealed class XmlLoaderBufferWriterTests
     [Fact]
     public void BufferWriterStream_supports_writing_only()
     {
-        var stream = new BufferWriterStream(new ArrayBufferWriter<byte>());
+        var stream = new BufferWriterStream(new TestBufferWriter());
 
         Assert.True(stream.CanWrite);
         Assert.False(stream.CanRead);
@@ -125,7 +170,7 @@ public sealed class XmlLoaderBufferWriterTests
     [Fact]
     public async Task BufferWriterStream_WriteAsync_appends_bytes_and_honours_cancellation()
     {
-        var bufferWriter = new ArrayBufferWriter<byte>();
+        var bufferWriter = new TestBufferWriter();
         var stream = new BufferWriterStream(bufferWriter);
 
         await stream.WriteAsync(new byte[] { 1, 2, 3 }, 0, 3, CancellationToken.None).ConfigureAwait(false);

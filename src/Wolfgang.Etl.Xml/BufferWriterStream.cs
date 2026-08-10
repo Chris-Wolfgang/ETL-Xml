@@ -64,19 +64,22 @@ internal sealed class BufferWriterStream : Stream
 
     public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
-        // Validate arguments synchronously (throw immediately), before observing cancellation, to
-        // match BCL Stream behaviour so a forgotten await can't swallow the argument error.
+        // Validate all arguments synchronously (throw immediately), before observing cancellation,
+        // to match BCL Stream behaviour so a forgotten await can't swallow an argument error.
+        // AsSpan(offset, count) performs the offset/count range validation.
         if (buffer is null)
         {
             throw new ArgumentNullException(nameof(buffer));
         }
+
+        var bytes = buffer.AsSpan(offset, count);
 
         if (cancellationToken.IsCancellationRequested)
         {
             return Task.FromCanceled(cancellationToken);
         }
 
-        WriteBytes(buffer.AsSpan(offset, count));
+        WriteBytes(bytes);
         return Task.CompletedTask;
     }
 
