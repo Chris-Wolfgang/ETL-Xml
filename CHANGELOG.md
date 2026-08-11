@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-11
+
+### Fixed
+
+- **Data loss: a record following an element that deserialized to `null` was silently dropped.**
+  `XmlSingleStreamExtractor<T>` recorded "the reader is already advanced" only after a successful
+  deserialize, so a `null` result (for example an `xsi:nil` element) fell through to another
+  `ReadAsync()` and consumed the *next* sibling's start tag. Given `<nil/>`, `Bob`, `Carol` the
+  extractor returned only `Carol`. It now returns `Bob` and `Carol`. Found by mutation testing (#127).
+- **`LeaveOpen` was ignored by the `(stream, logger)` constructors, closing the caller's stream.**
+  `XmlSingleStreamExtractor<T>` and `XmlSingleStreamLoader<T>` initialized their fields
+  independently in each overload, and the two-parameter logger overloads never assigned the
+  backing field — so it defaulted to `false` and the stream was closed on completion, the opposite
+  of the documented `LeaveOpen = true`. Every constructor now delegates to a single private
+  initializer, so the default cannot diverge per overload again.
+
+### Added
+
+- **Canonical constructors that accept options and a logger together.** Previously a logger could
+  only be supplied by giving up the options record or by also passing `XmlReaderSettings` /
+  `XmlWriterSettings`. New overloads take `(source, options, logger)` with `logger` optional:
+  - `XmlSingleStreamExtractor<T>(Stream, XmlSingleStreamExtractorOptions?, ILogger<...>?)`
+  - `XmlSingleStreamLoader<T>(Stream, XmlSingleStreamLoaderOptions?, ILogger<...>?)`
+  - `XmlSingleStreamLoader<T>(IBufferWriter<byte>, XmlSingleStreamLoaderOptions?, ILogger<...>?)`
+
+  Purely additive — existing constructors are unchanged and still bind exactly as before. They
+  become redundant and are scheduled to be marked `[Obsolete]` in 0.8.0 and removed in 0.9.0
+  (see the deprecation tracking issue); nothing is deprecated in this release, so upgrading
+  cannot break a build that treats warnings as errors.
+
 ## [0.6.0] - 2026-08-10
 
 ### Added

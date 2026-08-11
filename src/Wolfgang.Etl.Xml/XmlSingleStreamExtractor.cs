@@ -84,11 +84,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// </exception>
     [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamExtractor(Stream stream, XmlSingleStreamExtractorOptions? options = null)
+        : this(stream, options, logger: null)
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = NullLogger.Instance;
-        _readerSettings = null;
-        _leaveOpen = (options ?? new XmlSingleStreamExtractorOptions()).LeaveOpen;
     }
 
 
@@ -108,10 +105,11 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         Stream stream,
         ILogger<XmlSingleStreamExtractor<TRecord>> logger
     )
+        // Delegates to the canonical constructor rather than assigning fields directly. The
+        // hand-rolled version omitted _leaveOpen, so this overload silently defaulted it to
+        // false and closed the caller's stream, contradicting the documented LeaveOpen = true.
+        : this(stream, options: null, logger: logger ?? throw new ArgumentNullException(nameof(logger)))
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _readerSettings = null;
     }
 
 
@@ -137,10 +135,76 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         ILogger<XmlSingleStreamExtractor<TRecord>> logger,
         XmlSingleStreamExtractorOptions? options = null
     )
+        : this
+        (
+            stream,
+            settings: readerSettings ?? throw new ArgumentNullException(nameof(readerSettings)),
+            options: options,
+            logger: logger ?? throw new ArgumentNullException(nameof(logger)),
+            timer: null
+        )
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamExtractor{TRecord}"/> class.
+    /// This is the canonical constructor — every other overload delegates to it — and it is the
+    /// only one that lets <paramref name="options"/> and <paramref name="logger"/> be supplied
+    /// together without also supplying <see cref="XmlReaderSettings"/>.
+    /// </summary>
+    /// <param name="stream">The stream containing XML data to read from.</param>
+    /// <param name="options">
+    /// Options that control extractor behaviour. When <c>null</c>, defaults are used.
+    /// </param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c>, logging is disabled.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="stream"/> is <c>null</c>.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// // Options and a logger, without having to supply XmlReaderSettings:
+    /// var extractor = new XmlSingleStreamExtractor&lt;Person&gt;
+    /// (
+    ///     stream,
+    ///     options: new XmlSingleStreamExtractorOptions { LeaveOpen = false },
+    ///     logger: logger
+    /// );
+    /// </code>
+    /// </example>
+    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlSingleStreamExtractor
+    (
+        Stream stream,
+        XmlSingleStreamExtractorOptions? options,
+        ILogger<XmlSingleStreamExtractor<TRecord>>? logger = null
+    )
+        : this(stream, settings: null, options: options, logger: logger, timer: null)
+    {
+    }
+
+
+
+    // The single initialization path. Every public and internal constructor delegates here, so
+    // there is exactly one place that resolves options -> _leaveOpen. The previous shape let each
+    // overload initialize fields itself, which is how the (stream, logger) overload came to omit
+    // _leaveOpen entirely and silently close the caller's stream.
+    private XmlSingleStreamExtractor
+    (
+        Stream stream,
+        XmlReaderSettings? settings,
+        XmlSingleStreamExtractorOptions? options,
+        ILogger? logger,
+        IProgressTimer? timer
+    )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _readerSettings = settings;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _progressTimer = timer;
         _leaveOpen = (options ?? new XmlSingleStreamExtractorOptions()).LeaveOpen;
     }
 
@@ -165,12 +229,15 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         IProgressTimer timer,
         XmlSingleStreamExtractorOptions? options = null
     )
+        : this
+        (
+            stream,
+            settings: readerSettings ?? throw new ArgumentNullException(nameof(readerSettings)),
+            options: options,
+            logger: logger,
+            timer: timer ?? throw new ArgumentNullException(nameof(timer))
+        )
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _leaveOpen = (options ?? new XmlSingleStreamExtractorOptions()).LeaveOpen;
     }
 
 
@@ -196,9 +263,9 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
             token.ThrowIfCancellationRequested();
             needsRead = true;
 
-            if (reader.NodeType != XmlNodeType.Element || reader.Depth != 1)
+            if (!IsChildElement(reader))
             {
-                if (reader.NodeType == XmlNodeType.EndElement && reader.Depth == 0)
+                if (IsDocumentEnd(reader))
                 {
                     break;
                 }
@@ -206,21 +273,24 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
                 continue;
             }
 
-            var item = TryDeserializeChildElement(reader);
+            var item = TryDeserializeChildElement(reader, out var consumedElement);
+
+            // Recorded even on the null path: skipping it there re-read and swallowed the
+            // following sibling. See TryDeserializeChildElement.
+            if (consumedElement)
+            {
+                needsRead = false;
+            }
+
             if (item is null)
             {
                 continue;
             }
 
-            // After Deserialize, the reader is already positioned at the next node
-            needsRead = false;
-
             if (skipBudget > 0)
             {
                 skipBudget--;
-                IncrementCurrentSkippedItemCount();
-                XmlMetrics.RecordSkipped(MetricTags);
-                XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
+                RecordSkipped();
                 continue;
             }
 
@@ -230,9 +300,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
                 break;
             }
 
-            IncrementCurrentItemCount();
-            XmlMetrics.RecordExtracted(MetricTags);
-            XmlLogMessages.ExtractedItem(_logger, CurrentItemCount, null);
+            RecordExtracted();
 
             yield return item;
         }
@@ -265,13 +333,52 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
 
 
 
-    private TRecord? TryDeserializeChildElement(XmlReader reader)
+    // Counter + metric + log for one skipped item, kept together so the three can never drift.
+    private void RecordSkipped()
     {
-        if (reader.NodeType != XmlNodeType.Element || reader.Depth != 1)
+        IncrementCurrentSkippedItemCount();
+        XmlMetrics.RecordSkipped(MetricTags);
+        XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
+    }
+
+
+
+    // Counter + metric + log for one extracted item.
+    private void RecordExtracted()
+    {
+        IncrementCurrentItemCount();
+        XmlMetrics.RecordExtracted(MetricTags);
+        XmlLogMessages.ExtractedItem(_logger, CurrentItemCount, null);
+    }
+
+
+
+    // A record lives at depth 1 — a direct child of the root element.
+    private static bool IsChildElement(XmlReader reader) =>
+        reader.NodeType == XmlNodeType.Element && reader.Depth == 1;
+
+
+
+    // The root element's closing tag; nothing further in the document can be a record.
+    private static bool IsDocumentEnd(XmlReader reader) =>
+        reader.NodeType == XmlNodeType.EndElement && reader.Depth == 0;
+
+
+
+    // Deserializes the child element the reader is currently positioned on.
+    // <paramref name="consumedElement"/> reports whether the reader was actually advanced past an
+    // element — the caller needs that to decide whether to read again, and it cannot infer it from
+    // a null return value, because null means both "not positioned on a child element" (reader
+    // untouched) and "the element deserialized to null" (reader advanced).
+    private TRecord? TryDeserializeChildElement(XmlReader reader, out bool consumedElement)
+    {
+        if (!IsChildElement(reader))
         {
+            consumedElement = false;
             return default;
         }
 
+        consumedElement = true;
         var item = (TRecord?)Serializer.Deserialize(reader);
         if (item is null)
         {
