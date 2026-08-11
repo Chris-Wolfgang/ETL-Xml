@@ -91,9 +91,45 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// </exception>
     [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamLoader(Stream stream, XmlSingleStreamLoaderOptions? options = null)
+        : this(stream, options, logger: null)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class
+    /// with options and an optional logger.
+    /// </summary>
+    /// <param name="stream">The stream to write XML data to.</param>
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used
+    /// (notably <see cref="XmlSingleStreamLoaderOptions.LeaveOpen"/> is <c>true</c>).
+    /// </param>
+    /// <param name="logger">
+    /// The logger instance for diagnostic output. When <c>null</c>, logging is disabled.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="stream"/> is <c>null</c>.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty
+    /// or whitespace string, or is not a valid XML local name.
+    /// </exception>
+    /// <remarks>
+    /// This is the canonical constructor — every other <see cref="Stream"/>-based overload
+    /// delegates to it, so option resolution happens in exactly one place.
+    /// </remarks>
+    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlSingleStreamLoader
+    (
+        Stream stream,
+        XmlSingleStreamLoaderOptions? options,
+        ILogger<XmlSingleStreamLoader<TRecord>>? logger
+    )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = NullLogger.Instance;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _writerSettings = null;
         var resolved = options ?? new XmlSingleStreamLoaderOptions();
         _leaveOpen = resolved.LeaveOpen;
@@ -112,17 +148,14 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// Thrown when <paramref name="stream"/> or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [Obsolete("Use the (Stream, XmlSingleStreamLoaderOptions?, ILogger<XmlSingleStreamLoader<TRecord>>?) overload, which also accepts options. This overload will be removed in a future release. See https://github.com/Chris-Wolfgang/ETL-Xml/issues/251.")]
     public XmlSingleStreamLoader
     (
         Stream stream,
         ILogger<XmlSingleStreamLoader<TRecord>> logger
     )
+        : this(stream, options: null, logger ?? throw new ArgumentNullException(nameof(logger)))
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _writerSettings = null;
-
-        _rootElementName = "ArrayOf" + typeof(TRecord).Name;
     }
 
 
@@ -175,7 +208,33 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="bufferWriter"/> is <c>null</c>.</exception>
     [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamLoader(IBufferWriter<byte> bufferWriter, XmlSingleStreamLoaderOptions? options = null)
-        : this(new BufferWriterStream(bufferWriter ?? throw new ArgumentNullException(nameof(bufferWriter))), options)
+        : this(bufferWriter, options, logger: null)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class
+    /// writing to an <see cref="IBufferWriter{T}"/> of bytes (#8), with options and an
+    /// optional logger.
+    /// </summary>
+    /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
+    /// </param>
+    /// <param name="logger">
+    /// The logger instance for diagnostic output. When <c>null</c>, logging is disabled.
+    /// </param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="bufferWriter"/> is <c>null</c>.</exception>
+    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlSingleStreamLoader
+    (
+        IBufferWriter<byte> bufferWriter,
+        XmlSingleStreamLoaderOptions? options,
+        ILogger<XmlSingleStreamLoader<TRecord>>? logger
+    )
+        : this(new BufferWriterStream(bufferWriter ?? throw new ArgumentNullException(nameof(bufferWriter))), options, logger)
     {
     }
 
@@ -191,8 +250,9 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// Thrown when <paramref name="bufferWriter"/> or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [Obsolete("Use the (IBufferWriter<byte>, XmlSingleStreamLoaderOptions?, ILogger<XmlSingleStreamLoader<TRecord>>?) overload, which also accepts options. This overload will be removed in a future release. See https://github.com/Chris-Wolfgang/ETL-Xml/issues/251.")]
     public XmlSingleStreamLoader(IBufferWriter<byte> bufferWriter, ILogger<XmlSingleStreamLoader<TRecord>> logger)
-        : this(new BufferWriterStream(bufferWriter ?? throw new ArgumentNullException(nameof(bufferWriter))), logger)
+        : this(bufferWriter, options: null, logger ?? throw new ArgumentNullException(nameof(logger)))
     {
     }
 

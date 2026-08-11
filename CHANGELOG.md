@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Data loss when an element deserialized to `null`.** `XmlSingleStreamExtractor<T>` cleared its
+  "reader already advanced" flag only *after* the null check, so a `null` element left the loop
+  reading one extra node and the record immediately following it was silently dropped. A document
+  of `[nil, Bob, Carol]` yielded only `Carol`. Found by the mutation-testing pass (#127).
+- **Logger-only constructors ignored the documented `LeaveOpen = true` default.**
+  `XmlSingleStreamExtractor<T>(Stream, ILogger<...>)` and `XmlSingleStreamLoader<T>(Stream, ILogger<...>)`
+  never assigned their `LeaveOpen` backing field, so it defaulted to `false` and they closed the
+  caller's stream — diverging from every other constructor. They now delegate to the canonical
+  constructor, so option resolution happens in exactly one place.
+
+### Added
+
+- Canonical constructors accepting **options and a logger together**, closing a gap where supplying
+  a logger meant either giving up options or passing an otherwise-unwanted `XmlWriterSettings` /
+  `XmlReaderSettings`:
+  - `XmlSingleStreamExtractor<T>(Stream, XmlSingleStreamExtractorOptions?, ILogger<...>?)`
+  - `XmlSingleStreamLoader<T>(Stream, XmlSingleStreamLoaderOptions?, ILogger<...>?)`
+  - `XmlSingleStreamLoader<T>(IBufferWriter<byte>, XmlSingleStreamLoaderOptions?, ILogger<...>?)`
+
+  These are purely additive; existing call sites are unaffected.
+
+### Deprecated
+
+- The logger-only single-stream constructors — `XmlSingleStreamExtractor<T>(Stream, ILogger<...>)`,
+  `XmlSingleStreamLoader<T>(Stream, ILogger<...>)`, and
+  `XmlSingleStreamLoader<T>(IBufferWriter<byte>, ILogger<...>)` — are `[Obsolete]`. Use the canonical
+  overloads above (`new(source, options: null, logger)` for the logger-only case). Scheduled for
+  removal in #251.
+
 ## [0.6.0] - 2026-08-10
 
 ### Added

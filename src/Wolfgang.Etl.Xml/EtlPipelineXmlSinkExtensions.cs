@@ -45,7 +45,7 @@ public static class EtlPipelineXmlSinkExtensions
         }
 
         var stream = File.Create(path);
-        var loader = new XmlSingleStreamLoader<T>(stream, options);
+        var loader = new XmlSingleStreamLoader<T>(stream, options, logger: null);
         return pipeline.To(loader).DisposingOwned(stream);
     }
 
@@ -78,7 +78,7 @@ public static class EtlPipelineXmlSinkExtensions
             throw new ArgumentNullException(nameof(stream));
         }
 
-        return pipeline.To(new XmlSingleStreamLoader<T>(stream, options));
+        return pipeline.To(new XmlSingleStreamLoader<T>(stream, options, logger: null));
     }
 
 

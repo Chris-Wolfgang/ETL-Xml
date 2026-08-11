@@ -229,6 +229,7 @@ public class XmlSingleStreamExtractorTests
 
 
     [Fact]
+#pragma warning disable CS0618 // obsolete ctor kept under test until removal (#251)
     public void Constructor_Stream_Logger_when_logger_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>
@@ -240,6 +241,7 @@ public class XmlSingleStreamExtractorTests
             )
         );
     }
+#pragma warning restore CS0618
 
 
 

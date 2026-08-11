@@ -50,7 +50,8 @@ public static class EtlPipelineXmlSourceExtensions
         var extractor = new XmlSingleStreamExtractor<T>
         (
             stream,
-            new XmlSingleStreamExtractorOptions { LeaveOpen = false }
+            new XmlSingleStreamExtractorOptions { LeaveOpen = false },
+            logger: null
         );
 
         return pipeline.From(extractor);
@@ -84,7 +85,7 @@ public static class EtlPipelineXmlSourceExtensions
             throw new ArgumentNullException(nameof(stream));
         }
 
-        return pipeline.From(new XmlSingleStreamExtractor<T>(stream, options));
+        return pipeline.From(new XmlSingleStreamExtractor<T>(stream, options, logger: null));
     }
 
 

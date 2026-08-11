@@ -84,9 +84,41 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// </exception>
     [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamExtractor(Stream stream, XmlSingleStreamExtractorOptions? options = null)
+        : this(stream, options, logger: null)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamExtractor{TRecord}"/> class
+    /// with options and an optional logger.
+    /// </summary>
+    /// <param name="stream">The stream containing XML data to read from.</param>
+    /// <param name="options">
+    /// Options that control extractor behaviour. When <c>null</c>, defaults are used
+    /// (notably <see cref="XmlSingleStreamExtractorOptions.LeaveOpen"/> is <c>true</c>).
+    /// </param>
+    /// <param name="logger">
+    /// The logger instance for diagnostic output. When <c>null</c>, logging is disabled.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="stream"/> is <c>null</c>.
+    /// </exception>
+    /// <remarks>
+    /// This is the canonical constructor — every other <see cref="Stream"/>-based overload
+    /// delegates to it, so option resolution happens in exactly one place.
+    /// </remarks>
+    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlSingleStreamExtractor
+    (
+        Stream stream,
+        XmlSingleStreamExtractorOptions? options,
+        ILogger<XmlSingleStreamExtractor<TRecord>>? logger
+    )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = NullLogger.Instance;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _readerSettings = null;
         _leaveOpen = (options ?? new XmlSingleStreamExtractorOptions()).LeaveOpen;
     }
@@ -103,15 +135,14 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// Thrown when <paramref name="stream"/> or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [Obsolete("Use the (Stream, XmlSingleStreamExtractorOptions?, ILogger<XmlSingleStreamExtractor<TRecord>>?) overload, which also accepts options. This overload will be removed in a future release. See https://github.com/Chris-Wolfgang/ETL-Xml/issues/251.")]
     public XmlSingleStreamExtractor
     (
         Stream stream,
         ILogger<XmlSingleStreamExtractor<TRecord>> logger
     )
+        : this(stream, options: null, logger ?? throw new ArgumentNullException(nameof(logger)))
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _readerSettings = null;
     }
 
 
@@ -207,13 +238,15 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
             }
 
             var item = TryDeserializeChildElement(reader);
+
+            // Deserialize already advanced the reader — must be set even for a null item,
+            // or the extra read silently drops the sibling after a null element.
+            needsRead = false;
+
             if (item is null)
             {
                 continue;
             }
-
-            // After Deserialize, the reader is already positioned at the next node
-            needsRead = false;
 
             if (skipBudget > 0)
             {
