@@ -413,8 +413,9 @@ jobs:
   #
   # Runs concurrently with Stage 1/2/3 (no `needs:` on a test job) so it does not
   # extend wall-clock. Mutation testing is expensive (tens of minutes), so the
-  # job is skipped entirely unless the PR actually touches src/ — a docs, CI, or
-  # test-only PR cannot change the mutation score of the source under test.
+  # job is skipped entirely unless the PR touches src/ or tests/ — a docs- or
+  # CI-only PR cannot change the mutation score. tests/ counts because weakening
+  # a test lowers the score just as surely as changing the source does.
   #
   # The pass/fail decision is Stryker's own `break` threshold from
   # stryker-config.json: `dotnet stryker` exits non-zero when the score falls
@@ -473,7 +474,10 @@ jobs:
             git fetch origin "$base" --depth=1 || true
           fi
           if git cat-file -e "$base" 2>/dev/null; then
-            changed=$(git diff --name-only "$base"...HEAD -- src/ | head -1)
+            # Both src/ AND tests/ matter: weakening or deleting a test lowers
+            # the mutation score without touching src/, so a tests-only PR must
+            # not be able to slip under the floor unchecked.
+            changed=$(git diff --name-only "$base"...HEAD -- src/ tests/ | head -1)
           else
             # Base SHA unavailable (shallow/force-push edge case) — fail safe by
             # running the gate rather than silently skipping it.
@@ -483,7 +487,7 @@ jobs:
           if [ -n "$changed" ]; then
             printf 'run=true\n' >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::PR does not touch src/ — mutation score cannot change; skipping."
+            echo "::notice::PR touches neither src/ nor tests/ — mutation score cannot change; skipping."
             printf 'run=false\n' >> "$GITHUB_OUTPUT"
           fi
 
