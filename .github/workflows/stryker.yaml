@@ -146,9 +146,14 @@ jobs:
           # last one to finish would silently omit the others from the trend.
           # Each suite writes to its own <dir>/StrykerOutput/<timestamp>/, so
           # take the newest run per StrykerOutput directory.
+          # `find -printf '%T@ %p'` + sort rather than `ls -t`, so filenames with
+          # spaces or other non-alphanumerics are handled correctly (shellcheck
+          # SC2012). `cut -f2-` keeps everything after the timestamp, so a path
+          # containing spaces survives intact.
           reports=()
           while IFS= read -r outdir; do
-            newest=$(ls -1dt "$outdir"/*/reports/mutation-report.json 2>/dev/null | head -1 || true)
+            newest=$(find "$outdir" -type f -path '*/reports/mutation-report.json' \
+              -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2- || true)
             [ -n "$newest" ] && reports+=("$newest")
           done < <(find . -type d -name StrykerOutput | sort)
           if [ ${#reports[@]} -eq 0 ]; then
