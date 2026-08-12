@@ -91,13 +91,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// </exception>
     [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlSingleStreamLoader(Stream stream, XmlSingleStreamLoaderOptions? options = null)
+        : this(stream, options, logger: null)
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = NullLogger.Instance;
-        _writerSettings = null;
-        var resolved = options ?? new XmlSingleStreamLoaderOptions();
-        _leaveOpen = resolved.LeaveOpen;
-        _rootElementName = ResolveRootElementName(resolved.RootElementName);
     }
 
 
@@ -117,12 +112,11 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         Stream stream,
         ILogger<XmlSingleStreamLoader<TRecord>> logger
     )
+        // Delegates to the canonical constructor rather than assigning fields directly. The
+        // hand-rolled version omitted _leaveOpen, so this overload silently defaulted it to
+        // false and closed the caller's stream, contradicting the documented LeaveOpen = true.
+        : this(stream, options: null, logger: logger ?? throw new ArgumentNullException(nameof(logger)))
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _writerSettings = null;
-
-        _rootElementName = "ArrayOf" + typeof(TRecord).Name;
     }
 
 
@@ -152,10 +146,80 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         ILogger<XmlSingleStreamLoader<TRecord>> logger,
         XmlSingleStreamLoaderOptions? options = null
     )
+        : this
+        (
+            stream,
+            settings: writerSettings ?? throw new ArgumentNullException(nameof(writerSettings)),
+            options: options,
+            logger: logger ?? throw new ArgumentNullException(nameof(logger)),
+            timer: null
+        )
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class.
+    /// This is the canonical constructor — every other overload delegates to it — and it is the
+    /// only one that lets <paramref name="options"/> and <paramref name="logger"/> be supplied
+    /// together without also supplying <see cref="XmlWriterSettings"/>.
+    /// </summary>
+    /// <param name="stream">The stream to write XML data to.</param>
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
+    /// </param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c>, logging is disabled.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="stream"/> is <c>null</c>.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty or
+    /// whitespace string, or is not a valid XML local name.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// // Options and a logger, without having to supply XmlWriterSettings:
+    /// var loader = new XmlSingleStreamLoader&lt;Person&gt;
+    /// (
+    ///     stream,
+    ///     options: new XmlSingleStreamLoaderOptions { RootElementName = "People" },
+    ///     logger: loggerFactory.CreateLogger&lt;XmlSingleStreamLoader&lt;Person&gt;&gt;()
+    /// );
+    /// </code>
+    /// </example>
+    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlSingleStreamLoader
+    (
+        Stream stream,
+        XmlSingleStreamLoaderOptions? options,
+        ILogger<XmlSingleStreamLoader<TRecord>>? logger = null
+    )
+        : this(stream, settings: null, options: options, logger: logger, timer: null)
+    {
+    }
+
+
+
+    // The single initialization path. Every public and internal constructor delegates here, so
+    // there is exactly one place that resolves options -> _leaveOpen / _rootElementName. The
+    // previous shape let each overload initialize fields itself, which is how the (stream, logger)
+    // overload came to omit _leaveOpen entirely and silently close the caller's stream.
+    private XmlSingleStreamLoader
+    (
+        Stream stream,
+        XmlWriterSettings? settings,
+        XmlSingleStreamLoaderOptions? options,
+        ILogger? logger,
+        IProgressTimer? timer
+    )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _writerSettings = settings;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _progressTimer = timer;
         var resolved = options ?? new XmlSingleStreamLoaderOptions();
         _leaveOpen = resolved.LeaveOpen;
         _rootElementName = ResolveRootElementName(resolved.RootElementName);
@@ -226,6 +290,36 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class writing
+    /// to an <see cref="IBufferWriter{T}"/> of bytes (#8). This is the canonical buffer-writer
+    /// overload — it is the only one that lets <paramref name="options"/> and
+    /// <paramref name="logger"/> be supplied together without also supplying
+    /// <see cref="XmlWriterSettings"/>.
+    /// </summary>
+    /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
+    /// <param name="options">
+    /// Options that control loader behaviour. When <c>null</c>, defaults are used.
+    /// </param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c>, logging is disabled.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="bufferWriter"/> is <c>null</c>.
+    /// </exception>
+    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlSingleStreamLoader
+    (
+        IBufferWriter<byte> bufferWriter,
+        XmlSingleStreamLoaderOptions? options,
+        ILogger<XmlSingleStreamLoader<TRecord>>? logger = null
+    )
+        : this(new BufferWriterStream(bufferWriter ?? throw new ArgumentNullException(nameof(bufferWriter))), options, logger)
+    {
+    }
+
+
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class
     /// with an injected progress timer for testing.
     /// </summary>
@@ -244,14 +338,15 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         IProgressTimer timer,
         XmlSingleStreamLoaderOptions? options = null
     )
+        : this
+        (
+            stream,
+            settings: writerSettings ?? throw new ArgumentNullException(nameof(writerSettings)),
+            options: options,
+            logger: logger,
+            timer: timer ?? throw new ArgumentNullException(nameof(timer))
+        )
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        var resolved = options ?? new XmlSingleStreamLoaderOptions();
-        _leaveOpen = resolved.LeaveOpen;
-        _rootElementName = ResolveRootElementName(resolved.RootElementName);
     }
 
 
