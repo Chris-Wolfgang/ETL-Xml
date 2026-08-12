@@ -1,1 +1,4 @@
 #nullable enable
+Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>! bufferWriter, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>? logger = null) -> void

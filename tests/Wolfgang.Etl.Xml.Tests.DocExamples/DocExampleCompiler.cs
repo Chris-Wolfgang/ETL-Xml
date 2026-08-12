@@ -77,6 +77,12 @@ public static class DocExampleCompiler
                     protected Stream stream;
                     protected IAsyncEnumerable<Person> items;
                     protected ILogger<XmlMultiStreamExtractor<Person>> logger;
+
+                    // ILogger<T> is invariant in practice for these categories — a logger typed
+                    // for one component will not convert to another's. Snippets that construct a
+                    // different component therefore resolve their own correctly-typed logger from
+                    // the factory, exactly as a consumer would.
+                    protected ILoggerFactory loggerFactory;
                 }
 
                 internal sealed class Example : DocExampleContext
