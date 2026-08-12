@@ -21,6 +21,7 @@ Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>
 Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>!>! logger) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream! stream, System.Xml.XmlReaderSettings! readerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>!>! logger, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? options = null) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? options = null) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions
 Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.LeaveOpen.get -> bool
 Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.LeaveOpen.init -> void
@@ -31,9 +32,11 @@ Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.IsDryRun.set -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>! bufferWriter, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>! logger) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>! bufferWriter, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>! logger, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>! bufferWriter, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>! bufferWriter, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>! logger) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream! stream, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>! logger, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions
 Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.LeaveOpen.get -> bool
 Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.LeaveOpen.init -> void
