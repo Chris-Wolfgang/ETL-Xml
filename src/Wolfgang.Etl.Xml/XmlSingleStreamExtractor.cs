@@ -114,7 +114,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     (
         Stream stream,
         XmlSingleStreamExtractorOptions? options,
-        ILogger<XmlSingleStreamExtractor<TRecord>>? logger
+        ILogger<XmlSingleStreamExtractor<TRecord>>? logger = null
     )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
@@ -135,7 +135,6 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// Thrown when <paramref name="stream"/> or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
-    [Obsolete("Use the (Stream, XmlSingleStreamExtractorOptions?, ILogger<XmlSingleStreamExtractor<TRecord>>?) overload, which also accepts options. This overload will be removed in a future release. See https://github.com/Chris-Wolfgang/ETL-Xml/issues/251.")]
     public XmlSingleStreamExtractor
     (
         Stream stream,

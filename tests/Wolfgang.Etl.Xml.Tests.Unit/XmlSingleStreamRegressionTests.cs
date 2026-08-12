@@ -12,7 +12,7 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 
 /// <summary>
 /// Regression tests for two defects found by the mutation-testing pass (#127):
-/// the logger-only constructors silently ignoring the documented
+/// the <c>(stream, logger)</c> constructors silently ignoring the documented
 /// <c>LeaveOpen = true</c> default, and a null-deserializing element causing the
 /// element that follows it to be silently dropped.
 /// </summary>
@@ -44,16 +44,14 @@ public sealed class XmlSingleStreamRegressionTests
 
 
     [Fact]
-    public async Task Loader_logger_only_ctor_honours_default_LeaveOpen_true()
+    public async Task Loader_stream_logger_ctor_honours_default_LeaveOpen_true()
     {
         var stream = new MemoryStream();
-#pragma warning disable CS0618 // obsolete ctor kept under test until removal (#251)
         var loader = new XmlSingleStreamLoader<PersonRecord>
         (
             stream,
             NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
         );
-#pragma warning restore CS0618
 
         await loader.LoadAsync(One.ToAsyncEnumerable()).ConfigureAwait(false);
 
@@ -65,16 +63,14 @@ public sealed class XmlSingleStreamRegressionTests
 
 
     [Fact]
-    public async Task Extractor_logger_only_ctor_honours_default_LeaveOpen_true()
+    public async Task Extractor_stream_logger_ctor_honours_default_LeaveOpen_true()
     {
         using var source = await BuildXmlAsync().ConfigureAwait(false);
-#pragma warning disable CS0618 // obsolete ctor kept under test until removal (#251)
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
         (
             source,
             NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
         );
-#pragma warning restore CS0618
 
         await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
         {

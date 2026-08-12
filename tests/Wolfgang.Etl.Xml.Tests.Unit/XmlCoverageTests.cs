@@ -78,7 +78,6 @@ public sealed class XmlCoverageTests
 
         Assert.Equal(1, loader.CurrentItemCount);
     }
-#pragma warning restore CS0618
 
 
     [Fact]
@@ -104,7 +103,6 @@ public sealed class XmlCoverageTests
 
 
     [Fact]
-#pragma warning disable CS0618 // obsolete ctor kept under test until removal (#251)
     public async Task SingleStreamLoader_stream_logger_ctor_loads()
     {
         using var stream = new MemoryStream();
