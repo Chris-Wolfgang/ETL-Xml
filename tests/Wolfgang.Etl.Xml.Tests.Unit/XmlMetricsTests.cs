@@ -127,6 +127,69 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
+    public async Task SingleStreamExtractor_emits_items_skipped_counter_tagged_extract()
+    {
+        using var source = await BuildXmlAsync(Sample).ConfigureAwait(false);
+
+        var measurements = await CollectAsync(async () =>
+        {
+            var extractor = new XmlSingleStreamExtractor<MetricProbe>(source)
+            {
+                SkipItemCount = 1,
+            };
+            await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
+            {
+            }
+        }).ConfigureAwait(false);
+
+        var skipped = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.skipped")).ToList();
+        Assert.Equal(1, skipped.Sum(m => m.Value));
+        Assert.All(skipped, m => AssertTags(m, "extract", "XmlSingleStream"));
+    }
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_emits_items_extracted_counter_and_duration_tagged_multistream()
+    {
+        var streams = Sample.Select(SerializeProbe).ToArray();
+
+        var measurements = await CollectAsync(async () =>
+        {
+            var extractor = new XmlMultiStreamExtractor<MetricProbe>(streams);
+            await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
+            {
+            }
+        }).ConfigureAwait(false);
+
+        var extracted = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.extracted")).ToList();
+        Assert.Equal(2, extracted.Sum(m => m.Value));
+        Assert.All(extracted, m => AssertTags(m, "extract", "XmlMultiStream"));
+        Assert.Contains(measurements, m => Is(m, "wolfgang.etl.xml.operation.duration")
+            && Tag(m, "etl.operation", "extract")
+            && Tag(m, "etl.component", "XmlMultiStream")
+            && Tag(m, "etl.record_type", ProbeType));
+    }
+
+
+    [Fact]
+    public async Task MultiStreamLoader_emits_items_loaded_counter_and_duration_tagged_multistream()
+    {
+        var measurements = await CollectAsync(async () =>
+        {
+            var loader = new XmlMultiStreamLoader<MetricProbe>(_ => new MemoryStream());
+            await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
+        }).ConfigureAwait(false);
+
+        var loaded = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.loaded")).ToList();
+        Assert.Equal(2, loaded.Sum(m => m.Value));
+        Assert.All(loaded, m => AssertTags(m, "load", "XmlMultiStream"));
+        Assert.Contains(measurements, m => Is(m, "wolfgang.etl.xml.operation.duration")
+            && Tag(m, "etl.operation", "load")
+            && Tag(m, "etl.component", "XmlMultiStream"));
+    }
+
+
+    [Fact]
     public async Task MultiStreamLoader_error_policy_emits_items_errored_counter_tagged_multistream()
     {
         var measurements = await CollectAsync(
@@ -214,6 +277,16 @@ public sealed class XmlMetricsTests
         {
             sink.Add(new Measurement(name, value, dict));
         }
+    }
+
+
+    private static MemoryStream SerializeProbe(MetricProbe item)
+    {
+        var serializer = new System.Xml.Serialization.XmlSerializer(typeof(MetricProbe));
+        var ms = new MemoryStream();
+        serializer.Serialize(ms, item);
+        ms.Position = 0;
+        return ms;
     }
 
 
