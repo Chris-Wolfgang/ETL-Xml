@@ -186,7 +186,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// (
     ///     stream,
     ///     options: new XmlSingleStreamLoaderOptions { RootElementName = "People" },
-    ///     logger: logger
+    ///     logger: loggerFactory.CreateLogger&lt;XmlSingleStreamLoader&lt;Person&gt;&gt;()
     /// );
     /// </code>
     /// </example>

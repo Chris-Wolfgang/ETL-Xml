@@ -171,7 +171,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// (
     ///     stream,
     ///     options: new XmlSingleStreamExtractorOptions { LeaveOpen = false },
-    ///     logger: logger
+    ///     logger: loggerFactory.CreateLogger&lt;XmlSingleStreamExtractor&lt;Person&gt;&gt;()
     /// );
     /// </code>
     /// </example>
