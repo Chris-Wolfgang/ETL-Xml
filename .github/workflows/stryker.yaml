@@ -22,6 +22,11 @@ jobs:
     name: Run Stryker
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      # `contents: write` is needed by the trend-publishing step below, which
+      # pushes one data point per run to the gh-pages branch. The workflow-level
+      # default stays `contents: read`.
+      contents: write
     steps:
       - name: Check out repo
         uses: actions/checkout@v7
@@ -68,26 +73,33 @@ jobs:
         run: dotnet tool update -g dotnet-stryker || dotnet tool install -g dotnet-stryker
 
       - name: Run Stryker
+        id: run
         if: steps.check.outputs.found == 'true'
         shell: bash
+        # Does NOT use `set -e` on the Stryker invocations. Stryker exits
+        # non-zero when the score falls below the config's `break` threshold,
+        # and that is exactly the release-gate signal we want — but failing the
+        # step here would skip the trend-publishing step below and lose the data
+        # point for the very run that regressed. The exit code is captured and
+        # re-raised by the "Enforce mutation-score floor" step at the end.
         run: |
-          set -e
           shopt -s globstar nullglob
           # Run BOTH a root stryker-config.json (if present) AND any
           # tests/**/stryker-config.json suites. The Detect step collects
           # both shapes; running only one leaves per-test suites unscanned
           # in repos that have both an umbrella and per-suite configs.
           ran=0
+          worst=0
           if [ -f stryker-config.json ]; then
             echo "::group::Stryker with root stryker-config.json"
-            dotnet stryker --config-file stryker-config.json
+            dotnet stryker --config-file stryker-config.json || worst=$?
             echo "::endgroup::"
             ran=1
           fi
           for cfg in tests/**/stryker-config.json; do
             dir=$(dirname "$cfg")
             echo "::group::Stryker in $dir"
-            (cd "$dir" && dotnet stryker)
+            (cd "$dir" && dotnet stryker) || worst=$?
             echo "::endgroup::"
             ran=1
           done
@@ -95,6 +107,7 @@ jobs:
             echo "::error::Detect step said stryker-config.json was present, but Run found neither root nor tests/**/stryker-config.json. Bailing."
             exit 1
           fi
+          printf 'exit_code=%s\n' "$worst" >> "$GITHUB_OUTPUT"
 
       - name: Upload Stryker report
         if: always() && steps.check.outputs.found == 'true'
@@ -105,3 +118,103 @@ jobs:
             **/StrykerOutput/**
           if-no-files-found: ignore
           retention-days: 30
+
+      # ========================================================================
+      # Mutation-score trend (#127)
+      #
+      # Extracts the score from the newest mutation-report.json and appends one
+      # data point to gh-pages /dev/stryker/, charted by the same
+      # benchmark-action the benchmarks workflow uses for /dev/bench/.
+      #
+      # The score is recomputed from the mutant statuses rather than scraped
+      # from console output, using Stryker's own formula:
+      #     detected  = Killed + Timeout
+      #     undetected = Survived + NoCoverage
+      #     score = detected / (detected + undetected) * 100
+      # Ignored / CompileError mutants are excluded from the denominator, which
+      # is what makes this match the number Stryker prints.
+      # ========================================================================
+      - name: Extract mutation score
+        id: score
+        if: always() && steps.check.outputs.found == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Aggregate across EVERY suite's newest report, not just the single
+          # newest file. This workflow supports a root stryker-config.json and
+          # any number of tests/**/stryker-config.json suites; scoring only the
+          # last one to finish would silently omit the others from the trend.
+          # Each suite writes to its own <dir>/StrykerOutput/<timestamp>/, so
+          # take the newest run per StrykerOutput directory.
+          # `find -printf '%T@ %p'` + sort rather than `ls -t`, so filenames with
+          # spaces or other non-alphanumerics are handled correctly (shellcheck
+          # SC2012). `cut -f2-` keeps everything after the timestamp, so a path
+          # containing spaces survives intact.
+          reports=()
+          while IFS= read -r outdir; do
+            newest=$(find "$outdir" -type f -path '*/reports/mutation-report.json' \
+              -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2- || true)
+            [ -n "$newest" ] && reports+=("$newest")
+          done < <(find . -type d -name StrykerOutput | sort)
+          if [ ${#reports[@]} -eq 0 ]; then
+            echo "::warning::No mutation-report.json found — skipping trend publish."
+            printf 'found=false\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          printf 'Aggregating %d report(s):\n' "${#reports[@]}"
+          printf '  %s\n' "${reports[@]}"
+          score=$(jq -rs '
+            [ .[] | .files[].mutants[].status ]                            as $s
+            | (($s | map(select(. == "Killed" or . == "Timeout"))    | length)) as $detected
+            | (($s | map(select(. == "Survived" or . == "NoCoverage")) | length)) as $undetected
+            | if ($detected + $undetected) == 0 then ""
+              else (($detected / ($detected + $undetected)) * 100 * 100 | round / 100 | tostring)
+              end
+          ' "${reports[@]}")
+          if [ -z "$score" ] || [ "$score" = "null" ]; then
+            echo "::warning::Report contained no valid mutants — skipping trend publish."
+            printf 'found=false\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Mutation score: ${score}%"
+          jq -n --argjson v "$score" \
+            '[{name: "Mutation score", unit: "%", value: $v}]' > stryker-score.json
+          printf 'found=true\n' >> "$GITHUB_OUTPUT"
+          printf 'value=%s\n' "$score" >> "$GITHUB_OUTPUT"
+          printf '### Mutation score: %s%%\n' "$score" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish score history to gh-pages
+        # Only on the scheduled/dispatch runs of the default branch — a run from
+        # a fork or a topic branch must not push to gh-pages.
+        if: >-
+          always()
+          && steps.score.outputs.found == 'true'
+          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba  # v1.22.1
+        with:
+          name: Stryker mutation score
+          tool: 'customBiggerIsBetter'
+          output-file-path: stryker-score.json
+          gh-pages-branch: gh-pages
+          benchmark-data-dir-path: dev/stryker
+          auto-push: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Alert (comment only) if the score drops by more than a tenth versus
+          # the previous point. The hard pass/fail gate is Stryker's own `break`
+          # threshold, re-raised in the next step — this is trend signal only.
+          alert-threshold: '110%'
+          fail-on-alert: false
+
+      # Re-raise the Stryker exit code captured earlier, so a score below the
+      # config's `break` floor still fails the workflow after the data point
+      # has been recorded.
+      - name: Enforce mutation-score floor
+        if: always() && steps.check.outputs.found == 'true'
+        shell: bash
+        run: |
+          code="${{ steps.run.outputs.exit_code }}"
+          if [ -n "$code" ] && [ "$code" != "0" ]; then
+            echo "::error::Stryker exited $code — mutation score is below the 'break' threshold in stryker-config.json."
+            exit "$code"
+          fi
+          echo "Mutation score is at or above the configured floor."

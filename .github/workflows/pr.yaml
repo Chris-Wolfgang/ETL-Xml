@@ -407,6 +407,121 @@ jobs:
             exit 1
           }
           Write-Host "✅ No error-severity InspectCode findings."
+
+  # ============================================================================
+  # STRYKER GATE: block PRs that drop the mutation score below the floor (#127)
+  #
+  # Runs concurrently with Stage 1/2/3 (no `needs:` on a test job) so it does not
+  # extend wall-clock. Mutation testing is expensive (tens of minutes), so the
+  # job is skipped entirely unless the PR touches src/ or tests/ — a docs- or
+  # CI-only PR cannot change the mutation score. tests/ counts because weakening
+  # a test lowers the score just as surely as changing the source does.
+  #
+  # The pass/fail decision is Stryker's own `break` threshold from
+  # stryker-config.json: `dotnet stryker` exits non-zero when the score falls
+  # below it. The floor is raised only by editing that file (see #127).
+  # ============================================================================
+  stryker-gate:
+    name: "Stryker Gate (mutation score)"
+    runs-on: ubuntu-latest
+    needs: detect-projects
+    if: github.repository != 'Chris-Wolfgang/repo-template' && needs.detect-projects.outputs.has-projects == 'true'
+    timeout-minutes: 45
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/head
+          persist-credentials: false
+          fetch-depth: 0
+
+      # Same defense-in-depth pattern the other jobs use under
+      # pull_request_target: without this, a PR could simply lower `break` in
+      # its own stryker-config.json and walk straight through the gate.
+      - name: Fetch trusted stryker-config.json from main
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! git fetch origin main --depth=1; then
+            echo "::error::Failed to fetch origin/main — aborting before the Stryker gate."
+            exit 1
+          fi
+          if git cat-file -e origin/main:stryker-config.json 2>/dev/null; then
+            if ! git checkout origin/main -- stryker-config.json; then
+              echo "::error::Failed to check out origin/main:stryker-config.json — aborting rather than trusting the PR's copy."
+              exit 1
+            fi
+            echo "Using the trusted stryker-config.json from main."
+          else
+            echo "::notice::No stryker-config.json on main — nothing to gate against."
+          fi
+
+      - name: Detect src changes
+        id: changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -f stryker-config.json ]; then
+            echo "::notice::No stryker-config.json — skipping the mutation gate."
+            printf 'run=false\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          base="${{ github.event.pull_request.base.sha }}"
+          if ! git cat-file -e "$base" 2>/dev/null; then
+            git fetch origin "$base" --depth=1 || true
+          fi
+          if git cat-file -e "$base" 2>/dev/null; then
+            # Both src/ AND tests/ matter: weakening or deleting a test lowers
+            # the mutation score without touching src/, so a tests-only PR must
+            # not be able to slip under the floor unchecked.
+            changed=$(git diff --name-only "$base"...HEAD -- src/ tests/ | head -1)
+          else
+            # Base SHA unavailable (shallow/force-push edge case) — fail safe by
+            # running the gate rather than silently skipping it.
+            echo "::warning::Could not resolve the base SHA — running the gate unconditionally."
+            changed="unknown"
+          fi
+          if [ -n "$changed" ]; then
+            printf 'run=true\n' >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::PR touches neither src/ nor tests/ — mutation score cannot change; skipping."
+            printf 'run=false\n' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup .NET
+        if: steps.changed.outputs.run == 'true'
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Install dotnet-stryker
+        if: steps.changed.outputs.run == 'true'
+        run: dotnet tool update -g dotnet-stryker || dotnet tool install -g dotnet-stryker
+
+      - name: Run Stryker gate
+        if: steps.changed.outputs.run == 'true'
+        shell: bash
+        # `dotnet stryker` exits non-zero when the score is below the `break`
+        # threshold, so no extra comparison is needed here.
+        run: |
+          set -euo pipefail
+          dotnet stryker --config-file stryker-config.json --reporter progress --reporter json
+
+      - name: Upload Stryker report
+        if: always() && steps.changed.outputs.run == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: stryker-gate-report-${{ github.run_id }}
+          path: |
+            **/StrykerOutput/**
+          if-no-files-found: ignore
+          retention-days: 14
+
   # ============================================================================
   # STAGE 1: Linux - .NET Core/5+ Tests with Coverage Gate
   # ============================================================================
