@@ -2,78 +2,63 @@
 	<!--
 	  ReSharper InspectCode noise-floor.
 
-	  `jb inspectcode` is run with no explicit profile argument, so it auto-loads this
-	  solution-shared layer (the file must be named <SolutionFileName>.DotSettings
-	  and sit next to the solution — hence "ETL-Xml.slnx.DotSettings").
+	  `jb inspectcode` is run with no explicit profile argument, so it auto-loads
+	  this solution-shared layer (the file must be named
+	  <SolutionFileName>.DotSettings and sit next to the solution).
 
-	  Purpose: silence inspections that are either (a) already covered and gated by
-	  the build's Roslyn analyzer stack — double-reporting them here adds no signal —
-	  or (b) demonstrable false positives on this repo's multi-TFM layout, or (c) in
-	  direct conflict with a policy this repo has already settled in .editorconfig.
-	  The goal is a noise floor near zero on a clean main, so the first finding after
-	  this lands is always actionable.
+	  POLICY: an entry belongs here ONLY when the code is correct and the
+	  inspection is WRONG about it. A finding that is merely inconvenient,
+	  stylistic, or "accepted" is fixed instead. Every entry below states the
+	  evidence that makes it a false positive, and that evidence is reproducible.
 
-	  Only error-severity findings gate merge (the pr.yaml `inspectcode` job counts
-	  SARIF level=="error"); these entries drop the corresponding warnings from Code
-	  Scanning entirely. Nothing suppressed here weakens that gate.
+	  Everything else InspectCode reported on this repo was FIXED, not silenced —
+	  RedundantCast, RedundantNameQualifier, RedundantUsingDirective,
+	  RedundantTypeArgumentsOfMethod, xUnit1030, InvalidXmlDocComment,
+	  CheckNamespace, S1186/S3237/ValueParameterNotUsed, S108, MA0047,
+	  UnusedVariable and one always-true guard. See the accompanying fix PR.
 
-	  Counts below are the open-alert counts measured on main at v0.7.0 (2026-08-12),
-	  590 InspectCode alerts total. Deliberately NOT suppressed: InvalidXmlDocComment,
-	  VSTHRD002, CheckNamespace, S125/S108/S1186/S2743/S3237/S5034/S8949, MA0047,
-	  AccessToDisposedClosure, UnusedVariable, ValueParameterNotUsed,
-	  StaticMemberInGenericType, UsingStatementResourceInitialization — ~39 alerts
-	  that look genuine and should be FIXED, not hidden.
+	  Only error-severity findings gate merge (the pr.yaml `inspectcode` job
+	  counts SARIF level=="error"), so nothing here weakens the gate.
 	-->
 
-	<!-- PublicApiAnalyzers (286 + 138 = 424 alerts, 72% of the total).
-	     PROVABLE FALSE POSITIVES: InspectCode runs the Roslyn analyzers without
-	     passing PublicAPI.Shipped.txt / PublicAPI.Unshipped.txt as AdditionalFiles,
-	     so the analyzer believes nothing is declared and flags every public member.
-	     Verified: `dotnet build src/Wolfgang.Etl.Xml.csproj -c Release
-	     -p:TreatWarningsAsErrors=true` emits ZERO RS0016/RS0037. The real enforcement
-	     lives in the build (RS0017 is active and validates the manifest). -->
+	<!-- PublicApiAnalyzers (RS0016 286 alerts, RS0037 138 — 72% of the original 589).
+	     EVIDENCE: InspectCode runs the Roslyn analyzers without passing
+	     PublicAPI.Shipped.txt / PublicAPI.Unshipped.txt as AdditionalFiles, so the
+	     analyzer believes nothing is declared and flags every public member. The
+	     real build disagrees:
+	         dotnet build src/Wolfgang.Etl.Xml/Wolfgang.Etl.Xml.csproj -c Release \
+	             -p:TreatWarningsAsErrors=true
+	     emits ZERO RS0016/RS0037. Enforcement genuinely lives in the build, where
+	     RS0017 is active and validates the manifest against the real surface.
+	     RS0026 is the same analyzer family and is included for consistency; it is
+	     not currently firing. -->
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RS0016/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RS0037/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RS0026/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 
-	<!-- xUnit1030 "do not call ConfigureAwait in test methods" (65 alerts).
-	     A settled POLICY CONFLICT, not a defect: .editorconfig sets
-	     `dotnet_diagnostic.CA2007.severity = none` for the test project while
-	     mandating ConfigureAwait in library code, and the tests use ConfigureAwait
-	     throughout. The rule disagrees with a decision this repo already made. -->
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=xUnit1030/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-
-	<!-- Public-API false positive (20 alerts): R# cannot see external consumers of a
-	     library's public auto-properties, so it reports them as unused (.Global). -->
+	<!-- UnusedAutoPropertyAccessor.Global (20 alerts).
+	     EVIDENCE: every site is a DTO whose properties are read by XmlSerializer
+	     through REFLECTION, which R# cannot see — BenchmarkPerson, WidgetRecord,
+	     Person, GcProfileWorkload.Record, MetricProbe. They are populated by object
+	     initialisers in code and consumed by the serializer, so removing an accessor
+	     would silently change the emitted XML contract. The one src/ site is the
+	     RequiresUnreferencedCodeAttribute polyfill, whose surface must mirror the
+	     framework type it stands in for. -->
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedAutoPropertyAccessor_002EGlobal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 
-	<!-- Redundant-code style rules (14 + 11 + 7 + 7 = 39) — covered in-build by
-	     Roslynator / IDE00xx and .editorconfig. RedundantUsingDirective in particular
-	     is a MULTI-TFM FALSE POSITIVE: InspectCode analyses a single TFM, but this
-	     library targets net462/netstandard2.0/2.1 as well, where the explicit System
-	     usings are REQUIRED — removing them breaks net462 with CS0246. -->
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantUsingDirective/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantNameQualifier/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantCast/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantTypeArgumentsOfMethod/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-
-	<!-- Nullability — owned by the Roslyn nullable reference-type analysis, not R#.
-	     The *AccordingTo(Nullable)APIContract rules flag defensive null-checks on
-	     non-null-annotated parameters; those checks are INTENTIONAL in a library
-	     called from nullable-oblivious / older-TFM code where a caller can still pass
-	     null despite the annotation (this repo's ArgumentNullException guards). -->
+	<!-- ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract (2 remaining).
+	     EVIDENCE: both are null-guards on the result of a USER-SUPPLIED factory
+	     delegate in XmlMultiStreamLoader. The nullable annotation is a compile-time
+	     claim, not a runtime guarantee — a caller can and does return null. Both
+	     branches are reachable and covered by PASSING tests that supply exactly
+	     that:
+	         LoadAsync_when_stream_factory_returns_null_throws_InvalidOperationException
+	             -> new XmlMultiStreamLoader<PersonRecord>(_ => (Stream)null!)
+	         XmlLoaderBufferWriterTests
+	             -> new XmlMultiStreamLoader<PersonRecord>(_ => (IBufferWriter<byte>)null!)
+	     Deleting the guards on the analyser's advice would turn a clear
+	     InvalidOperationException into a NullReferenceException.
+	     NOTE: the third instance of this rule was a genuinely redundant guard in a
+	     stress test and was FIXED, not covered by this entry. -->
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ReturnTypeCanBeNotNullable/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantNullableFlowAttribute/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=NullnessAnnotationConflictWithJetBrainsAnnotations/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConditionalAccessQualifierIsNonNullableAccordingToAPIContract/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-
-	<!-- Roslyn / Sonar diagnostics re-run by InspectCode and already enforced by the
-	     in-build analyzer stack. Carried from the canonical profile for fleet parity;
-	     these are not currently firing on this repo. -->
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MA0009/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=S3267/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=S3220/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=S2068/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 </wpf:ResourceDictionary>
