@@ -141,7 +141,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
         _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = logger ?? NullLogger.Instance;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
 

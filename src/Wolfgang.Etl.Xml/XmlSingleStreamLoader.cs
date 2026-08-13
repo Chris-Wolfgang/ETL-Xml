@@ -218,7 +218,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _writerSettings = settings;
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = logger ?? NullLogger.Instance;
         _progressTimer = timer;
         var resolved = options ?? new XmlSingleStreamLoaderOptions();
         _leaveOpen = resolved.LeaveOpen;
@@ -512,9 +512,9 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
         try
         {
-            System.Xml.XmlConvert.VerifyNCName(rootElementName);
+            XmlConvert.VerifyNCName(rootElementName);
         }
-        catch (System.Xml.XmlException ex)
+        catch (XmlException ex)
         {
             throw new ArgumentException
             (

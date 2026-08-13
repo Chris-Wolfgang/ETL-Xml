@@ -237,7 +237,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = logger ?? NullLogger.Instance;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
 
@@ -317,7 +317,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     // through the configurable ErrorPolicy. Returns true when the item was loaded, false when the
     // policy skipped a failed item — each item writes an independent document, so Skip genuinely
     // skips and continues; re-throws the original exception when the policy aborts.
-    private async System.Threading.Tasks.Task<bool> SerializeItemOrHandleErrorAsync(TRecord item, int oneBasedItemNumber, int streamIndex, CancellationToken token)
+    private async Task<bool> SerializeItemOrHandleErrorAsync(TRecord item, int oneBasedItemNumber, int streamIndex, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
