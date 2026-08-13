@@ -43,13 +43,11 @@ await ErrorPolicyDeadLetterAsync().ConfigureAwait(false);
 
 
 
-/// <summary>
-/// Demonstrates per-item error handling / dead-lettering (#11) on the multi-stream extractor.
-/// Each stream is an independent record, so assigning an <see cref="XmlMultiStreamExtractor{TRecord}"/>
-/// an <c>ErrorPolicy</c> lets a stream that fails to deserialize be captured (dead-lettered) and
-/// skipped instead of aborting the whole run. Ready-made policies come from
-/// <see cref="Wolfgang.Etl.ErrorPolicies.ItemErrorPolicy"/>.
-/// </summary>
+// Demonstrates per-item error handling / dead-lettering (#11) on the multi-stream extractor.
+// Each stream is an independent record, so assigning an XmlMultiStreamExtractor<TRecord>
+// an ErrorPolicy lets a stream that fails to deserialize be captured (dead-lettered) and
+// skipped instead of aborting the whole run. Ready-made policies come from
+// Wolfgang.Etl.ErrorPolicies.ItemErrorPolicy.
 static async Task ErrorPolicyDeadLetterAsync()
 {
     Console.WriteLine("=== Per-item error handling / dead-lettering ===");
@@ -93,15 +91,13 @@ static async Task ErrorPolicyDeadLetterAsync()
 
 
 
-/// <summary>
-/// Demonstrates validating the source XML against an XSD <em>during</em> extraction. Because
-/// <see cref="XmlSingleStreamExtractor{TRecord}"/> accepts a custom <see cref="XmlReaderSettings"/>
-/// (and clones it before use), setting <see cref="XmlReaderSettings.ValidationType"/> to
-/// <see cref="ValidationType.Schema"/> with a loaded <see cref="XmlSchemaSet"/> validates each
-/// element as it is read — no extra pass over the document. A schema violation surfaces from
-/// <c>ExtractAsync</c> as an <see cref="InvalidOperationException"/> whose inner exception is the
-/// <see cref="XmlSchemaValidationException"/> with the offending line and reason.
-/// </summary>
+// Demonstrates validating the source XML against an XSD during extraction. Because
+// XmlSingleStreamExtractor<TRecord> accepts a custom XmlReaderSettings
+// (and clones it before use), setting XmlReaderSettings.ValidationType to
+// ValidationType.Schema with a loaded XmlSchemaSet validates each
+// element as it is read — no extra pass over the document. A schema violation surfaces from
+// ExtractAsync as an InvalidOperationException whose inner exception is the
+// XmlSchemaValidationException with the offending line and reason.
 static async Task XsdValidationAsync(ILoggerFactory loggerFactory)
 {
     Console.WriteLine("=== XSD validation during extraction ===");
@@ -146,7 +142,7 @@ static async Task XsdValidationAsync(ILoggerFactory loggerFactory)
     using var validStream = CreateSampleXmlStream();
     var validExtractor = new XmlSingleStreamExtractor<Person>(validStream, ValidatingSettings(), logger);
     var validated = 0;
-    await foreach (var person in validExtractor.ExtractAsync().ConfigureAwait(false))
+    await foreach (var _ in validExtractor.ExtractAsync().ConfigureAwait(false))
     {
         validated++;
     }
@@ -164,6 +160,8 @@ static async Task XsdValidationAsync(ILoggerFactory loggerFactory)
     {
         await foreach (var _ in invalidExtractor.ExtractAsync().ConfigureAwait(false))
         {
+            // Drain the sequence — the schema violation surfaces as an exception
+            // partway through, so no record is expected to arrive here.
         }
     }
     catch (InvalidOperationException ex) when (ex.InnerException is XmlSchemaValidationException schemaError)
@@ -174,23 +172,19 @@ static async Task XsdValidationAsync(ILoggerFactory loggerFactory)
 
 
 
-/// <summary>
-/// Demonstrates reading and writing <em>compressed</em> XML. Because every
-/// extractor and loader works against a plain <see cref="Stream"/>, gzip (or any
-/// other <see cref="System.IO.Compression"/> codec) is transparent — you simply
-/// wrap the underlying stream in a <see cref="GZipStream"/>. Here sample records
-/// are serialized straight into a gzip stream (compress) and then read back out of
-/// one (decompress), a full <c>.xml.gz</c> round trip.
-/// </summary>
-/// <remarks>
-/// Ownership note: the loader is given <c>LeaveOpen = false</c> so that when the
-/// load completes it disposes the <see cref="GZipStream"/>, which flushes the gzip
-/// footer into the backing buffer. The backing <see cref="MemoryStream"/> is kept
-/// alive via <c>leaveOpen: true</c> on the <see cref="GZipStream"/> so it can be
-/// rewound and read back. A file-based equivalent would swap the
-/// <see cref="MemoryStream"/> for <c>File.Create("people.xml.gz")</c> /
-/// <c>File.OpenRead("people.xml.gz")</c>.
-/// </remarks>
+// Demonstrates reading and writing compressed XML. Because every
+// extractor and loader works against a plain Stream, gzip (or any
+// other System.IO.Compression codec) is transparent — you simply
+// wrap the underlying stream in a GZipStream. Here sample records
+// are serialized straight into a gzip stream (compress) and then read back out of
+// one (decompress), a full .xml.gz round trip.
+// Ownership note: the loader is given LeaveOpen = false so that when the
+// load completes it disposes the GZipStream, which flushes the gzip
+// footer into the backing buffer. The backing MemoryStream is kept
+// alive via leaveOpen: true on the GZipStream so it can be
+// rewound and read back. A file-based equivalent would swap the
+// MemoryStream for File.Create("people.xml.gz") /
+// File.OpenRead("people.xml.gz").
 static async Task CompressedStreamRoundTripAsync()
 {
     Console.WriteLine("=== Compressed streams (gzip .xml.gz round trip) ===");
@@ -241,12 +235,10 @@ static async Task CompressedStreamRoundTripAsync()
 
 
 
-/// <summary>
-/// Demonstrates the fluent <see cref="EtlPipeline"/> chain using the XML source
-/// and sink factories. A single-root XML source is filtered by a Through stage
-/// and written to a single-root XML destination — no explicit extractor,
-/// transformer, or loader variables. This reads the same as the CSV/JSON siblings.
-/// </summary>
+// Demonstrates the fluent EtlPipeline chain using the XML source
+// and sink factories. A single-root XML source is filtered by a Through stage
+// and written to a single-root XML destination — no explicit extractor,
+// transformer, or loader variables. This reads the same as the CSV/JSON siblings.
 static async Task FluentPipelineAsync()
 {
     Console.WriteLine("=== Fluent EtlPipeline (XML → filter → XML) ===");
@@ -274,13 +266,11 @@ static async Task FluentPipelineAsync()
 
 
 
-/// <summary>
-/// Demonstrates the fluent <see cref="EtlPipeline"/> chain fanning a single XML
-/// source <em>out</em> to many destinations — one XML document per record — via
-/// <c>XmlMultiStreamLoader</c>. The loader disposes each factory-supplied stream
-/// after writing its record, so a real pipeline would return
-/// <see cref="FileStream"/>s here (e.g. <c>File.Create($"{p.LastName}.xml")</c>).
-/// </summary>
+// Demonstrates the fluent EtlPipeline chain fanning a single XML
+// source out to many destinations — one XML document per record — via
+// XmlMultiStreamLoader. The loader disposes each factory-supplied stream
+// after writing its record, so a real pipeline would return
+// FileStreams here (e.g. File.Create($"{p.LastName}.xml")).
 static async Task FluentMultiStreamFanOutAsync()
 {
     Console.WriteLine("=== Fluent EtlPipeline (XML → fan out to one file per record) ===");
@@ -315,12 +305,10 @@ static async Task FluentMultiStreamFanOutAsync()
 
 
 
-/// <summary>
-/// Demonstrates the fluent <see cref="EtlPipeline"/> chain fanning many
-/// single-document XML sources <em>in</em> to one XML destination via
-/// <c>XmlMultiStreamExtractor</c> — the mirror of the fan-out shape. The
-/// extractor disposes each source stream after reading its record.
-/// </summary>
+// Demonstrates the fluent EtlPipeline chain fanning many
+// single-document XML sources in to one XML destination via
+// XmlMultiStreamExtractor — the mirror of the fan-out shape. The
+// extractor disposes each source stream after reading its record.
 static async Task FluentMultiStreamFanInAsync()
 {
     Console.WriteLine("=== Fluent EtlPipeline (fan in many files → one XML) ===");
@@ -347,10 +335,8 @@ static async Task FluentMultiStreamFanInAsync()
 
 
 
-/// <summary>
-/// Filters an async sequence in place — a minimal Through stage for the fluent
-/// pipeline example that avoids taking a dependency on System.Linq.Async.
-/// </summary>
+// Filters an async sequence in place — a minimal Through stage for the fluent
+// pipeline example that avoids taking a dependency on System.Linq.Async.
 static async IAsyncEnumerable<T> WhereAsync<T>(IAsyncEnumerable<T> items, Func<T, bool> predicate)
 {
     await foreach (var item in items.ConfigureAwait(false))
@@ -364,11 +350,9 @@ static async IAsyncEnumerable<T> WhereAsync<T>(IAsyncEnumerable<T> items, Func<T
 
 
 
-/// <summary>
-/// Demonstrates extracting from XML through a full ETL pipeline.
-/// XmlSingleStreamExtractor reads from an XML stream, then a
-/// TestTransformer passes items through, and a TestLoader collects them.
-/// </summary>
+// Demonstrates extracting from XML through a full ETL pipeline.
+// XmlSingleStreamExtractor reads from an XML stream, then a
+// TestTransformer passes items through, and a TestLoader collects them.
 static async Task SingleStreamExtractPipelineAsync()
 {
     Console.WriteLine("=== Single-Stream Extract Pipeline ===");
@@ -399,13 +383,11 @@ static async Task SingleStreamExtractPipelineAsync()
 
 
 
-/// <summary>
-/// Demonstrates loading to XML with a custom root element name.
-/// By default the root element is <c>ArrayOf{TypeName}</c>; this shows
-/// how to override that with a domain-meaningful name.
-/// Also demonstrates <c>leaveOpen: false</c> so the stream is closed
-/// automatically when loading completes.
-/// </summary>
+// Demonstrates loading to XML with a custom root element name.
+// By default the root element is ArrayOf{TypeName}; this shows
+// how to override that with a domain-meaningful name.
+// Also demonstrates leaveOpen: false so the stream is closed
+// automatically when loading completes.
 static async Task SingleStreamLoadWithCustomRootAsync()
 {
     Console.WriteLine("=== Single-Stream Load with Custom Root Element ===");
@@ -445,11 +427,9 @@ static async Task SingleStreamLoadWithCustomRootAsync()
 
 
 
-/// <summary>
-/// Demonstrates loading to XML through a full ETL pipeline.
-/// TestExtractor provides in-memory data, TestTransformer passes it
-/// through, and XmlSingleStreamLoader writes the XML output.
-/// </summary>
+// Demonstrates loading to XML through a full ETL pipeline.
+// TestExtractor provides in-memory data, TestTransformer passes it
+// through, and XmlSingleStreamLoader writes the XML output.
 static async Task SingleStreamLoadPipelineAsync(ILoggerFactory loggerFactory)
 {
     Console.WriteLine("=== Single-Stream Load Pipeline ===");
@@ -489,10 +469,8 @@ static async Task SingleStreamLoadPipelineAsync(ILoggerFactory loggerFactory)
 
 
 
-/// <summary>
-/// Demonstrates extracting from multiple XML streams (one item per file)
-/// through a full ETL pipeline using TestTransformer and TestLoader.
-/// </summary>
+// Demonstrates extracting from multiple XML streams (one item per file)
+// through a full ETL pipeline using TestTransformer and TestLoader.
 static async Task MultiStreamExtractPipelineAsync()
 {
     Console.WriteLine("=== Multi-Stream Extract Pipeline ===");
@@ -522,10 +500,8 @@ static async Task MultiStreamExtractPipelineAsync()
 
 
 
-/// <summary>
-/// Demonstrates loading to multiple XML streams (one item per file)
-/// through a full ETL pipeline using TestExtractor and TestTransformer.
-/// </summary>
+// Demonstrates loading to multiple XML streams (one item per file)
+// through a full ETL pipeline using TestExtractor and TestTransformer.
 static async Task MultiStreamLoadPipelineAsync(ILoggerFactory loggerFactory)
 {
     Console.WriteLine("=== Multi-Stream Load Pipeline ===");
@@ -574,9 +550,7 @@ static async Task MultiStreamLoadPipelineAsync(ILoggerFactory loggerFactory)
 
 
 
-/// <summary>
-/// Creates a MemoryStream containing sample XML with three Person elements.
-/// </summary>
+// Creates a MemoryStream containing sample XML with three Person elements.
 static MemoryStream CreateSampleXmlStream()
 {
     var serializer = new XmlSerializer(typeof(Person));
@@ -604,9 +578,7 @@ static MemoryStream CreateSampleXmlStream()
 
 
 
-/// <summary>
-/// Creates a list of MemoryStreams, each containing a single Person as XML.
-/// </summary>
+// Creates a list of MemoryStreams, each containing a single Person as XML.
 static List<MemoryStream> CreateSampleMultiStreams()
 {
     var serializer = new XmlSerializer(typeof(Person));
