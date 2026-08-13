@@ -56,7 +56,7 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
             IsDryRun = true,
         };
 
-        await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(Sample.ToAsyncEnumerable());
 
         // Nothing was written, but LeaveOpen = false must still close the stream on completion.
         Xunit.Assert.Throws<System.ObjectDisposedException>(() => stream.Position);

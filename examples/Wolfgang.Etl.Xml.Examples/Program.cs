@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
@@ -252,7 +251,7 @@ static async Task FluentPipelineAsync()
         .Create()
         .XmlSingleStreamExtractor<Person>(source)
         .Through<Person>(people => WhereAsync(people, p => p.Age >= 30))
-        .XmlSingleStreamLoader<Person>(destination)
+        .XmlSingleStreamLoader(destination)
         .RunAsync()
         .ConfigureAwait(false);
 
@@ -283,7 +282,7 @@ static async Task FluentMultiStreamFanOutAsync()
     await EtlPipeline
         .Create()
         .XmlSingleStreamExtractor<Person>(source)
-        .XmlMultiStreamLoader<Person>(person =>
+        .XmlMultiStreamLoader(person =>
         {
             var ms = new MemoryStream();
             buffers[$"{person.FirstName}_{person.LastName}.xml"] = ms;
@@ -321,7 +320,7 @@ static async Task FluentMultiStreamFanInAsync()
     await EtlPipeline
         .Create()
         .XmlMultiStreamExtractor<Person>(streams)
-        .XmlSingleStreamLoader<Person>(destination)
+        .XmlSingleStreamLoader(destination)
         .RunAsync()
         .ConfigureAwait(false);
 

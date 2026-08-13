@@ -75,7 +75,7 @@ public sealed class XmlLoaderBufferWriterTests
     {
         var bufferWriter = new TestBufferWriter();
         var loader = new XmlSingleStreamLoader<PersonRecord>(bufferWriter);
-        await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(Sample.ToAsyncEnumerable());
         var viaBuffer = Encoding.UTF8.GetString(bufferWriter.WrittenSpan.ToArray());
 
         using var ms = new MemoryStream();
@@ -84,7 +84,7 @@ public sealed class XmlLoaderBufferWriterTests
             ms,
             new XmlSingleStreamLoaderOptions { LeaveOpen = true }
         );
-        await streamLoader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
+        await streamLoader.LoadAsync(Sample.ToAsyncEnumerable());
         var viaStream = Encoding.UTF8.GetString(ms.ToArray());
 
         Assert.Equal(viaStream, viaBuffer);
@@ -106,7 +106,7 @@ public sealed class XmlLoaderBufferWriterTests
             }
         );
 
-        await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(Sample.ToAsyncEnumerable());
 
         Assert.Equal(2, buffers.Count);
         Assert.All(buffers, b => Assert.True(b.WrittenCount > 0));
@@ -134,7 +134,7 @@ public sealed class XmlLoaderBufferWriterTests
         await Assert.ThrowsAsync<InvalidOperationException>
         (
             () => loader.LoadAsync(Sample.ToAsyncEnumerable())
-        ).ConfigureAwait(false);
+        );
     }
 
 
@@ -173,24 +173,24 @@ public sealed class XmlLoaderBufferWriterTests
         var bufferWriter = new TestBufferWriter();
         var stream = new BufferWriterStream(bufferWriter);
 
-        await stream.WriteAsync(new byte[] { 1, 2, 3 }, 0, 3, CancellationToken.None).ConfigureAwait(false);
+        await stream.WriteAsync(new byte[] { 1, 2, 3 }, 0, 3, CancellationToken.None);
         stream.Flush();
         Assert.Equal(3, bufferWriter.WrittenCount);
 
         // An empty write is a no-op.
-        await stream.WriteAsync(Array.Empty<byte>(), 0, 0, CancellationToken.None).ConfigureAwait(false);
+        await stream.WriteAsync(Array.Empty<byte>(), 0, 0, CancellationToken.None);
         Assert.Equal(3, bufferWriter.WrittenCount);
 
         // A null buffer surfaces ArgumentNullException.
         await Assert.ThrowsAsync<ArgumentNullException>
         (
             () => stream.WriteAsync(null!, 0, 0, CancellationToken.None)
-        ).ConfigureAwait(false);
+        );
 
         // A pre-cancelled token is honoured.
         await Assert.ThrowsAsync<TaskCanceledException>
         (
             () => stream.WriteAsync(new byte[] { 4 }, 0, 1, new CancellationToken(canceled: true))
-        ).ConfigureAwait(false);
+        );
     }
 }

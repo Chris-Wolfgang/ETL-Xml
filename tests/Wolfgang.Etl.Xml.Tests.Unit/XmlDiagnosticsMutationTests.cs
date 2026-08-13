@@ -40,7 +40,7 @@ public sealed class XmlDiagnosticsMutationTests
     [Fact]
     public async Task SingleStreamExtractor_logs_start_skip_extract_and_completion_with_counts()
     {
-        using var source = await BuildXmlAsync(ThreePeople).ConfigureAwait(false);
+        using var source = await BuildXmlAsync(ThreePeople);
         var logger = new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>();
 
         var extractor = new XmlSingleStreamExtractor<PersonRecord>(source, logger)
@@ -48,7 +48,7 @@ public sealed class XmlDiagnosticsMutationTests
             SkipItemCount = 1,
         };
 
-        await DrainAsync(extractor).ConfigureAwait(false);
+        await DrainAsync(extractor);
 
         Assert.Contains(logger.Messages, m => m.Contains("Starting XML single-stream extraction of PersonRecord.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Skipped item 1 of 1.", StringComparison.Ordinal));
@@ -77,7 +77,7 @@ public sealed class XmlDiagnosticsMutationTests
             SkipItemCount = 1,
         };
 
-        await loader.LoadAsync(ThreePeople.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(ThreePeople.ToAsyncEnumerable());
 
         Assert.Contains(logger.Messages, m => m.Contains("Starting XML single-stream loading of PersonRecord.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Skipped item 1 of 1.", StringComparison.Ordinal));
@@ -95,7 +95,7 @@ public sealed class XmlDiagnosticsMutationTests
         var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
         var extractor = new XmlMultiStreamExtractor<PersonRecord>(SerializeEach(TwoPeople), logger);
 
-        await DrainAsync(extractor).ConfigureAwait(false);
+        await DrainAsync(extractor);
 
         Assert.Contains(logger.Messages, m => m.Contains("Reading stream 0.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Reading stream 1.", StringComparison.Ordinal));
@@ -113,7 +113,7 @@ public sealed class XmlDiagnosticsMutationTests
         var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
         var loader = new XmlMultiStreamLoader<PersonRecord>(_ => new MemoryStream(), logger);
 
-        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 
         Assert.Contains(logger.Messages, m => m.Contains("Starting XML multi-stream loading of PersonRecord.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Loaded item 1 to stream 0.", StringComparison.Ordinal));
@@ -142,7 +142,7 @@ public sealed class XmlDiagnosticsMutationTests
         var extractor = new XmlSingleStreamExtractor<PersonRecord>(source);
 
         var results = new List<PersonRecord>();
-        await foreach (var item in extractor.ExtractAsync().ConfigureAwait(false))
+        await foreach (var item in extractor.ExtractAsync())
         {
             results.Add(item);
         }
@@ -170,7 +170,7 @@ public sealed class XmlDiagnosticsMutationTests
         var extractor = new XmlSingleStreamExtractor<PersonRecord>(source);
 
         var results = new List<PersonRecord>();
-        await foreach (var item in extractor.ExtractAsync().ConfigureAwait(false))
+        await foreach (var item in extractor.ExtractAsync())
         {
             results.Add(item);
         }
@@ -199,7 +199,7 @@ public sealed class XmlDiagnosticsMutationTests
             IsDryRun = true,
         };
 
-        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 
         Assert.Equal(0, factoryCalls);
         Assert.Equal(2, loader.CurrentItemCount);
@@ -218,7 +218,7 @@ public sealed class XmlDiagnosticsMutationTests
         var logger = new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>();
         var loader = new XmlSingleStreamLoader<PersonRecord>(stream, logger);
 
-        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 
         var content = Encoding.UTF8.GetString(stream.ToArray());
         Assert.Contains("<ArrayOfPersonRecord>", content, StringComparison.Ordinal);
@@ -238,7 +238,7 @@ public sealed class XmlDiagnosticsMutationTests
             new XmlSingleStreamLoaderOptions { LeaveOpen = true }
         );
 
-        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 
         var content = Encoding.UTF8.GetString(stream.ToArray());
         // The loader passes an empty-namespace set to the serializer; the default xsi/xsd
@@ -253,7 +253,7 @@ public sealed class XmlDiagnosticsMutationTests
     [Fact]
     public async Task SingleStreamExtractor_settings_ctor_leaveOpen_false_closes_stream()
     {
-        using var source = await BuildXmlAsync(TwoPeople).ConfigureAwait(false);
+        using var source = await BuildXmlAsync(TwoPeople);
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
         (
             source,
@@ -262,7 +262,7 @@ public sealed class XmlDiagnosticsMutationTests
             new XmlSingleStreamExtractorOptions { LeaveOpen = false }
         );
 
-        await DrainAsync(extractor).ConfigureAwait(false);
+        await DrainAsync(extractor);
 
         Assert.False(source.CanRead);
     }
@@ -280,7 +280,7 @@ public sealed class XmlDiagnosticsMutationTests
             new XmlSingleStreamLoaderOptions { LeaveOpen = false }
         );
 
-        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 
         Assert.False(stream.CanWrite);
     }
@@ -358,15 +358,21 @@ public sealed class XmlDiagnosticsMutationTests
             _messages.Add(formatter(state, exception));
         }
 
-
-        private sealed class NullScope : IDisposable
-        {
-            public static readonly NullScope Instance = new();
+    }
+}
 
 
-            public void Dispose()
-            {
-            }
-        }
+/// <summary>
+/// Non-generic no-op scope shared by every <c>CapturingLogger&lt;T&gt;</c>. Nesting it inside the
+/// generic logger gave each closed generic type its own identical singleton for no benefit (S2743);
+/// it does not depend on the type parameter.
+/// </summary>
+internal sealed class NullScope : IDisposable
+{
+    internal static readonly NullScope Instance = new();
+
+
+    public void Dispose()
+    {
     }
 }

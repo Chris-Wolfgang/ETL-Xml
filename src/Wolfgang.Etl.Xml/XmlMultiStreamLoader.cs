@@ -237,7 +237,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = logger ?? NullLogger.Instance;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
 
@@ -317,7 +317,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     // through the configurable ErrorPolicy. Returns true when the item was loaded, false when the
     // policy skipped a failed item — each item writes an independent document, so Skip genuinely
     // skips and continues; re-throws the original exception when the policy aborts.
-    private async System.Threading.Tasks.Task<bool> SerializeItemOrHandleErrorAsync(TRecord item, int oneBasedItemNumber, int streamIndex, CancellationToken token)
+    private async Task<bool> SerializeItemOrHandleErrorAsync(TRecord item, int oneBasedItemNumber, int streamIndex, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
@@ -333,9 +333,9 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         {
             SerializeToStream(stream, item);
 #if NETSTANDARD2_0 || NET462 || NET481
-#pragma warning disable CA2016, MA0040 // FlushAsync(CancellationToken) not available on this TFM
+#pragma warning disable CA2016, MA0040, S8949 // FlushAsync(CancellationToken) does not exist on this TFM
             await stream.FlushAsync().ConfigureAwait(false);
-#pragma warning restore CA2016, MA0040
+#pragma warning restore CA2016, MA0040, S8949
 #else
             await stream.FlushAsync(token).ConfigureAwait(false);
 #endif

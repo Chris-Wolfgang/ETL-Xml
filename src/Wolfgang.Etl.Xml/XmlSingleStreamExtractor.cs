@@ -203,7 +203,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _readerSettings = settings;
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = logger ?? NullLogger.Instance;
         _progressTimer = timer;
         _leaveOpen = (options ?? new XmlSingleStreamExtractorOptions()).LeaveOpen;
     }

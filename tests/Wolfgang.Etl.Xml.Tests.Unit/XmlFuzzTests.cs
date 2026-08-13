@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using CsCheck;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
@@ -45,14 +44,18 @@ public class XmlFuzzTests
 
 
     [Fact]
-    public void Extract_after_Load_round_trips_every_record()
+    public async Task Extract_after_Load_round_trips_every_record()
     {
-        GenPerson.List[0, 40].Sample
+        // SampleAsync (not Sample) so the property body can await the extractor/loader directly.
+        // The synchronous overload forced .GetAwaiter().GetResult() around every async call, which
+        // is sync-over-async inside the test host (VSTHRD002) and only avoided deadlock because the
+        // library happens to use ConfigureAwait(false) internally.
+        await GenPerson.List[0, 40].SampleAsync
         (
-            records =>
+            async records =>
             {
-                var xml = LoadToBytes(records);
-                var readBack = ExtractFromBytes(xml);
+                var xml = await LoadToBytesAsync(records);
+                var readBack = await ExtractFromBytesAsync(xml);
 
                 if (readBack.Count != records.Count)
                 {
@@ -75,7 +78,7 @@ public class XmlFuzzTests
     }
 
 
-    private static byte[] LoadToBytes(IReadOnlyList<PersonRecord> records)
+    private static async Task<byte[]> LoadToBytesAsync(IReadOnlyList<PersonRecord> records)
     {
         using var stream = new MemoryStream();
         var loader = new XmlSingleStreamLoader<PersonRecord>
@@ -84,30 +87,21 @@ public class XmlFuzzTests
             new XmlSingleStreamLoaderOptions { LeaveOpen = true }
         );
 
-        loader.LoadAsync(ToAsync(records)).GetAwaiter().GetResult();
+        await loader.LoadAsync(ToAsync(records)).ConfigureAwait(false);
 
         return stream.ToArray();
     }
 
 
-    private static List<PersonRecord> ExtractFromBytes(byte[] xml)
+    private static async Task<List<PersonRecord>> ExtractFromBytesAsync(byte[] xml)
     {
         using var stream = new MemoryStream(xml);
         var extractor = new XmlSingleStreamExtractor<PersonRecord>(stream);
 
         var results = new List<PersonRecord>();
-        var enumerator = extractor.ExtractAsync().GetAsyncEnumerator();
-
-        try
+        await foreach (var record in extractor.ExtractAsync().ConfigureAwait(false))
         {
-            while (enumerator.MoveNextAsync().AsTask().GetAwaiter().GetResult())
-            {
-                results.Add(enumerator.Current);
-            }
-        }
-        finally
-        {
-            enumerator.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            results.Add(record);
         }
 
         return results;

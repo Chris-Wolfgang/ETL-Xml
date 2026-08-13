@@ -34,7 +34,7 @@ public sealed class EtlPipelineXmlExtensionsTests
         await EtlPipeline
             .Create()
             .XmlSingleStreamExtractor<PersonRecord>(source)
-            .XmlSingleStreamLoader<PersonRecord>(destination)
+            .XmlSingleStreamLoader(destination)
             .RunAsync();
 
         // Assert: reading the destination back yields the same records.
@@ -61,7 +61,7 @@ public sealed class EtlPipelineXmlExtensionsTests
             await EtlPipeline
                 .Create()
                 .XmlSingleStreamExtractor<PersonRecord>(inPath)
-                .XmlSingleStreamLoader<PersonRecord>(outPath)
+                .XmlSingleStreamLoader(outPath)
                 .RunAsync();
 
             // If the factory-owned streams were not closed, these opens would throw IOException.
@@ -92,7 +92,7 @@ public sealed class EtlPipelineXmlExtensionsTests
         await EtlPipeline
             .Create()
             .XmlMultiStreamExtractor<PersonRecord>(sources)
-            .XmlSingleStreamLoader<PersonRecord>(destination)
+            .XmlSingleStreamLoader(destination)
             .RunAsync();
 
         var readBack = await ReadSingleStreamXmlAsync(destination);
@@ -112,7 +112,7 @@ public sealed class EtlPipelineXmlExtensionsTests
         await EtlPipeline
             .Create()
             .XmlSingleStreamExtractor<PersonRecord>(source)
-            .XmlMultiStreamLoader<PersonRecord>(_ => new CapturingMemoryStream(captured))
+            .XmlMultiStreamLoader(_ => new CapturingMemoryStream(captured))
             .RunAsync();
 
         // One captured document per record, each deserializing back to the original.
@@ -138,7 +138,7 @@ public sealed class EtlPipelineXmlExtensionsTests
             .Create()
             .XmlSingleStreamExtractor<PersonRecord>(source)
             .Through<PersonRecord>(items => Filter(items, p => p.Age >= 30))
-            .XmlSingleStreamLoader<PersonRecord>(destination)
+            .XmlSingleStreamLoader(destination)
             .RunAsync();
 
         var readBack = await ReadSingleStreamXmlAsync(destination);
@@ -192,7 +192,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
         Assert.Throws<ArgumentNullException>
         (
-            () => pipeline.XmlSingleStreamLoader<PersonRecord>((string)null!)
+            () => pipeline.XmlSingleStreamLoader((string)null!)
         );
     }
 
@@ -205,7 +205,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
         Assert.Throws<ArgumentNullException>
         (
-            () => pipeline.XmlMultiStreamLoader<PersonRecord>((Func<PersonRecord, Stream>)null!)
+            () => pipeline.XmlMultiStreamLoader((Func<PersonRecord, Stream>)null!)
         );
     }
 
@@ -249,7 +249,7 @@ public sealed class EtlPipelineXmlExtensionsTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => ((IEtlPipeline<PersonRecord>)null!).XmlSingleStreamLoader<PersonRecord>("people.xml")
+            () => ((IEtlPipeline<PersonRecord>)null!).XmlSingleStreamLoader("people.xml")
         );
     }
 
@@ -260,7 +260,7 @@ public sealed class EtlPipelineXmlExtensionsTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => ((IEtlPipeline<PersonRecord>)null!).XmlSingleStreamLoader<PersonRecord>(new MemoryStream())
+            () => ((IEtlPipeline<PersonRecord>)null!).XmlSingleStreamLoader(new MemoryStream())
         );
     }
 
@@ -273,7 +273,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
         Assert.Throws<ArgumentNullException>
         (
-            () => pipeline.XmlSingleStreamLoader<PersonRecord>((Stream)null!)
+            () => pipeline.XmlSingleStreamLoader((Stream)null!)
         );
     }
 
@@ -284,7 +284,7 @@ public sealed class EtlPipelineXmlExtensionsTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => ((IEtlPipeline<PersonRecord>)null!).XmlMultiStreamLoader<PersonRecord>(_ => new MemoryStream())
+            () => ((IEtlPipeline<PersonRecord>)null!).XmlMultiStreamLoader(_ => new MemoryStream())
         );
     }
 
