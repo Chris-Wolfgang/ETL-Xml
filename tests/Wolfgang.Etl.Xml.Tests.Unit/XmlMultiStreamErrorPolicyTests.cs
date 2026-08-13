@@ -26,7 +26,9 @@ public sealed class XmlMultiStreamErrorPolicyTests
         public string Value
         {
             get => Explode ? throw new InvalidOperationException("boom") : "ok";
-            set { }
+            // XmlSerializer requires a public setter to round-trip the property; the
+            // value is never read back, so it is deliberately discarded.
+            set => _ = value;
         }
     }
 

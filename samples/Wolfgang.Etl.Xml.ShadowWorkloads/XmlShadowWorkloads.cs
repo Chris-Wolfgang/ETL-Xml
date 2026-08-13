@@ -11,7 +11,7 @@ namespace Wolfgang.Etl.Xml.ShadowWorkloads;
 /// <summary>
 /// Realistic consumer workloads for ETL-Xml. Unlike the micro-benchmarks in
 /// <c>benchmarks/</c>, these exercise production-shaped record counts and a
-/// bursty concurrent-caller pattern, with <see cref="MemoryDiagnoser"/> tracking
+/// bursty concurrent-caller pattern, with <see cref="MemoryDiagnoserAttribute"/> tracking
 /// per-op allocations so a nightly <c>shadow.yaml</c> run can compare the current
 /// build against a baseline release for latency and allocation regressions.
 /// </summary>

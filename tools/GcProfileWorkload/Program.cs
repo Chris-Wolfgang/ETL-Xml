@@ -10,6 +10,7 @@
 // Meaningful metrics come from the ETW / EventPipe trace captured by the outer
 // workflow, not from the wall time this process reports.
 
+using GcProfileWorkload;   // Record lives in a namespace (MA0047)
 using System.Diagnostics;
 using Wolfgang.Etl.Xml;
 
@@ -101,12 +102,17 @@ static async IAsyncEnumerable<Record> GenerateBatch(int count)
     }
 }
 
-// XmlSerializer requires a public type with a public parameterless constructor.
-public sealed class Record
+// Block-scoped (not file-scoped): this file uses top-level statements, so a
+// file-scoped namespace cannot be declared after them (CS8956).
+namespace GcProfileWorkload
 {
-    public int Id { get; set; }
+    // XmlSerializer requires a public type with a public parameterless constructor.
+    public sealed class Record
+    {
+        public int Id { get; set; }
 
-    public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
-    public decimal Price { get; set; }
+        public decimal Price { get; set; }
+    }
 }
