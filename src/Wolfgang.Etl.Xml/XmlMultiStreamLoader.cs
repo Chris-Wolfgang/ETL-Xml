@@ -333,9 +333,9 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         {
             SerializeToStream(stream, item);
 #if NETSTANDARD2_0 || NET462 || NET481
-#pragma warning disable CA2016, MA0040 // FlushAsync(CancellationToken) not available on this TFM
+#pragma warning disable CA2016, MA0040, S8949 // FlushAsync(CancellationToken) does not exist on this TFM
             await stream.FlushAsync().ConfigureAwait(false);
-#pragma warning restore CA2016, MA0040
+#pragma warning restore CA2016, MA0040, S8949
 #else
             await stream.FlushAsync(token).ConfigureAwait(false);
 #endif

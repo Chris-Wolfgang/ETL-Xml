@@ -358,15 +358,21 @@ public sealed class XmlDiagnosticsMutationTests
             _messages.Add(formatter(state, exception));
         }
 
-
-        private sealed class NullScope : IDisposable
-        {
-            public static readonly NullScope Instance = new();
+    }
+}
 
 
-            public void Dispose()
-            {
-            }
-        }
+/// <summary>
+/// Non-generic no-op scope shared by every <c>CapturingLogger&lt;T&gt;</c>. Nesting it inside the
+/// generic logger gave each closed generic type its own identical singleton for no benefit (S2743);
+/// it does not depend on the type parameter.
+/// </summary>
+internal sealed class NullScope : IDisposable
+{
+    internal static readonly NullScope Instance = new();
+
+
+    public void Dispose()
+    {
     }
 }

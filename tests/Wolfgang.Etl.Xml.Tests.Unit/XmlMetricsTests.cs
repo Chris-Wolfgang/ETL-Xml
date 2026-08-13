@@ -231,15 +231,13 @@ public sealed class XmlMetricsTests
     {
         var measurements = new List<Measurement>();
 
-        using var listener = new MeterListener
+        using var listener = new MeterListener();
+        listener.InstrumentPublished = (instrument, l) =>
         {
-            InstrumentPublished = (instrument, l) =>
+            if (string.Equals(instrument.Meter.Name, XmlMetrics.MeterName, StringComparison.Ordinal))
             {
-                if (string.Equals(instrument.Meter.Name, XmlMetrics.MeterName, StringComparison.Ordinal))
-                {
-                    l.EnableMeasurementEvents(instrument);
-                }
-            },
+                l.EnableMeasurementEvents(instrument);
+            }
         };
 
         listener.SetMeasurementEventCallback<long>((instrument, value, tags, _) =>
