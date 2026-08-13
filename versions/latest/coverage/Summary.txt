@@ -1,23 +1,23 @@
 Summary
-  Generated on: 8/12/2026 - 3:50:39 PM
-  Coverage date: 8/12/2026 - 3:50:33 PM - 8/12/2026 - 3:50:35 PM
+  Generated on: 8/13/2026 - 8:52:37 PM
+  Coverage date: 8/13/2026 - 8:52:26 PM - 8/13/2026 - 8:52:29 PM
   Parser: MultiReport (2x Cobertura)
   Assemblies: 1
-  Classes: 12
-  Files: 12
+  Classes: 13
+  Files: 13
   Line coverage: 95.1%
   Covered lines: 572
   Uncovered lines: 29
   Coverable lines: 601
-  Total lines: 2338
+  Total lines: 2361
   Branch coverage: 86.7% (203 of 234)
   Covered branches: 203
   Total branches: 234
-  Method coverage: 94.8% (92 of 97)
-  Full method coverage: 87.6% (85 of 97)
-  Covered methods: 92
-  Fully covered methods: 85
-  Total methods: 97
+  Method coverage: 94.8% (93 of 98)
+  Full method coverage: 87.7% (86 of 98)
+  Covered methods: 93
+  Fully covered methods: 86
+  Total methods: 98
 
 Wolfgang.Etl.Xml                                     95.1%
   Wolfgang.Etl.Xml.BufferWriterStream                93.5%
@@ -28,7 +28,8 @@ Wolfgang.Etl.Xml                                     95.1%
   Wolfgang.Etl.Xml.XmlMultiStreamExtractor<T>        96.1%
   Wolfgang.Etl.Xml.XmlMultiStreamLoader<T>           93.6%
   Wolfgang.Etl.Xml.XmlReport                          100%
+  Wolfgang.Etl.Xml.XmlSerializerNamespacesCache       100%
   Wolfgang.Etl.Xml.XmlSingleStreamExtractor<T>       94.4%
   Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions    100%
-  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>          93.1%
+  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>            93%
   Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions       100%
