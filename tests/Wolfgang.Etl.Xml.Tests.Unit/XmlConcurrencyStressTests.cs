@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
@@ -103,7 +102,7 @@ public class XmlConcurrencyStressTests
                 var seen = 0;
                 await foreach (var record in extractor.ExtractAsync(cts.Token))
                 {
-                    if (record is not null && ++seen == 5)
+                    if (++seen == 5)
                     {
                         cts.Cancel();
                     }

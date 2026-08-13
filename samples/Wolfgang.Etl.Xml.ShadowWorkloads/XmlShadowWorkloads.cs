@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using Wolfgang.Etl.Xml;
 
 namespace Wolfgang.Etl.Xml.ShadowWorkloads;
 

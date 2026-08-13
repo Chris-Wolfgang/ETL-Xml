@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Xunit;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit.Globalization;
