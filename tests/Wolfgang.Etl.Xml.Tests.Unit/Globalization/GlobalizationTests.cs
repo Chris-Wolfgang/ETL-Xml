@@ -66,8 +66,8 @@ public sealed class GlobalizationTests
     [MemberData(nameof(Cultures))]
     public async Task Load_produces_identical_xml_under_any_culture(string cultureName)
     {
-        var baseline = await LoadToXmlUnderCultureAsync("en-US").ConfigureAwait(false);
-        var underCulture = await LoadToXmlUnderCultureAsync(cultureName).ConfigureAwait(false);
+        var baseline = await LoadToXmlUnderCultureAsync("en-US");
+        var underCulture = await LoadToXmlUnderCultureAsync(cultureName);
 
         Assert.Equal(baseline, underCulture);
     }
@@ -78,19 +78,19 @@ public sealed class GlobalizationTests
     [MemberData(nameof(Cultures))]
     public async Task Round_trip_preserves_values_under_any_culture(string cultureName)
     {
-        var xml = await LoadToXmlUnderCultureAsync(cultureName).ConfigureAwait(false);
+        var xml = await LoadToXmlUnderCultureAsync(cultureName);
 
         var readBack = await RunUnderCultureAsync(cultureName, async () =>
         {
             using var source = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(xml));
             var results = new List<Measurement>();
-            await foreach (var m in new XmlSingleStreamExtractor<Measurement>(source).ExtractAsync().ConfigureAwait(false))
+            await foreach (var m in new XmlSingleStreamExtractor<Measurement>(source).ExtractAsync())
             {
                 results.Add(m);
             }
 
             return results;
-        }).ConfigureAwait(false);
+        });
 
         Assert.Single(readBack);
         Assert.Equal(Sample[0].Amount, readBack[0].Amount);

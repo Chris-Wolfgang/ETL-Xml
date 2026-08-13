@@ -42,7 +42,7 @@ public class XmlConcurrencyStressTests
     [Fact]
     public async Task Concurrent_extractions_of_the_same_record_type_stay_isolated_and_correct()
     {
-        var xml = await BuildXmlAsync(Sample).ConfigureAwait(false);
+        var xml = await BuildXmlAsync(Sample);
 
         var tasks = Enumerable.Range(0, Workers).Select(_ => Task.Run(async () =>
         {
@@ -50,7 +50,7 @@ public class XmlConcurrencyStressTests
             var extractor = new XmlSingleStreamExtractor<PersonRecord>(stream);
 
             var got = new List<PersonRecord>();
-            await foreach (var record in extractor.ExtractAsync().ConfigureAwait(false))
+            await foreach (var record in extractor.ExtractAsync())
             {
                 got.Add(record);
             }
@@ -58,7 +58,7 @@ public class XmlConcurrencyStressTests
             return got;
         }));
 
-        var results = await Task.WhenAll(tasks).ConfigureAwait(false);
+        var results = await Task.WhenAll(tasks);
 
         foreach (var got in results)
         {
@@ -73,12 +73,12 @@ public class XmlConcurrencyStressTests
     [Fact]
     public async Task Concurrent_loads_produce_correct_independent_output()
     {
-        var expected = await BuildXmlAsync(Sample).ConfigureAwait(false);
+        var expected = await BuildXmlAsync(Sample);
 
         var tasks = Enumerable.Range(0, Workers).Select(_ => Task.Run(async () =>
-            await BuildXmlAsync(Sample).ConfigureAwait(false)));
+            await BuildXmlAsync(Sample)));
 
-        var outputs = await Task.WhenAll(tasks).ConfigureAwait(false);
+        var outputs = await Task.WhenAll(tasks);
 
         Assert.All(outputs, output => Assert.Equal(expected, output));
     }
@@ -90,7 +90,7 @@ public class XmlConcurrencyStressTests
         var many = Enumerable.Range(0, 2000)
             .Select(i => new PersonRecord { FirstName = $"First{i}", LastName = $"Last{i}", Age = i % 120 })
             .ToArray();
-        var xml = await BuildXmlAsync(many).ConfigureAwait(false);
+        var xml = await BuildXmlAsync(many);
 
         var tasks = Enumerable.Range(0, Workers).Select(_ => Task.Run(async () =>
         {
@@ -101,21 +101,21 @@ public class XmlConcurrencyStressTests
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             {
                 var seen = 0;
-                await foreach (var record in extractor.ExtractAsync(cts.Token).ConfigureAwait(false))
+                await foreach (var record in extractor.ExtractAsync(cts.Token))
                 {
                     if (record is not null && ++seen == 5)
                     {
                         cts.Cancel();
                     }
                 }
-            }).ConfigureAwait(false);
+            });
         }));
 
         var all = Task.WhenAll(tasks);
-        var finished = await Task.WhenAny(all, Task.Delay(TimeSpan.FromSeconds(30))).ConfigureAwait(false);
+        var finished = await Task.WhenAny(all, Task.Delay(TimeSpan.FromSeconds(30)));
 
         Assert.Same(all, finished);
-        await all.ConfigureAwait(false);
+        await all;
     }
 
 

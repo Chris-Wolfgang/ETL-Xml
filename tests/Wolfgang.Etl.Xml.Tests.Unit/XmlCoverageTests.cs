@@ -34,7 +34,7 @@ public sealed class XmlCoverageTests
             NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
         );
 
-        Assert.Equal(1, await CountAsync(extractor).ConfigureAwait(false));
+        Assert.Equal(1, await CountAsync(extractor));
     }
 
 
@@ -48,7 +48,7 @@ public sealed class XmlCoverageTests
             NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
         );
 
-        Assert.Equal(1, await CountAsync(extractor).ConfigureAwait(false));
+        Assert.Equal(1, await CountAsync(extractor));
     }
 
 
@@ -60,7 +60,7 @@ public sealed class XmlCoverageTests
         var streams = new[] { new MemoryStream(Encoding.UTF8.GetBytes(nilXml)) };
         var extractor = new XmlMultiStreamExtractor<PersonRecord>(streams);
 
-        Assert.Equal(0, await CountAsync(extractor).ConfigureAwait(false));
+        Assert.Equal(0, await CountAsync(extractor));
     }
 
 
@@ -74,7 +74,7 @@ public sealed class XmlCoverageTests
             NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
         );
 
-        await loader.LoadAsync(ToAsync(Sample)).ConfigureAwait(false);
+        await loader.LoadAsync(ToAsync(Sample));
 
         Assert.Equal(1, loader.CurrentItemCount);
     }
@@ -91,7 +91,7 @@ public sealed class XmlCoverageTests
             NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
         );
 
-        await loader.LoadAsync(ToAsync(Sample)).ConfigureAwait(false);
+        await loader.LoadAsync(ToAsync(Sample));
 
         Assert.Equal(1, loader.CurrentItemCount);
         var xml = Encoding.UTF8.GetString(Assert.Single(buffers).ToArray());
@@ -112,7 +112,7 @@ public sealed class XmlCoverageTests
             NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
         );
 
-        await loader.LoadAsync(ToAsync(Sample)).ConfigureAwait(false);
+        await loader.LoadAsync(ToAsync(Sample));
 
         Assert.Equal(1, loader.CurrentItemCount);
     }

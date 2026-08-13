@@ -47,7 +47,7 @@ public sealed class XmlConstructorConvergenceTests
             NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
         );
 
-        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 
         // Documented default is LeaveOpen = true, so the caller's stream stays usable.
         Assert.True(stream.CanWrite);
@@ -57,14 +57,14 @@ public sealed class XmlConstructorConvergenceTests
     [Fact]
     public async Task Extractor_stream_logger_ctor_honours_documented_LeaveOpen_default()
     {
-        using var source = await BuildXmlAsync().ConfigureAwait(false);
+        using var source = await BuildXmlAsync();
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
         (
             source,
             NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
         );
 
-        await DrainAsync(extractor).ConfigureAwait(false);
+        await DrainAsync(extractor);
 
         Assert.True(source.CanRead);
     }
@@ -78,11 +78,11 @@ public sealed class XmlConstructorConvergenceTests
         var viaCanonical = new MemoryStream();
 
         await new XmlSingleStreamLoader<PersonRecord>(viaOptions)
-            .LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+            .LoadAsync(TwoPeople.ToAsyncEnumerable());
         await new XmlSingleStreamLoader<PersonRecord>(viaLogger, NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance)
-            .LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+            .LoadAsync(TwoPeople.ToAsyncEnumerable());
         await new XmlSingleStreamLoader<PersonRecord>(viaCanonical, options: null, logger: null)
-            .LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+            .LoadAsync(TwoPeople.ToAsyncEnumerable());
 
         Assert.True(viaOptions.CanWrite);
         Assert.True(viaLogger.CanWrite);
@@ -103,7 +103,7 @@ public sealed class XmlConstructorConvergenceTests
             NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
         );
 
-        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 
         var content = Encoding.UTF8.GetString(stream.ToArray());
         Assert.Contains("<People>", content, StringComparison.Ordinal);
@@ -113,7 +113,7 @@ public sealed class XmlConstructorConvergenceTests
     [Fact]
     public async Task Extractor_canonical_ctor_accepts_options_and_logger_together()
     {
-        var source = await BuildXmlAsync().ConfigureAwait(false);
+        var source = await BuildXmlAsync();
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
         (
             source,
@@ -121,7 +121,7 @@ public sealed class XmlConstructorConvergenceTests
             NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
         );
 
-        await DrainAsync(extractor).ConfigureAwait(false);
+        await DrainAsync(extractor);
 
         // Proof the options were applied rather than silently dropped.
         Assert.False(source.CanRead);
@@ -139,7 +139,7 @@ public sealed class XmlConstructorConvergenceTests
             NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
         );
 
-        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 
         var content = Encoding.UTF8.GetString(writer.ToArray());
         Assert.Contains("<People>", content, StringComparison.Ordinal);
@@ -166,7 +166,7 @@ public sealed class XmlConstructorConvergenceTests
         var extractor = new XmlSingleStreamExtractor<PersonRecord>(source);
 
         var results = new List<PersonRecord>();
-        await foreach (var item in extractor.ExtractAsync().ConfigureAwait(false))
+        await foreach (var item in extractor.ExtractAsync())
         {
             results.Add(item);
         }
@@ -190,7 +190,7 @@ public sealed class XmlConstructorConvergenceTests
         var extractor = new XmlSingleStreamExtractor<PersonRecord>(source);
 
         var results = new List<PersonRecord>();
-        await foreach (var item in extractor.ExtractAsync().ConfigureAwait(false))
+        await foreach (var item in extractor.ExtractAsync())
         {
             results.Add(item);
         }
@@ -212,7 +212,7 @@ public sealed class XmlConstructorConvergenceTests
 
         var extractor = new XmlSingleStreamExtractor<PersonRecord>(source);
 
-        await DrainAsync(extractor).ConfigureAwait(false);
+        await DrainAsync(extractor);
 
         Assert.Equal(1, extractor.CurrentItemCount);
     }

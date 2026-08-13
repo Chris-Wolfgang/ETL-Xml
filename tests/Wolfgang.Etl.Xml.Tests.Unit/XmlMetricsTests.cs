@@ -64,15 +64,15 @@ public sealed class XmlMetricsTests
     [Fact]
     public async Task SingleStreamExtractor_emits_items_extracted_counter_and_duration_with_tags()
     {
-        using var source = await BuildXmlAsync(Sample).ConfigureAwait(false);
+        using var source = await BuildXmlAsync(Sample);
 
         var measurements = await CollectAsync(async () =>
         {
             var extractor = new XmlSingleStreamExtractor<MetricProbe>(source);
-            await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
+            await foreach (var _ in extractor.ExtractAsync())
             {
             }
-        }).ConfigureAwait(false);
+        });
 
         var extracted = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.extracted")).ToList();
         Assert.Equal(2, extracted.Sum(m => m.Value));
@@ -95,8 +95,8 @@ public sealed class XmlMetricsTests
                 ms,
                 new XmlSingleStreamLoaderOptions { LeaveOpen = true }
             );
-            await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
-        }).ConfigureAwait(false);
+            await loader.LoadAsync(Sample.ToAsyncEnumerable());
+        });
 
         var loaded = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.loaded")).ToList();
         Assert.Equal(2, loaded.Sum(m => m.Value));
@@ -121,8 +121,8 @@ public sealed class XmlMetricsTests
             {
                 SkipItemCount = 1,
             };
-            await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
-        }).ConfigureAwait(false);
+            await loader.LoadAsync(Sample.ToAsyncEnumerable());
+        });
 
         Assert.Equal(1, measurements.Where(m => Is(m, "wolfgang.etl.xml.items.skipped")).Sum(m => m.Value));
     }
@@ -131,7 +131,7 @@ public sealed class XmlMetricsTests
     [Fact]
     public async Task SingleStreamExtractor_emits_items_skipped_counter_tagged_extract()
     {
-        using var source = await BuildXmlAsync(Sample).ConfigureAwait(false);
+        using var source = await BuildXmlAsync(Sample);
 
         var measurements = await CollectAsync(async () =>
         {
@@ -139,10 +139,10 @@ public sealed class XmlMetricsTests
             {
                 SkipItemCount = 1,
             };
-            await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
+            await foreach (var _ in extractor.ExtractAsync())
             {
             }
-        }).ConfigureAwait(false);
+        });
 
         var skipped = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.skipped")).ToList();
         Assert.Equal(1, skipped.Sum(m => m.Value));
@@ -158,10 +158,10 @@ public sealed class XmlMetricsTests
         var measurements = await CollectAsync(async () =>
         {
             var extractor = new XmlMultiStreamExtractor<MetricProbe>(streams);
-            await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
+            await foreach (var _ in extractor.ExtractAsync())
             {
             }
-        }).ConfigureAwait(false);
+        });
 
         var extracted = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.extracted")).ToList();
         Assert.Equal(2, extracted.Sum(m => m.Value));
@@ -179,8 +179,8 @@ public sealed class XmlMetricsTests
         var measurements = await CollectAsync(async () =>
         {
             var loader = new XmlMultiStreamLoader<MetricProbe>(_ => new MemoryStream());
-            await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
-        }).ConfigureAwait(false);
+            await loader.LoadAsync(Sample.ToAsyncEnumerable());
+        });
 
         var loaded = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.loaded")).ToList();
         Assert.Equal(2, loaded.Sum(m => m.Value));
@@ -202,9 +202,9 @@ public sealed class XmlMetricsTests
                     ErrorPolicy = ItemErrorPolicy.Skip,
                 };
                 await loader.LoadAsync(new[] { new ExplodingMetricProbe { Explode = true } }.ToAsyncEnumerable())
-                    .ConfigureAwait(false);
+                    ;
             },
-            recordType: nameof(ExplodingMetricProbe)).ConfigureAwait(false);
+            recordType: nameof(ExplodingMetricProbe));
 
         var errored = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.errored")).ToList();
         Assert.Equal(1, errored.Sum(m => m.Value));

@@ -52,7 +52,7 @@ public sealed class XmlSingleStreamExtractorXsdValidationTests
         {
             new PersonRecord { FirstName = "Alice", LastName = "Smith", Age = 30 },
             new PersonRecord { FirstName = "Bob", LastName = "Jones", Age = 25 },
-        }).ConfigureAwait(false);
+        });
 
         using var stream = new MemoryStream(validXml);
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
@@ -63,7 +63,7 @@ public sealed class XmlSingleStreamExtractorXsdValidationTests
         );
 
         var results = new List<PersonRecord>();
-        await foreach (var record in extractor.ExtractAsync().ConfigureAwait(false))
+        await foreach (var record in extractor.ExtractAsync())
         {
             results.Add(record);
         }
@@ -97,10 +97,10 @@ public sealed class XmlSingleStreamExtractorXsdValidationTests
         // inner exception is the XmlSchemaValidationException with the details.
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
+            await foreach (var _ in extractor.ExtractAsync())
             {
             }
-        }).ConfigureAwait(false);
+        });
 
         Assert.IsType<XmlSchemaValidationException>(ex.InnerException);
     }

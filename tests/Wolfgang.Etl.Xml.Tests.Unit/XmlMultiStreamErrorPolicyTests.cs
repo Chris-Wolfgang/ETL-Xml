@@ -43,10 +43,10 @@ public sealed class XmlMultiStreamErrorPolicyTests
 
         await Assert.ThrowsAnyAsync<Exception>(async () =>
         {
-            await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
+            await foreach (var _ in extractor.ExtractAsync())
             {
             }
-        }).ConfigureAwait(false);
+        });
     }
 
 
@@ -57,7 +57,7 @@ public sealed class XmlMultiStreamErrorPolicyTests
         var extractor = new XmlMultiStreamExtractor<PersonRecord>(streams) { ErrorPolicy = ItemErrorPolicy.Skip };
 
         var got = new List<PersonRecord>();
-        await foreach (var record in extractor.ExtractAsync().ConfigureAwait(false))
+        await foreach (var record in extractor.ExtractAsync())
         {
             got.Add(record);
         }
@@ -78,7 +78,7 @@ public sealed class XmlMultiStreamErrorPolicyTests
         };
 
         var got = new List<PersonRecord>();
-        await foreach (var record in extractor.ExtractAsync().ConfigureAwait(false))
+        await foreach (var record in extractor.ExtractAsync())
         {
             got.Add(record);
         }
@@ -98,8 +98,8 @@ public sealed class XmlMultiStreamErrorPolicyTests
         var loader = new XmlMultiStreamLoader<ConditionalRecord>(_ => new MemoryStream());
 
         await Assert.ThrowsAnyAsync<Exception>(async () =>
-            await loader.LoadAsync(ToAsync(new[] { new ConditionalRecord { Explode = true } })).ConfigureAwait(false))
-            .ConfigureAwait(false);
+            await loader.LoadAsync(ToAsync(new[] { new ConditionalRecord { Explode = true } })))
+            ;
     }
 
 
@@ -118,7 +118,7 @@ public sealed class XmlMultiStreamErrorPolicyTests
             new ConditionalRecord { Explode = false },
         };
 
-        await loader.LoadAsync(ToAsync(items)).ConfigureAwait(false);
+        await loader.LoadAsync(ToAsync(items));
 
         Assert.Equal(2, loader.CurrentItemCount);
         Assert.Equal(1, loader.CurrentErrorItemCount);

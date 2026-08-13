@@ -43,9 +43,9 @@ public class XmlSnapshotTests
     [Fact]
     public async Task Default_root_element_wraps_records()
     {
-        var xml = await LoadSingleStreamAsync(People, options: null).ConfigureAwait(false);
+        var xml = await LoadSingleStreamAsync(People, options: null);
 
-        await Verifier.Verify(SplitLines(xml)).UseDirectory("Snapshots").ConfigureAwait(false);
+        await Verifier.Verify(SplitLines(xml)).UseDirectory("Snapshots");
     }
 
 
@@ -54,18 +54,18 @@ public class XmlSnapshotTests
     {
         var options = new XmlSingleStreamLoaderOptions { RootElementName = "People", LeaveOpen = true };
 
-        var xml = await LoadSingleStreamAsync(People, options).ConfigureAwait(false);
+        var xml = await LoadSingleStreamAsync(People, options);
 
-        await Verifier.Verify(SplitLines(xml)).UseDirectory("Snapshots").ConfigureAwait(false);
+        await Verifier.Verify(SplitLines(xml)).UseDirectory("Snapshots");
     }
 
 
     [Fact]
     public async Task Empty_sequence_writes_empty_root()
     {
-        var xml = await LoadSingleStreamAsync(Array.Empty<PersonRecord>(), options: null).ConfigureAwait(false);
+        var xml = await LoadSingleStreamAsync(Array.Empty<PersonRecord>(), options: null);
 
-        await Verifier.Verify(SplitLines(xml)).UseDirectory("Snapshots").ConfigureAwait(false);
+        await Verifier.Verify(SplitLines(xml)).UseDirectory("Snapshots");
     }
 
 
