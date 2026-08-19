@@ -48,4 +48,21 @@
 	     is consumed by the framework, not by our code. -->
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedAutoPropertyAccessor_002EGlobal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 
+	<!-- ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract.
+
+	     Both remaining sites are null-guards on the result of a USER-SUPPLIED
+	     factory delegate in XmlMultiStreamLoader. The nullable annotation is
+	     a compile-time claim, not a runtime guarantee — a caller can (and in
+	     the test suite does) return null. Both branches are reachable and
+	     covered by passing tests:
+
+	         LoadAsync_when_stream_factory_returns_null_throws_InvalidOperationException
+	             -> new XmlMultiStreamLoader<PersonRecord>(_ => (Stream)null!)
+	         XmlLoaderBufferWriterTests
+	             -> new XmlMultiStreamLoader<PersonRecord>(_ => (IBufferWriter<byte>)null!)
+
+	     Deleting the guards on the analyser's advice would turn a clear
+	     InvalidOperationException into a NullReferenceException. -->
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+
 </wpf:ResourceDictionary>

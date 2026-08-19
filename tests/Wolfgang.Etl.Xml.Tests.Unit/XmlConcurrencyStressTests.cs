@@ -100,11 +100,9 @@ public class XmlConcurrencyStressTests
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             {
                 var seen = 0;
-                // ReSharper disable once UnusedVariable — the loop drives the async
-                // enumerator until cancellation fires; the record value is unused
-                // by design. A `var _` discard would shadow the outer lambda param.
                 await foreach (var record in extractor.ExtractAsync(cts.Token))
                 {
+                    Assert.NotNull(record);
                     if (++seen == 5)
                     {
                         cts.Cancel();

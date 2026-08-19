@@ -99,11 +99,12 @@ public static class DocExampleCompiler
     }
 
 
-    // Chooses the wrapper method shape that lets the snippet compile:
-    //   - a `yield` snippet must sit in an async-iterator method;
-    //   - an `await` snippet needs `async Task`;
-    //   - anything else (e.g. a plain construction) is a synchronous `void` body,
-    //     which avoids a spurious CS1998 "async method lacks await" on those.
+    /// <summary>
+    /// Chooses the wrapper method shape that lets the snippet compile: a snippet containing
+    /// <c>yield</c> must sit in an async-iterator method, one containing <c>await</c> needs
+    /// <c>async Task</c>, and anything else (for example a plain construction) is a synchronous
+    /// <c>void</c> body, which avoids a spurious CS1998 "async method lacks await" on those.
+    /// </summary>
     private static (string Signature, string Closer) WrapperSignature(string code)
     {
         if (ContainsWord(code, "yield"))

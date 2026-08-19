@@ -70,7 +70,7 @@ static async Task ErrorPolicyDeadLetterAsync()
         PersonStream(new Person { FirstName = "Bob", LastName = "Jones", Age = 25 }),
     };
 
-    var deadLetters = new List<Wolfgang.Etl.Abstractions.ItemErrorContext>();
+    var deadLetters = new List<ItemErrorContext>();
     var extractor = new XmlMultiStreamExtractor<Person>(streams)
     {
         ErrorPolicy = Wolfgang.Etl.ErrorPolicies.ItemErrorPolicy.SkipAndDeadLetter(deadLetters),
