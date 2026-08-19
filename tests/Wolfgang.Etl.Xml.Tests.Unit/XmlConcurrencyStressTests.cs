@@ -100,7 +100,7 @@ public class XmlConcurrencyStressTests
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             {
                 var seen = 0;
-                await foreach (var record in extractor.ExtractAsync(cts.Token))
+                await foreach (var _ in extractor.ExtractAsync(cts.Token))
                 {
                     if (++seen == 5)
                     {

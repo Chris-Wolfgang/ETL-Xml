@@ -1,0 +1,75 @@
+# zizmor configuration — GitHub Actions workflow security audit.
+# https://docs.zizmor.sh/configuration/
+#
+# Pinning policy: every action reference in this repo is pinned to a full
+# commit hash with a trailing `# vMAJOR.MINOR.PATCH` comment (PR #261).
+# The strictest policy that matches reality is `hash-pin` — a future PR
+# that adds a tag-pinned action becomes a high-severity finding.
+#
+# Local reusable-workflow calls of the form `uses: ./…` are not registry
+# actions and are exempt from pinning.
+#
+# Each `ignore:` entry below is an accepted, documented suppression — a
+# pre-existing finding that is deliberate design rather than a defect. A
+# NEW finding of any of these audit types anywhere else still fails.
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        "*": hash-pin
+
+  dangerous-triggers:
+    ignore:
+      # pr.yaml's `pull_request_target` is deliberate: the workflow YAML
+      # executes from the base branch (main), not from the PR branch, so a
+      # malicious PR cannot modify the workflow logic that validates it.
+      # The "Detect .NET Projects" job re-fetches every trusted config
+      # file (Directory.Build.props, .editorconfig, workflows, …) from
+      # main before any build step runs; jobs that build PR code check
+      # out the PR head explicitly and run with least-privilege
+      # `permissions:`. Moving off `pull_request_target` would break that
+      # trusted-config model.
+      - pr.yaml
+
+  template-injection:
+    ignore:
+      # codeql.yaml line 169 references four `steps.*.outcome` /
+      # `steps.*.outputs.*` values inside a pwsh block that composes the
+      # final security-scan summary. Every one of them is set by a
+      # previous step in the same job — `steps.check-csharp.outcome`,
+      # `.outputs.has-csharp`, `steps.build.outcome`,
+      # `steps.perform-codeql-analysis.outcome`. `.outcome` is drawn
+      # from the fixed enum success | failure | cancelled | skipped and
+      # `.outputs.has-csharp` is the literal string "true" / "false" the
+      # detect step writes. None is attacker-controllable.
+      - codeql.yaml
+      # stryker.yaml line 214 interpolates `steps.run.outputs.exit_code`
+      # into a shell script. That value is the numeric exit code of the
+      # earlier `dotnet stryker` step (captured via `echo "exit_code=$?"
+      # >> "$GITHUB_OUTPUT"`), not attacker-supplied input.
+      - stryker.yaml
+
+  excessive-permissions:
+    ignore:
+      # pr-benchmarks.yaml needs `pull-requests: write` to post the
+      # benchmark comparison as a comment on the PR. The workflow only
+      # runs the benchmark, formats the summary, and calls the comment
+      # API — no arbitrary code from the PR runs under this permission.
+      - pr-benchmarks.yaml
+      # scorecard.yaml uses `permissions: read-all` because OSSF
+      # Scorecard's per-check queries hit repository metadata, workflow
+      # history, dependency graph, branch-protection state, and code
+      # scanning results — most of the `read` scopes at once. It never
+      # writes, and its output uploads via the dedicated
+      # `security-events: write` / `id-token: write` scopes granted on
+      # the analysis step itself.
+      - scorecard.yaml
+
+  artipacked:
+    ignore:
+      # license-audit.yaml checks out the code only to enumerate NuGet
+      # package licenses. It never invokes git commands with the token
+      # after checkout, so the token being left in the git config carries
+      # no additional risk. A `persist-credentials: false` follow-up
+      # belongs in the repo-template sync (fleet-wide), not per-repo.
+      - license-audit.yaml
