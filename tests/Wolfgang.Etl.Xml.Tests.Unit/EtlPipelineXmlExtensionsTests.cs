@@ -166,9 +166,11 @@ public sealed class EtlPipelineXmlExtensionsTests
     [Fact]
     public void XmlSingleStreamExtractor_null_path_throws()
     {
+        string path = null!;
+
         Assert.Throws<ArgumentNullException>
         (
-            () => EtlPipeline.Create().XmlSingleStreamExtractor<PersonRecord>((string)null!)
+            () => EtlPipeline.Create().XmlSingleStreamExtractor<PersonRecord>(path)
         );
     }
 
@@ -177,9 +179,11 @@ public sealed class EtlPipelineXmlExtensionsTests
     [Fact]
     public void XmlMultiStreamExtractor_null_streams_throws()
     {
+        IEnumerable<Stream> streams = null!;
+
         Assert.Throws<ArgumentNullException>
         (
-            () => EtlPipeline.Create().XmlMultiStreamExtractor<PersonRecord>((IEnumerable<Stream>)null!)
+            () => EtlPipeline.Create().XmlMultiStreamExtractor<PersonRecord>(streams)
         );
     }
 
@@ -202,10 +206,11 @@ public sealed class EtlPipelineXmlExtensionsTests
     public void XmlMultiStreamLoader_null_factory_throws()
     {
         var pipeline = EtlPipeline.Create().XmlSingleStreamExtractor<PersonRecord>(new MemoryStream());
+        Func<PersonRecord, Stream> streamFactory = null!;
 
         Assert.Throws<ArgumentNullException>
         (
-            () => pipeline.XmlMultiStreamLoader((Func<PersonRecord, Stream>)null!)
+            () => pipeline.XmlMultiStreamLoader(streamFactory)
         );
     }
 

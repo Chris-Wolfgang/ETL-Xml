@@ -7,7 +7,7 @@
 // namespace for the compiler to recognise it.
 namespace System.Runtime.CompilerServices
 {
-    using System.Diagnostics.CodeAnalysis;
+    using Diagnostics.CodeAnalysis;
 
     [ExcludeFromCodeCoverage]
     internal static class IsExternalInit { }

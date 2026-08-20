@@ -102,6 +102,7 @@ public class XmlConcurrencyStressTests
                 var seen = 0;
                 await foreach (var record in extractor.ExtractAsync(cts.Token))
                 {
+                    Assert.NotNull(record);
                     if (++seen == 5)
                     {
                         cts.Cancel();
