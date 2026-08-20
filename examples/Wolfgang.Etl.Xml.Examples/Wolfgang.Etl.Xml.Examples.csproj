@@ -15,8 +15,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.11" />
-    <PackageReference Include="Wolfgang.Etl.ErrorPolicies" Version="0.23.1" />
-    <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.23.1" />
+    <PackageReference Include="Wolfgang.Etl.ErrorPolicies" Version="0.23.2" />
+    <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.23.2" />
   </ItemGroup>
 
   <!-- Analyzer PackageReferences are centralized in Directory.Build.props -->
