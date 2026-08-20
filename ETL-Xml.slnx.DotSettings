@@ -36,17 +36,13 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RS0036/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RS0037/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 
-	<!-- UnusedAutoPropertyAccessor.Global.
-
-	     False positive on POCO test/benchmark/example/sample record classes
-	     whose properties are populated by the test/benchmark framework and
-	     consumed only through XML (de)serialization or reflection. The
-	     analyzer sees no direct reader in the source and reports every getter
-	     as unused, but removing them would break the round-trip these types
-	     exist to exercise. Also fires on TFM polyfill attribute classes
-	     (Properties/RequiresUnreferencedCodeAttribute) whose .Message getter
-	     is consumed by the framework, not by our code. -->
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedAutoPropertyAccessor_002EGlobal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<!-- UnusedAutoPropertyAccessor.Global is intentionally NOT globally
+	     silenced here. Each of the 20 sites that fires it was addressed
+	     with a per-class `[SuppressMessage("ReSharper", "…")]` documenting
+	     which reflection framework (XmlSerializer, BenchmarkDotNet [Params],
+	     framework polyfill contract) reads the accessor. That keeps the
+	     intent visible at each callsite and lets a NEW site be reviewed
+	     rather than silently silenced. -->
 
 	<!-- ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract.
 

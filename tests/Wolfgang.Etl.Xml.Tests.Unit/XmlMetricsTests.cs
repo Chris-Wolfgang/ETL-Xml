@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// the <c>Wolfgang.Etl.Xml</c> meter is process-global, so the tests filter by the
 /// <c>etl.record_type</c> tag to ignore metrics emitted by other test classes running in parallel.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Properties are populated by object initializer and consumed by XmlSerializer via reflection; the getters have no direct reader in source.")]
 public sealed class MetricProbe
 {
     public string Name { get; set; } = string.Empty;

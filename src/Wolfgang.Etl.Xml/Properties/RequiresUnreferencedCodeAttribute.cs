@@ -14,6 +14,7 @@ namespace System.Diagnostics.CodeAnalysis;
 [EditorBrowsable(EditorBrowsableState.Never)]
 [ExcludeFromCodeCoverage]
 [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method, Inherited = false)]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Message.get and Url are part of the framework's public shape for this attribute; the polyfill must mirror it so trimmer / analyzer tooling that reads these properties via reflection sees the same surface as the real BCL type.")]
 internal sealed class RequiresUnreferencedCodeAttribute : Attribute
 {
     public RequiresUnreferencedCodeAttribute(string message)
