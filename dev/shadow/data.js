@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1787199547872,
+  "lastUpdate": 1787286001171,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -350,6 +350,76 @@ window.BENCHMARK_DATA = {
             "value": 2949012157,
             "unit": "ns",
             "range": "± 1739891.9569536494"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "d42fcbaec4072c0aa4d06cf1b9608f7ec4764080",
+          "message": "Merge pull request #276 from Chris-Wolfgang/fix/inspectcode-publicapi-gate\n\nfix: replace UnusedAutoPropertyAccessor.Global silence with per-site attributes",
+          "timestamp": "2026-08-21T01:16:29Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/d42fcbaec4072c0aa4d06cf1b9608f7ec4764080"
+        },
+        "date": 1787285998071,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1471433.4583333333,
+            "unit": "ns",
+            "range": "± 19339.79071019466"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 673440.95703125,
+            "unit": "ns",
+            "range": "± 5940.098562072473"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 2218378.5755208335,
+            "unit": "ns",
+            "range": "± 50993.57473152612"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 22917333.885416668,
+            "unit": "ns",
+            "range": "± 37702.10490483533"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 149096253.83333334,
+            "unit": "ns",
+            "range": "± 4886977.016408458"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 66388774.833333336,
+            "unit": "ns",
+            "range": "± 192017.08999470974"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 218071256.33333334,
+            "unit": "ns",
+            "range": "± 1124870.0114138005"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 2371345112,
+            "unit": "ns",
+            "range": "± 2774790.3419611724"
           }
         ]
       }
