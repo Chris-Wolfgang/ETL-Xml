@@ -39,6 +39,53 @@ jobs:
           # Publish to the OpenSSF transparency log so the README badge resolves.
           publish_results: true
 
+      # TEMPORARY WORKAROUND — pending upstream ossf/scorecard support for
+      # .NET fuzzing frameworks. Filter documented false-positive rules out
+      # of the SARIF before it reaches code-scanning. Doing it here (rather
+      # than dismissing the individual alerts) is durable across weekly
+      # re-runs — Scorecard emits a fresh SARIF each run and fingerprint
+      # drift means per-alert dismissals decay (see
+      # reference_scorecard_dismissal_not_durable).
+      #
+      # Suppressed rule IDs:
+      #   FuzzingID  — this repo ships CsCheck-based fuzz tests in
+      #                tests/Wolfgang.Etl.Xml.Tests.Fuzz + fuzz.yaml, but
+      #                Scorecard's fuzzing heuristic only recognizes
+      #                OSS-Fuzz, ClusterFuzzLite, Go native fuzz, Python
+      #                atheris, Java Jazzer, Haskell QuickCheck, and
+      #                OneFuzz — none of which support .NET/C#. A real fix
+      #                requires ossf/scorecard to add a C# fuzzing
+      #                detector (CsCheck, SharpFuzz, DotnetFuzzing). When
+      #                that lands upstream, remove this filter entry.
+      #
+      # The scorecard.dev score published to the transparency log (README
+      # badge) still counts every check; this only trims the code-scanning-
+      # tab noise.
+      - name: Filter documented false positives from SARIF
+        shell: bash
+        env:
+          SUPPRESSED_RULES: 'FuzzingID'
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "::error::jq not available on the runner; cannot filter SARIF."
+            exit 1
+          fi
+          # shellcheck disable=SC2086
+          rules_json=$(printf '%s\n' $SUPPRESSED_RULES | jq -R . | jq -s .)
+          jq \
+            --argjson suppressed "$rules_json" \
+            '
+              .runs |= map(
+                .results |= map(select(
+                  ($suppressed | index(.ruleId // "")) == null
+                ))
+              )
+            ' results.sarif > results.filtered.sarif
+          before=$(jq '[.runs[].results[]] | length' results.sarif)
+          after=$(jq '[.runs[].results[]] | length' results.filtered.sarif)
+          echo "Scorecard SARIF results: $before -> $after after suppression"
+          mv results.filtered.sarif results.sarif
+
       - name: Upload artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
