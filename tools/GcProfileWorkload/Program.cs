@@ -107,6 +107,7 @@ static async IAsyncEnumerable<Record> GenerateBatch(int count)
 namespace GcProfileWorkload
 {
     // XmlSerializer requires a public type with a public parameterless constructor.
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Properties are populated by object initializer and consumed by XmlSerializer via reflection; the getters have no direct reader in source.")]
     public sealed class Record
     {
         public int Id { get; set; }

@@ -19,6 +19,7 @@ public class XmlSingleStreamExtractorBenchmarks
 
 
     [Params(10, 100, 1000)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Set by BenchmarkDotNet via reflection for each [Params] value.")]
     public int ItemCount { get; set; }
 
 

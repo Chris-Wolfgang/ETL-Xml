@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ public class XmlMultiStreamLoaderBenchmarks
 
 
     [Params(10, 100, 1000)]
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Set by BenchmarkDotNet via reflection for each [Params] value.")]
     public int ItemCount { get; set; }
 
 

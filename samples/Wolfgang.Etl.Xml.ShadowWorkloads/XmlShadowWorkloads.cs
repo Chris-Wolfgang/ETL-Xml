@@ -19,6 +19,7 @@ public class XmlShadowWorkloads
 {
     // Small = per-request payload; large = a batch/export shape.
     [Params(1_000, 100_000)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Set by BenchmarkDotNet via reflection for each [Params] value.")]
     public int RecordCount { get; set; }
 
     private byte[] _sourceXml = Array.Empty<byte>();
