@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-08-21
+
+Maintenance release — no `Wolfgang.Etl.Xml` source-behaviour changes since 0.8.0. Closes the
+code-scanning umbrella #260: 485 open alerts on `main` are now 0 InspectCode, 0 zizmor, and 19
+Scorecard (all under the < 25 floor), landed via #273 and #276.
+
+### Changed
+
+- Transitive floor for `Wolfgang.Etl.Abstractions` raised from **0.22.0** to **0.23.2**.
+  Consumers building with `TreatWarningsAsErrors` may need to update their
+  `Wolfgang.Etl.Abstractions` reference in lockstep; see the Abstractions release notes for the
+  0.23.x consumer-visible notes.
+
 ## [0.8.0] - 2026-08-13
 
 ### Changed
