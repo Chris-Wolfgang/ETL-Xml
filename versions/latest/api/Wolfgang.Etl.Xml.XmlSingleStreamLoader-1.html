@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/new/v0.8.0/apiSpec/new?filename=Wolfgang_Etl_Xml_XmlSingleStreamLoader_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.Xml.XmlSingleStreamLoader%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/new/v0.8.1/apiSpec/new?filename=Wolfgang_Etl_Xml_XmlSingleStreamLoader_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.Xml.XmlSingleStreamLoader%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,7 +75,7 @@
 
 
   <h1 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1" class="text-break">
-Class XmlSingleStreamLoader&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L54"><i class="bi bi-code-slash"></i></a>
+Class XmlSingleStreamLoader&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L54"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -165,6 +165,9 @@ wrapped in a root element.</p>
       <span class="xref">LoaderBase&lt;TRecord, XmlReport&gt;.SkipItemCount</span>
     </div>
     <div>
+      <span class="xref">LoaderBase&lt;TRecord, XmlReport&gt;.WorkerResilience</span>
+    </div>
+    <div>
       <span class="xref">LoaderBase&lt;TRecord, XmlReport&gt;.ErrorPolicy</span>
     </div>
     <div>
@@ -231,7 +234,7 @@ to <code>false</code>, mirroring the behaviour of <a class="xref" href="https://
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_Buffers_IBufferWriter_System_Byte__Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})">
   XmlSingleStreamLoader(IBufferWriter&lt;byte&gt;, ILogger&lt;XmlSingleStreamLoader&lt;TRecord&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L255"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L255"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a> class writing
@@ -275,7 +278,7 @@ public XmlSingleStreamLoader(IBufferWriter&lt;byte&gt; bufferWriter, ILogger&lt;
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_Buffers_IBufferWriter_System_Byte__System_Xml_XmlWriterSettings_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},System.Xml.XmlWriterSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)">
   XmlSingleStreamLoader(IBufferWriter&lt;byte&gt;, XmlWriterSettings, ILogger&lt;XmlSingleStreamLoader&lt;TRecord&gt;&gt;, XmlSingleStreamLoaderOptions?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L276"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L276"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a> class writing
@@ -325,7 +328,7 @@ public XmlSingleStreamLoader(IBufferWriter&lt;byte&gt; bufferWriter, XmlWriterSe
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_Buffers_IBufferWriter_System_Byte__Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)">
   XmlSingleStreamLoader(IBufferWriter&lt;byte&gt;, XmlSingleStreamLoaderOptions?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L238"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L238"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a> class that
@@ -370,7 +373,7 @@ public XmlSingleStreamLoader(IBufferWriter&lt;byte&gt; bufferWriter, XmlSingleSt
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_Buffers_IBufferWriter_System_Byte__Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})">
   XmlSingleStreamLoader(IBufferWriter&lt;byte&gt;, XmlSingleStreamLoaderOptions?, ILogger&lt;XmlSingleStreamLoader&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L307"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L307"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a> class writing
@@ -420,7 +423,7 @@ public XmlSingleStreamLoader(IBufferWriter&lt;byte&gt; bufferWriter, XmlSingleSt
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})">
   XmlSingleStreamLoader(Stream, ILogger&lt;XmlSingleStreamLoader&lt;TRecord&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L107"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L107"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a> class
@@ -464,7 +467,7 @@ public XmlSingleStreamLoader(Stream stream, ILogger&lt;XmlSingleStreamLoader&lt;
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_IO_Stream_System_Xml_XmlWriterSettings_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,System.Xml.XmlWriterSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)">
   XmlSingleStreamLoader(Stream, XmlWriterSettings, ILogger&lt;XmlSingleStreamLoader&lt;TRecord&gt;&gt;, XmlSingleStreamLoaderOptions?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L139"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L139"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a> class
@@ -518,7 +521,7 @@ or whitespace string.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)">
   XmlSingleStreamLoader(Stream, XmlSingleStreamLoaderOptions?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L90"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L90"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a> class.</p>
@@ -565,7 +568,7 @@ or whitespace string.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})">
   XmlSingleStreamLoader(Stream, XmlSingleStreamLoaderOptions?, ILogger&lt;XmlSingleStreamLoader&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L191"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L191"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a> class.
@@ -631,7 +634,7 @@ whitespace string, or is not a valid XML local name.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_IsDryRun" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.IsDryRun">
   IsDryRun
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L360"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L360"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
@@ -672,7 +675,7 @@ counters, and logs as usual, but writes nothing to the output stream. Defaults t
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_CreateProgressReport" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L531"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L531"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a progress report of type TProgress. This gives the derived class the opportunity to
@@ -706,7 +709,7 @@ implement a custom progress report that is specific to the loading process.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_CreateProgressTimer_System_IProgress_Wolfgang_Etl_Xml_XmlReport__" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.CreateProgressTimer(System.IProgress{Wolfgang.Etl.Xml.XmlReport})">
   CreateProgressTimer(IProgress&lt;XmlReport&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L541"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L541"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -747,7 +750,7 @@ Override this method in a derived class to inject a custom timer
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_LoadWorkerAsync_System_Collections_Generic_IAsyncEnumerable__0__System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Threading.CancellationToken)">
   LoadWorkerAsync(IAsyncEnumerable&lt;TRecord&gt;, CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L365"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L365"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>This method is the core implementation of the loading logic and should be
@@ -799,7 +802,7 @@ overridden by derived classes.</p>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L54" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L54" class="edit-link">Edit this page</a>
         </div>
 
 
