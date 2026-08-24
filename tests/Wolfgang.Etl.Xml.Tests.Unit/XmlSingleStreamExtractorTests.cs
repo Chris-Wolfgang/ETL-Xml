@@ -77,9 +77,8 @@ public class XmlSingleStreamExtractorTests
         (
             CreateXmlStream(ExpectedItems.Count),
             new XmlReaderSettings(),
-            options: null,
             timer,
-            NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
+            logger: NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
         );
 
 
@@ -269,9 +268,8 @@ public class XmlSingleStreamExtractorTests
             (
                 null!,
                 new XmlReaderSettings(),
-                options: null,
                 new ManualProgressTimer(),
-                NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
+                logger: NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
             )
         );
     }
@@ -286,7 +284,6 @@ public class XmlSingleStreamExtractorTests
         (
             stream,
             new XmlReaderSettings(),
-            options: null,
             new ManualProgressTimer(),
             logger: null
         );
@@ -310,9 +307,8 @@ public class XmlSingleStreamExtractorTests
             (
                 new MemoryStream(),
                 new XmlReaderSettings(),
-                options: null,
                 timer: null!,
-                NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
+                logger: NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
             )
         );
     }

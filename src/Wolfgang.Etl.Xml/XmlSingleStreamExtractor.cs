@@ -225,8 +225,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     (
         Stream stream,
         XmlReaderSettings readerSettings,
-        XmlSingleStreamExtractorOptions? options,
         IProgressTimer timer,
+        XmlSingleStreamExtractorOptions? options = null,
         ILogger? logger = null
     )
         : this

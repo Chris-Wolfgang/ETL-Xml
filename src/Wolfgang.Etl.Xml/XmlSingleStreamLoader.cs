@@ -332,8 +332,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     (
         Stream stream,
         XmlWriterSettings writerSettings,
-        XmlSingleStreamLoaderOptions? options,
         IProgressTimer timer,
+        XmlSingleStreamLoaderOptions? options = null,
         ILogger? logger = null
     )
         : this

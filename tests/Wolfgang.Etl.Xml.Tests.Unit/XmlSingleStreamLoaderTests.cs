@@ -54,9 +54,8 @@ public class XmlSingleStreamLoaderTests
         (
             stream,
             new XmlWriterSettings(),
-            options: null,
             timer,
-            NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
+            logger: NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
         );
     }
 
@@ -404,9 +403,8 @@ public class XmlSingleStreamLoaderTests
             (
                 null!,
                 new XmlWriterSettings(),
-                options: null,
                 new ManualProgressTimer(),
-                NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
+                logger: NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
             )
         );
     }
@@ -420,7 +418,6 @@ public class XmlSingleStreamLoaderTests
         (
             new MemoryStream(),
             new XmlWriterSettings(),
-            options: null,
             new ManualProgressTimer(),
             logger: null
         );
@@ -441,9 +438,8 @@ public class XmlSingleStreamLoaderTests
             (
                 new MemoryStream(),
                 new XmlWriterSettings(),
-                options: null,
                 timer: null!,
-                NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
+                logger: NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
             )
         );
     }
