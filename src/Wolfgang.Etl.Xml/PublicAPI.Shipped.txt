@@ -3,17 +3,17 @@ Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions
 Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions
 Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>
 Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>!>! logger) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams, System.Xml.XmlReaderSettings! readerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>!>! logger) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams, System.Xml.XmlReaderSettings! readerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>
 Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.IsDryRun.get -> bool
 Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.IsDryRun.set -> void
 Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>! logger) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>! logger) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>! logger) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>! logger) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.Xml.XmlReport
 Wolfgang.Etl.Xml.XmlReport.CurrentSkippedItemCount.get -> int
 Wolfgang.Etl.Xml.XmlReport.XmlReport(int currentItemCount, int currentSkippedItemCount) -> void

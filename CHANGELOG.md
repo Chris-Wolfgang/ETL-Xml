@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`logger` is now an optional trailing constructor parameter on the multi-stream types.** The six
+  required-logger constructors on `XmlMultiStreamExtractor<T>` and `XmlMultiStreamLoader<T>`
+  (including the `IBufferWriter<byte>` factory overloads) now declare `ILogger<T>? logger = null`.
+  Passing `null` — or omitting it — resolves to `NullLogger.Instance` instead of throwing
+  `ArgumentNullException`.
+
+  This completes the constructor convergence begun on the single-stream types: every extractor and
+  loader in the package now takes the logger last and optional, matching the fleet-wide convention.
+  A side effect is that `XmlReaderSettings` / `XmlWriterSettings` can now be supplied *without* also
+  supplying a logger, which previously required passing one.
+
+  Not a breaking change: each parameter list is unchanged, so the emitted signatures are identical
+  and PackageValidation against the published baseline passes.
+
 ## [0.8.1] - 2026-08-21
 
 Maintenance release — no `Wolfgang.Etl.Xml` source-behaviour changes since 0.8.0. Closes the

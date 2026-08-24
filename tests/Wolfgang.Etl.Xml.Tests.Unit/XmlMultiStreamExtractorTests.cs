@@ -138,16 +138,17 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
-    public void Constructor_Streams_Logger_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_Streams_Logger_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        // logger is now an optional trailing parameter: null means "no logging"
+        // (NullLogger.Instance) rather than an argument error.
+        var sut = new XmlMultiStreamExtractor<PersonRecord>
         (
-            () => new XmlMultiStreamExtractor<PersonRecord>
-            (
-                Array.Empty<Stream>(),
-                logger: null!
-            )
+            Array.Empty<Stream>(),
+            logger: null
         );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -185,17 +186,18 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
-    public void Constructor_with_settings_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_with_settings_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        // logger is now an optional trailing parameter: null means "no logging"
+        // (NullLogger.Instance) rather than an argument error.
+        var sut = new XmlMultiStreamExtractor<PersonRecord>
         (
-            () => new XmlMultiStreamExtractor<PersonRecord>
-            (
-                Array.Empty<Stream>(),
-                new XmlReaderSettings(),
-                logger: null!
-            )
+            Array.Empty<Stream>(),
+            new XmlReaderSettings(),
+            logger: null
         );
+
+        Assert.NotNull(sut);
     }
 
 
