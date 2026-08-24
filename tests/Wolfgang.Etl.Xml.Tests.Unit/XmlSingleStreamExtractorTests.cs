@@ -77,8 +77,9 @@ public class XmlSingleStreamExtractorTests
         (
             CreateXmlStream(ExpectedItems.Count),
             new XmlReaderSettings(),
-            NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance,
-            timer
+            options: null,
+            timer,
+            NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
         );
 
 
@@ -268,8 +269,9 @@ public class XmlSingleStreamExtractorTests
             (
                 null!,
                 new XmlReaderSettings(),
-                NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance,
-                new ManualProgressTimer()
+                options: null,
+                new ManualProgressTimer(),
+                NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
             )
         );
     }
@@ -284,8 +286,9 @@ public class XmlSingleStreamExtractorTests
         (
             stream,
             new XmlReaderSettings(),
-            logger: null,
-            new ManualProgressTimer()
+            options: null,
+            new ManualProgressTimer(),
+            logger: null
         );
 
         await foreach (var item in sut.ExtractAsync())
@@ -307,8 +310,9 @@ public class XmlSingleStreamExtractorTests
             (
                 new MemoryStream(),
                 new XmlReaderSettings(),
-                NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance,
-                timer: null!
+                options: null,
+                timer: null!,
+                NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
             )
         );
     }

@@ -54,8 +54,9 @@ public class XmlSingleStreamLoaderTests
         (
             stream,
             new XmlWriterSettings(),
-            NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance,
-            timer
+            options: null,
+            timer,
+            NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
         );
     }
 
@@ -403,8 +404,9 @@ public class XmlSingleStreamLoaderTests
             (
                 null!,
                 new XmlWriterSettings(),
-                NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance,
-                new ManualProgressTimer()
+                options: null,
+                new ManualProgressTimer(),
+                NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
             )
         );
     }
@@ -418,8 +420,9 @@ public class XmlSingleStreamLoaderTests
         (
             new MemoryStream(),
             new XmlWriterSettings(),
-            logger: null,
-            new ManualProgressTimer()
+            options: null,
+            new ManualProgressTimer(),
+            logger: null
         );
 
         await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
@@ -438,8 +441,9 @@ public class XmlSingleStreamLoaderTests
             (
                 new MemoryStream(),
                 new XmlWriterSettings(),
-                NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance,
-                timer: null!
+                options: null,
+                timer: null!,
+                NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
             )
         );
     }

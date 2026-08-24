@@ -50,8 +50,8 @@ public class XmlMultiStreamLoaderTests
         (
             _ => new MemoryStream(),
             new XmlWriterSettings(),
-            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance,
-            timer
+            timer,
+            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
         );
 
 
@@ -272,8 +272,8 @@ public class XmlMultiStreamLoaderTests
             (
                 null!,
                 new XmlWriterSettings(),
-                NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance,
-                new ManualProgressTimer()
+                new ManualProgressTimer(),
+                NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
             )
         );
     }
@@ -287,8 +287,8 @@ public class XmlMultiStreamLoaderTests
         (
             _ => new MemoryStream(),
             new XmlWriterSettings(),
-            logger: null,
-            new ManualProgressTimer()
+            new ManualProgressTimer(),
+            logger: null
         );
 
         await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
@@ -307,8 +307,8 @@ public class XmlMultiStreamLoaderTests
             (
                 _ => new MemoryStream(),
                 new XmlWriterSettings(),
-                NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance,
-                timer: null!
+                timer: null!,
+                NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
             )
         );
     }

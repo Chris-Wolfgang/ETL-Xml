@@ -216,8 +216,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// </summary>
     /// <param name="stream">The stream containing XML data to read from.</param>
     /// <param name="readerSettings">The XML reader settings to use for deserialization.</param>
-    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
+    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="options">
     /// Options that control extractor behaviour. When <c>null</c>, defaults are used.
     /// </param>
@@ -225,9 +225,9 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     (
         Stream stream,
         XmlReaderSettings readerSettings,
-        ILogger? logger,
+        XmlSingleStreamExtractorOptions? options,
         IProgressTimer timer,
-        XmlSingleStreamExtractorOptions? options = null
+        ILogger? logger = null
     )
         : this
         (
