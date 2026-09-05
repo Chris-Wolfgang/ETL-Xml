@@ -81,19 +81,22 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// A factory function that receives the item to be written and returns a <see cref="Stream"/> to write it to.
     /// The loader will dispose the stream after writing.
     /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="streamFactory"/> or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="streamFactory"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
-        ILogger<XmlMultiStreamLoader<TRecord>> logger
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
     )
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _writerSettings = null;
     }
 
@@ -108,21 +111,24 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// The loader will dispose the stream after writing.
     /// </param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="streamFactory"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="streamFactory"/> or <paramref name="writerSettings"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
         XmlWriterSettings writerSettings,
-        ILogger<XmlMultiStreamLoader<TRecord>> logger
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
     )
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -153,15 +159,18 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
     /// of bytes to write it to.
     /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="bufferWriterFactory"/> or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="bufferWriterFactory"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader
     (
         Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
-        ILogger<XmlMultiStreamLoader<TRecord>> logger
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
     )
         : this(ToStreamFactory(bufferWriterFactory), logger)
     {
@@ -178,16 +187,19 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// of bytes to write it to.
     /// </param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="bufferWriterFactory"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="bufferWriterFactory"/> or <paramref name="writerSettings"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader
     (
         Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
         XmlWriterSettings writerSettings,
-        ILogger<XmlMultiStreamLoader<TRecord>> logger
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
     )
         : this(ToStreamFactory(bufferWriterFactory), writerSettings, logger)
     {

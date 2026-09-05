@@ -80,19 +80,22 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// with a logger.
     /// </summary>
     /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="streams"/> or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="streams"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
-        ILogger<XmlMultiStreamExtractor<TRecord>> logger
+        ILogger<XmlMultiStreamExtractor<TRecord>>? logger = null
     )
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _readerSettings = null;
     }
 
@@ -104,21 +107,24 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// </summary>
     /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
     /// <param name="readerSettings">The XML reader settings to use for deserialization.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="streams"/>, <paramref name="readerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="streams"/> or <paramref name="readerSettings"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
         XmlReaderSettings readerSettings,
-        ILogger<XmlMultiStreamExtractor<TRecord>> logger
+        ILogger<XmlMultiStreamExtractor<TRecord>>? logger = null
     )
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
         _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 

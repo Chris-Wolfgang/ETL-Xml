@@ -232,16 +232,17 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
-    public void Constructor_StreamFactory_Logger_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_StreamFactory_Logger_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        // logger is now an optional trailing parameter: null means "no logging"
+        // (NullLogger.Instance) rather than an argument error.
+        var sut = new XmlMultiStreamLoader<PersonRecord>
         (
-            () => new XmlMultiStreamLoader<PersonRecord>
-            (
-                _ => new MemoryStream(),
-                logger: null!
-            )
+            _ => new MemoryStream(),
+            logger: null
         );
+
+        Assert.NotNull(sut);
     }
 
 
