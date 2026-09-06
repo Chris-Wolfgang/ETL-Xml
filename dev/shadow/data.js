@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1787899361118,
+  "lastUpdate": 1788668480118,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -910,6 +910,76 @@ window.BENCHMARK_DATA = {
             "value": 2362944068,
             "unit": "ns",
             "range": "± 3058158.97333739"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "a55cd59e4f30de51fcbcd250d917b4633d7e6e24",
+          "message": "Merge pull request #287 from Chris-Wolfgang/dependabot/github_actions/github-actions-2390256866\n\nchore(deps): bump the github-actions group across 1 directory with 4 updates",
+          "timestamp": "2026-09-05T15:37:20Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/a55cd59e4f30de51fcbcd250d917b4633d7e6e24"
+        },
+        "date": 1788668477421,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1613407.744140625,
+            "unit": "ns",
+            "range": "± 16412.344038075662"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 833936.7083333334,
+            "unit": "ns",
+            "range": "± 34601.143976641695"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 2765971.640625,
+            "unit": "ns",
+            "range": "± 110955.2438536406"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 25604610.979166668,
+            "unit": "ns",
+            "range": "± 282995.1488635573"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 161934984.41666666,
+            "unit": "ns",
+            "range": "± 891087.1348810863"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 82809575.61904761,
+            "unit": "ns",
+            "range": "± 2718079.4619316086"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 249967553.66666666,
+            "unit": "ns",
+            "range": "± 8489067.84910018"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 2582145727.3333335,
+            "unit": "ns",
+            "range": "± 1891228.9375129424"
           }
         ]
       }
