@@ -135,14 +135,14 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// </summary>
     /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
     /// <param name="readerSettings">The XML reader settings to use for deserialization.</param>
-    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
+    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     internal XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
         XmlReaderSettings readerSettings,
-        ILogger? logger,
-        IProgressTimer timer
+        IProgressTimer timer,
+        ILogger? logger = null
     )
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));

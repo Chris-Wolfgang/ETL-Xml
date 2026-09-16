@@ -323,8 +323,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// </summary>
     /// <param name="stream">The stream to write XML data to.</param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
-    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
+    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="options">
     /// Options that control loader behaviour. When <c>null</c>, defaults are used.
     /// </param>
@@ -332,9 +332,9 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     (
         Stream stream,
         XmlWriterSettings writerSettings,
-        ILogger? logger,
         IProgressTimer timer,
-        XmlSingleStreamLoaderOptions? options = null
+        XmlSingleStreamLoaderOptions? options = null,
+        ILogger? logger = null
     )
         : this
         (
