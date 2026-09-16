@@ -51,7 +51,7 @@ namespace Wolfgang.Etl.Xml;
 /// await owningLoader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
-public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>, ISupportDryRun
+public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML single-stream loading of {typeof(TRecord).Name}";
@@ -213,14 +213,16 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         ILogger? logger,
         IProgressTimer? timer
     )
+        : base(options)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _writerSettings = settings;
+        _writerSettings = settings ?? options?.WriterSettings;
         _logger = logger ?? NullLogger.Instance;
         _progressTimer = timer;
         var resolved = options ?? new XmlSingleStreamLoaderOptions();
         _leaveOpen = resolved.LeaveOpen;
         _rootElementName = ResolveRootElementName(resolved.RootElementName);
+        IsDryRun = resolved.IsDryRun;
     }
 
 

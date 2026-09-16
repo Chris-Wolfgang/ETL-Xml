@@ -200,9 +200,10 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         ILogger? logger,
         IProgressTimer? timer
     )
+        : base(options)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _readerSettings = settings;
+        _readerSettings = settings ?? options?.ReaderSettings;
         _logger = logger ?? NullLogger.Instance;
         _progressTimer = timer;
         _leaveOpen = (options ?? new XmlSingleStreamExtractorOptions()).LeaveOpen;
