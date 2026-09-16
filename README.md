@@ -319,10 +319,34 @@ Class-named factories over the fluent `EtlPipeline` chain, so XML sources and si
 
 ### Constructor overloads
 
-Each extractor and loader provides two public constructors (the first parameter varies by type):
-- **`XmlSingleStreamExtractor<T>` / `XmlSingleStreamLoader<T>`** — `(stream)` or `(stream, settings, logger)`
-- **`XmlMultiStreamExtractor<T>`** — `(streams)` or `(streams, settings, logger)` where `streams` is `IEnumerable<Stream>`
-- **`XmlMultiStreamLoader<T>`** — `(streamFactory)` or `(streamFactory, settings, logger)` where `streamFactory` is `Func<T, Stream>`
+Every extractor and loader takes its source, an optional options record, and an optional logger, in that order
+(`(source, options, logger)`). The record carries the stage's own settings — the `XmlReaderSettings` /
+`XmlWriterSettings`, `LeaveOpen`, the loader's `RootElementName` and `IsDryRun` — together with the ones every
+extractor or loader shares (`ReportingInterval`, `MaximumItemCount`, `SkipItemCount`, `ErrorPolicy`):
+
+```csharp
+var extractor = new XmlSingleStreamExtractor<Person>
+(
+    stream,
+    new XmlSingleStreamExtractorOptions
+    {
+        ReaderSettings = new XmlReaderSettings { IgnoreComments = true },
+        MaximumItemCount = 1_000,
+    }
+);
+
+var loader = new XmlMultiStreamLoader<Person>(record => OpenFile(record), new XmlMultiStreamLoaderOptions { IsDryRun = true });
+```
+
+| Stage | Record | Own members |
+|-------|--------|-------------|
+| `XmlSingleStreamExtractor<T>` | `XmlSingleStreamExtractorOptions` | `ReaderSettings`, `LeaveOpen` |
+| `XmlMultiStreamExtractor<T>` | `XmlMultiStreamExtractorOptions` | `ReaderSettings` |
+| `XmlSingleStreamLoader<T>` | `XmlSingleStreamLoaderOptions` | `WriterSettings`, `RootElementName`, `LeaveOpen`, `IsDryRun` |
+| `XmlMultiStreamLoader<T>` | `XmlMultiStreamLoaderOptions` | `WriterSettings`, `IsDryRun` |
+
+A stage constructed without a record keeps every default. The older overloads that took the settings or a logger
+positionally still exist for binary compatibility but are hidden from IntelliSense.
 
 ### Progress reporting
 

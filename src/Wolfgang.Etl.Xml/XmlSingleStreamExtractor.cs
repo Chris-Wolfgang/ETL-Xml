@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -82,7 +83,14 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/> is <c>null</c>.
     /// </exception>
+    /// <remarks>
+    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
+    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
+    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
+    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamExtractor(Stream stream, XmlSingleStreamExtractorOptions? options = null)
         : this(stream, options, logger: null)
     {
@@ -99,7 +107,14 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/> or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
+    /// <remarks>
+    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
+    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
+    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
+    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamExtractor
     (
         Stream stream,
@@ -127,7 +142,14 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="stream"/>, <paramref name="readerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
+    /// <remarks>
+    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
+    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
+    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
+    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamExtractor
     (
         Stream stream,

@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Fifteen constructors are hidden from IntelliSense (`[EditorBrowsable(Never)]`) and retained permanently for binary
+  compatibility: the single-argument ones (#253, #281) and every overload that took the reader/writer settings or a
+  logger positionally, all superseded by `(source, options, logger)` with the settings on the record. Not `[Obsolete]`:
+  positional calls bind to them by exact match, so a warning could only be silenced by rewriting the call, and removal
+  would fail un-rebuilt callers at runtime. Nothing changes for callers.
 - `Wolfgang.Etl.Abstractions` / `.ErrorPolicies` 0.23.2 → 0.24.0 (`.TestKit` / `.TestKit.Xunit` for the test project). The two
   dry-run contract tests use the now non-generic TestKit base.
 
@@ -37,6 +42,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   Not a breaking change: each parameter list is unchanged, so the emitted signatures are identical
   and PackageValidation against the published baseline passes.
+
+### Deprecated
+
+- `XmlSingleStreamLoader<T>.IsDryRun` and `XmlMultiStreamLoader<T>.IsDryRun` setters — `[Obsolete]` on the **setter accessor**
+  (reads stay warning-free), pointing at the options record. Nothing is removed; removal follows in a later release.
 
 ### Removed
 
