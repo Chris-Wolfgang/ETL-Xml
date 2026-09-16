@@ -193,11 +193,9 @@ public sealed class XmlDiagnosticsMutationTests
                 factoryCalls++;
                 return new MemoryStream();
             },
+            new XmlMultiStreamLoaderOptions { IsDryRun = true },
             logger
-        )
-        {
-            IsDryRun = true,
-        };
+        );
 
         await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 

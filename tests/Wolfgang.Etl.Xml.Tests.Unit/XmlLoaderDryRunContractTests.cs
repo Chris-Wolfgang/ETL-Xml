@@ -29,11 +29,8 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
         var loader = new XmlSingleStreamLoader<PersonRecord>
         (
             stream,
-            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
-        )
-        {
-            IsDryRun = isDryRun,
-        };
+            new XmlSingleStreamLoaderOptions { LeaveOpen = true, IsDryRun = isDryRun }
+        );
 
         await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
 
@@ -48,11 +45,8 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
         var loader = new XmlSingleStreamLoader<PersonRecord>
         (
             stream,
-            new XmlSingleStreamLoaderOptions { LeaveOpen = false }
-        )
-        {
-            IsDryRun = true,
-        };
+            new XmlSingleStreamLoaderOptions { LeaveOpen = false, IsDryRun = true }
+        );
 
         await loader.LoadAsync(Sample.ToAsyncEnumerable());
 
@@ -88,11 +82,9 @@ public sealed class XmlMultiStreamLoaderDryRunContractTests
                 var ms = new MemoryStream();
                 buffers.Add(ms);
                 return ms;
-            }
-        )
-        {
-            IsDryRun = isDryRun,
-        };
+            },
+            new XmlMultiStreamLoaderOptions { IsDryRun = isDryRun }
+        );
 
         await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -65,7 +66,14 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streams"/> is <c>null</c>.
     /// </exception>
+    /// <remarks>
+    /// Retained for binary compatibility with assemblies compiled before the optional-logger overload existed: a
+    /// single-argument call in such an assembly is bound to this exact signature, and removing it would fail at runtime
+    /// with <see cref="MissingMethodException"/> with no compile-time signal. Hidden from IntelliSense; source code
+    /// binds here too, so nothing changes for callers. New code has no reason to name this overload.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamExtractor(IEnumerable<Stream> streams)
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
@@ -114,7 +122,14 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streams"/> or <paramref name="readerSettings"/> is <c>null</c>.
     /// </exception>
+    /// <remarks>
+    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
+    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
+    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
+    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
