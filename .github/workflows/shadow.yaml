@@ -52,7 +52,7 @@ jobs:
       run: ${{ steps.decide.outputs.run }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # need history to diff HEAD against the last measured commit
           persist-credentials: false
@@ -117,7 +117,7 @@ jobs:
       SAMPLE_DIR: samples/Wolfgang.Etl.Xml.ShadowWorkloads
     steps:
       - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
