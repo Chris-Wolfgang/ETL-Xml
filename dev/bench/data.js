@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789563344155,
+  "lastUpdate": 1789600094860,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "BenchmarkDotNet": [
@@ -2166,6 +2166,120 @@ window.BENCHMARK_DATA = {
             "value": 1094416.2337239583,
             "unit": "ns",
             "range": "± 27854.053283610883"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0c42509698a6c07951e1576550ec0c627d9dc6ae",
+          "message": "ci: pin every workflow action to a commit SHA with an exact # vX.Y.Z comment (#301)\n\nRan repo-template's scripts/pin-actions.ps1 -PinTags: tag references become\nSHA pins and major-only comments (# v7) become the exact tag on the pinned\ncommit (# v7.0.1), so zizmor's ref-version-mismatch stops firing when the\nmajor tag moves on. Only the ref/comment text changed. Dependabot keeps the\nprecision it finds, so this stays converted.\n\n23 already exact, 62 line(s) rewritten, 0 tag reference(s), 0 pinned SHA(s) with no tag\n\nRefs Chris-Wolfgang/repo-template#447\n\nCo-authored-by: Chris Wolfgang <cwolfgan@ptd.net>\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-16T19:05:33-04:00",
+          "tree_id": "fa35c3810494ae5fc2503816d8a0cc616f1e45b8",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/0c42509698a6c07951e1576550ec0c627d9dc6ae"
+        },
+        "date": 1789600092369,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 39391.06650797526,
+            "unit": "ns",
+            "range": "± 837.8671755151693"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 384835.4904785156,
+            "unit": "ns",
+            "range": "± 441.4626373628775"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 3863019.9192708335,
+            "unit": "ns",
+            "range": "± 43401.518144005364"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 21042.19420369466,
+            "unit": "ns",
+            "range": "± 28.2931891109836"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 207928.59252929688,
+            "unit": "ns",
+            "range": "± 1094.448469608058"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 2094641.5989583333,
+            "unit": "ns",
+            "range": "± 6192.865109166782"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 27678.11762491862,
+            "unit": "ns",
+            "range": "± 109.76867314600855"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 176492.66056315103,
+            "unit": "ns",
+            "range": "± 201.5647017552874"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 1644979.0305989583,
+            "unit": "ns",
+            "range": "± 1310.229138376689"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 14560.009562174479,
+            "unit": "ns",
+            "range": "± 73.53814905431773"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 10)",
+            "value": 13546.022857666016,
+            "unit": "ns",
+            "range": "± 137.81477177141485"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 86146.10591634114,
+            "unit": "ns",
+            "range": "± 40.764955991124545"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 100)",
+            "value": 74183.5078125,
+            "unit": "ns",
+            "range": "± 2691.528799851114"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 942873.5146484375,
+            "unit": "ns",
+            "range": "± 27386.740744682596"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 1000)",
+            "value": 826676.2939453125,
+            "unit": "ns",
+            "range": "± 5060.031480644233"
           }
         ]
       }
