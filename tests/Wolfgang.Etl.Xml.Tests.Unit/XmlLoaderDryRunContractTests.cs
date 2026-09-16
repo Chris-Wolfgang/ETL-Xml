@@ -13,7 +13,7 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// output stream, and in a real run it does.
 /// </summary>
 public sealed class XmlSingleStreamLoaderDryRunContractTests
-    : SupportsDryRunContractTests<XmlSingleStreamLoader<PersonRecord>>
+    : SupportsDryRunContractTests
 {
     private static readonly PersonRecord[] Sample =
     {
@@ -21,8 +21,6 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
     };
 
 
-    protected override XmlSingleStreamLoader<PersonRecord> CreateSut() =>
-        new(new MemoryStream());
 
 
     protected override async Task<bool> RunAndReportSideEffectAsync(bool isDryRun)
@@ -70,7 +68,7 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
 /// destination-stream factory or writes, and in a real run it does.
 /// </summary>
 public sealed class XmlMultiStreamLoaderDryRunContractTests
-    : SupportsDryRunContractTests<XmlMultiStreamLoader<PersonRecord>>
+    : SupportsDryRunContractTests
 {
     private static readonly PersonRecord[] Sample =
     {
@@ -78,8 +76,6 @@ public sealed class XmlMultiStreamLoaderDryRunContractTests
     };
 
 
-    protected override XmlMultiStreamLoader<PersonRecord> CreateSut() =>
-        new(_ => new MemoryStream());
 
 
     protected override async Task<bool> RunAndReportSideEffectAsync(bool isDryRun)

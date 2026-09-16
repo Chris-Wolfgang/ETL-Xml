@@ -1,3 +1,6 @@
+using System.Xml;
+using Wolfgang.Etl.Abstractions;
+
 namespace Wolfgang.Etl.Xml;
 
 /// <summary>
@@ -16,7 +19,7 @@ namespace Wolfgang.Etl.Xml;
 /// );
 /// </code>
 /// </example>
-public sealed class XmlSingleStreamLoaderOptions
+public sealed record XmlSingleStreamLoaderOptions : LoaderOptions
 {
     /// <summary>
     /// Gets or initializes the name of the XML root element that wraps all serialized items.
@@ -42,4 +45,21 @@ public sealed class XmlSingleStreamLoaderOptions
     /// <see cref="System.IO.BinaryWriter"/>.
     /// </remarks>
     public bool LeaveOpen { get; init; } = true;
+
+
+
+    /// <summary>
+    /// Gets the <see cref="XmlWriterSettings"/> the writer is created with. <see langword="null"/> (the default) uses the
+    /// loader's defaults.
+    /// </summary>
+    public XmlWriterSettings? WriterSettings { get; init; }
+
+
+
+
+    /// <summary>
+    /// Gets a value indicating whether the loader runs without writing: the source is enumerated and counted, but nothing
+    /// reaches the destination. Defaults to <see langword="false"/>.
+    /// </summary>
+    public bool IsDryRun { get; init; }
 }

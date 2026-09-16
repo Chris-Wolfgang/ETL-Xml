@@ -130,6 +130,28 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
 
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamExtractor{TRecord}"/> class configured through an options record.
+    /// </summary>
+    /// <param name="streams">The streams to read, one XML document each, in order.</param>
+    /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="ExtractorOptions"/>; <see langword="null"/> keeps every default.</param>
+    /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="streams"/> is <see langword="null"/>.</exception>
+    public XmlMultiStreamExtractor
+    (
+        IEnumerable<Stream> streams,
+        XmlMultiStreamExtractorOptions? options,
+        ILogger<XmlMultiStreamExtractor<TRecord>>? logger = null
+    )
+        : base(options)
+    {
+        _streams = streams ?? throw new ArgumentNullException(nameof(streams));
+        _readerSettings = options?.ReaderSettings;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="XmlMultiStreamExtractor{TRecord}"/> class
     /// with an injected progress timer for testing.
     /// </summary>

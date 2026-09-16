@@ -7,7 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Options records for all four stages** (ADR-0009, Chris-Wolfgang/ETL-Abstractions#455). `XmlSingleStreamExtractorOptions` and
+  `XmlSingleStreamLoaderOptions` become `sealed record`s (they were classes) and gain `ReaderSettings` / `WriterSettings`
+  and, on the loader, `IsDryRun`; new `XmlMultiStreamExtractorOptions` and `XmlMultiStreamLoaderOptions` carry the same for
+  the multi-stream stages. All four inherit the Wolfgang.Etl.Abstractions 0.24 base records (`ExtractorOptions` /
+  `LoaderOptions`), so `ReportingInterval`, `MaximumItemCount`, `SkipItemCount` and `ErrorPolicy` are configured through
+  the same object as every XML setting and applied by the base constructor.
+- `XmlMultiStreamExtractor<T>(streams, options, logger = null)`, `XmlMultiStreamLoader<T>(streamFactory, options,
+  logger = null)` and `XmlMultiStreamLoader<T>(bufferWriterFactory, options, logger = null)`: the record constructors the
+  single-stream stages already had. The existing constructors are unchanged in this release.
+
 ### Changed
+
+- `Wolfgang.Etl.Abstractions` / `.ErrorPolicies` 0.23.2 → 0.24.0 (`.TestKit` / `.TestKit.Xunit` for the test project). The two
+  dry-run contract tests use the now non-generic TestKit base.
 
 - **`logger` is now an optional trailing constructor parameter on the multi-stream types.** The six
   required-logger constructors on `XmlMultiStreamExtractor<T>` and `XmlMultiStreamLoader<T>`
@@ -22,6 +37,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   Not a breaking change: each parameter list is unchanged, so the emitted signatures are identical
   and PackageValidation against the published baseline passes.
+
+### Removed
+
+- `XmlSingleStreamLoader<TRecord>` and `XmlMultiStreamLoader<TRecord>` no longer implement `ISupportDryRun`;
+  Wolfgang.Etl.Abstractions 0.24 removes the interface (Chris-Wolfgang/ETL-Abstractions#457). `IsDryRun` itself is
+  unchanged for readers and now also configurable through the loaders' options records.
 
 ## [0.8.1] - 2026-08-21
 

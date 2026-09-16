@@ -34,7 +34,7 @@ namespace Wolfgang.Etl.Xml;
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
-public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>, ISupportDryRun
+public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML multi-stream loading of {typeof(TRecord).Name}";
@@ -202,6 +202,48 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
     )
         : this(ToStreamFactory(bufferWriterFactory), writerSettings, logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class configured through an options record.
+    /// </summary>
+    /// <param name="streamFactory">The factory that supplies the destination stream for each record.</param>
+    /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="LoaderOptions"/>; <see langword="null"/> keeps every default.</param>
+    /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="streamFactory"/> is <see langword="null"/>.</exception>
+    public XmlMultiStreamLoader
+    (
+        Func<TRecord, Stream> streamFactory,
+        XmlMultiStreamLoaderOptions? options,
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
+    )
+        : base(options)
+    {
+        _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
+        _writerSettings = options?.WriterSettings;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+        IsDryRun = options?.IsDryRun ?? false;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class writing to buffer writers, configured through an options record.
+    /// </summary>
+    /// <param name="bufferWriterFactory">The factory that supplies the destination buffer writer for each record.</param>
+    /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="LoaderOptions"/>; <see langword="null"/> keeps every default.</param>
+    /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="bufferWriterFactory"/> is <see langword="null"/>.</exception>
+    public XmlMultiStreamLoader
+    (
+        Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
+        XmlMultiStreamLoaderOptions? options,
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
+    )
+        : this(ToStreamFactory(bufferWriterFactory), options, logger)
     {
     }
 

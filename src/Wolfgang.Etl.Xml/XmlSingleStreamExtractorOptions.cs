@@ -1,3 +1,6 @@
+using System.Xml;
+using Wolfgang.Etl.Abstractions;
+
 namespace Wolfgang.Etl.Xml;
 
 /// <summary>
@@ -12,7 +15,7 @@ namespace Wolfgang.Etl.Xml;
 /// );
 /// </code>
 /// </example>
-public sealed class XmlSingleStreamExtractorOptions
+public sealed record XmlSingleStreamExtractorOptions : ExtractorOptions
 {
     /// <summary>
     /// Gets or initializes a value indicating whether the stream should remain open
@@ -25,4 +28,12 @@ public sealed class XmlSingleStreamExtractorOptions
     /// <see cref="System.IO.BinaryReader"/>.
     /// </remarks>
     public bool LeaveOpen { get; init; } = true;
+
+
+
+    /// <summary>
+    /// Gets the <see cref="XmlReaderSettings"/> the reader is created with. <see langword="null"/> (the default) uses the
+    /// extractor's defaults.
+    /// </summary>
+    public XmlReaderSettings? ReaderSettings { get; init; }
 }
