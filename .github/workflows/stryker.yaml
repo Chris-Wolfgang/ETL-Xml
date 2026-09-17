@@ -72,6 +72,17 @@ jobs:
         if: steps.check.outputs.found == 'true'
         run: dotnet tool update -g dotnet-stryker || dotnet tool install -g dotnet-stryker
 
+      # dotnet-stryker 5.0.0 analyses each project with a design-time build and,
+      # when the packages are not already restored, restores on the fly per target
+      # framework. On this repo that on-the-fly restore fails ("simulated build
+      # failed ... Analysis of project src/... failed for frameworks net462,net481,
+      # netstandard2.0,net8.0"), after which every mutant compiles against
+      # unresolved package references (CS0234 on Wolfgang.Etl.Abstractions) and the
+      # run reports a 0 % score (#306; same fix as Etl-Csv). Restoring up front
+      # removes the race.
+      - name: Restore packages for every target framework
+        run: dotnet restore
+
       - name: Run Stryker
         id: run
         if: steps.check.outputs.found == 'true'
