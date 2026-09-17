@@ -229,11 +229,15 @@ using Wolfgang.Etl.ErrorPolicies;
 
 var deadLetters = new List<ItemErrorContext>();
 
-var extractor = new XmlMultiStreamExtractor<Person>(streams)
-{
-    // Skip / SkipAndLog(logger) / SkipAndDeadLetter(...) / SkipDeadLetterAndLog(...)
-    ErrorPolicy = ItemErrorPolicy.SkipAndDeadLetter(deadLetters),
-};
+var extractor = new XmlMultiStreamExtractor<Person>
+(
+    streams,
+    new XmlMultiStreamExtractorOptions
+    {
+        // Skip / SkipAndLog(logger) / SkipAndDeadLetter(...) / SkipDeadLetterAndLog(...)
+        ErrorPolicy = ItemErrorPolicy.SkipAndDeadLetter(deadLetters),
+    }
+);
 
 await foreach (var person in extractor.ExtractAsync())
 {
