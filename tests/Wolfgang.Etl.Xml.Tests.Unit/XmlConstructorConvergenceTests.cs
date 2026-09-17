@@ -141,7 +141,7 @@ public sealed class XmlConstructorConvergenceTests
 
         await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 
-        var content = Encoding.UTF8.GetString(writer.ToArray());
+        var content = Encoding.UTF8.GetString(writer.WrittenSpan.ToArray());
         Assert.Contains("<People>", content, StringComparison.Ordinal);
     }
 
@@ -239,52 +239,5 @@ public sealed class XmlConstructorConvergenceTests
         await loader.LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
         ms.Position = 0;
         return ms;
-    }
-
-
-    // ArrayBufferWriter<T> does not exist on the netfx / netstandard2.0 test TFMs, so the
-    // tests use a portable buffer writer of their own.
-    private sealed class TestBufferWriter : IBufferWriter<byte>
-    {
-        private byte[] _buffer = new byte[256];
-        private int _written;
-
-
-        public byte[] ToArray() => _buffer.AsSpan(0, _written).ToArray();
-
-
-        public void Advance(int count) => _written += count;
-
-
-        public Memory<byte> GetMemory(int sizeHint = 0)
-        {
-            EnsureCapacity(sizeHint);
-            return _buffer.AsMemory(_written);
-        }
-
-
-        public Span<byte> GetSpan(int sizeHint = 0)
-        {
-            EnsureCapacity(sizeHint);
-            return _buffer.AsSpan(_written);
-        }
-
-
-        private void EnsureCapacity(int sizeHint)
-        {
-            if (sizeHint < 1)
-            {
-                sizeHint = 1;
-            }
-
-            if (_written + sizeHint <= _buffer.Length)
-            {
-                return;
-            }
-
-            var grown = new byte[Math.Max(_buffer.Length * 2, _written + sizeHint)];
-            Array.Copy(_buffer, grown, _written);
-            _buffer = grown;
-        }
     }
 }

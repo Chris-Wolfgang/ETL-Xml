@@ -38,11 +38,7 @@ internal sealed class TestBufferWriter : IBufferWriter<byte>
     }
 
 
-    public Span<byte> GetSpan(int sizeHint = 0)
-    {
-        EnsureCapacity(sizeHint);
-        return _buffer.AsSpan(WrittenCount);
-    }
+    public Span<byte> GetSpan(int sizeHint = 0) => GetMemory(sizeHint).Span;
 
 
     private void EnsureCapacity(int sizeHint)

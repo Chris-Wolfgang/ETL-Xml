@@ -29,6 +29,10 @@ public sealed class MetricProbe
 /// multi-stream loader's error policy fires. A dedicated type keeps its <c>etl.record_type</c> tag
 /// unique to this test class.
 /// </summary>
+// Serializer-shape probe: XmlSerializer only emits a property that has a public setter, and the
+// loader test serializes (never deserializes) it, so the setter can never execute; the getter's
+// non-throwing branch is likewise unreachable from the only test that uses it (Explode = true).
+[ExcludeFromCodeCoverage]
 public sealed class ExplodingMetricProbe
 {
     public bool Explode { get; set; }
