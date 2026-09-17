@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789600094860,
+  "lastUpdate": 1789614246869,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "BenchmarkDotNet": [
@@ -2280,6 +2280,120 @@ window.BENCHMARK_DATA = {
             "value": 826676.2939453125,
             "unit": "ns",
             "range": "± 5060.031480644233"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ded4a70d14f929469bbd571e078ee3afb1751296",
+          "message": "Release v0.9.0 — options records for all four stages inherit the Abstractions 0.24 base records; 15 superseded constructors hidden; IsDryRun setters deprecated (#302)\n\n* feat: make logger optional on the multi-stream ctors, defaulting to NullLogger\n\nCompletes the constructor convergence begun on the single-stream types: every\nextractor and loader in this package now takes the logger last and optional,\nmatching the fleet-wide convention already followed by Etl-DbClient.\n\nSix required-logger constructors become optional:\n  XmlMultiStreamExtractor<T>(IEnumerable<Stream>, ILogger<T>? = null)\n  XmlMultiStreamExtractor<T>(IEnumerable<Stream>, XmlReaderSettings, ILogger<T>? = null)\n  XmlMultiStreamLoader<T>(Func<TRecord, Stream>, ILogger<T>? = null)\n  XmlMultiStreamLoader<T>(Func<TRecord, Stream>, XmlWriterSettings, ILogger<T>? = null)\n  XmlMultiStreamLoader<T>(Func<TRecord, IBufferWriter<byte>>, ILogger<T>? = null)\n  XmlMultiStreamLoader<T>(Func<TRecord, IBufferWriter<byte>>, XmlWriterSettings, ILogger<T>? = null)\n\nnull (or omitted) now resolves to NullLogger.Instance instead of throwing\nArgumentNullException. A useful side effect: reader/writer settings can now be\nsupplied WITHOUT also supplying a logger, which previously was not possible.\n\nNot a breaking change: each parameter list is unchanged, so the emitted\nsignatures are identical. Release build with TreatWarningsAsErrors is clean and\nPackageValidation passes, so the 6 PublicAPI.Shipped.txt entries were corrected\nin place rather than recorded as an add/remove pair.\n\nNo overload became ambiguous: the shorter overloads still win resolution\nbecause all of their parameters have a corresponding argument, while the longer\nforms now require default substitution.\n\nTests: the three tests asserting a null logger throws now assert the NullLogger\ncontract. 330 unit + 9 doc-example tests pass in Release with\nTreatWarningsAsErrors.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\n\n* chore: put the logger last on the internal test-injection ctors\n\nApplies Rule 6 of the fleet constructor standard: the logger is the final\nparameter on EVERY constructor, internal ones included.\n\n  multi-stream:  (…, settings, ILogger? logger, IProgressTimer timer)\n              -> (…, settings, IProgressTimer timer, ILogger? logger = null)\n\n  single-stream: (…, settings, ILogger? logger, IProgressTimer timer, Options? options = null)\n              -> (…, settings, Options? options, IProgressTimer timer, ILogger? logger = null)\n\nThe single-stream overloads needed the fuller reorder because `options` was\ntrailing; it moves ahead of the timer so the logger can be last, matching the\ncanonical Rule 6 shape (inputs, options, timer, logger).\n\nInternal-only: no public API change, no PublicAPI entry, no consumer impact and\nnothing to deprecate. Test call sites updated, including supplying the now\nnon-defaulted `options` argument on the single-stream internal constructors.\n\n330 unit + 9 doc-example tests pass in Release with TreatWarningsAsErrors.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\n\n* refactor: put the timer before options on the single-stream internal ctors\n\nRevises the order this PR originally used, following call-site evidence rather\nthan the existing majority.\n\n  (…, settings, Options? options, IProgressTimer timer, ILogger? logger = null)\n    -> (…, settings, IProgressTimer timer, Options? options = null, ILogger? logger = null)\n\nThe first version made `options` a required positional parameter so that the\nlogger could stay last. That forced `options: null` at 14 call sites to satisfy\na parameter none of them actually set - all 14 are now gone.\n\nOrdering is driven by how these constructors are called across the fleet\n(149 internal call sites):\n\n  IProgressTimer   149/149 pass one -> required, and the reason the overload exists\n  ILogger           34/149 pass a real logger -> optional\n  options            0/14  pass non-null -> optional\n\nTimer first is also what makes the trailing parameters optional at all: an\noptional parameter cannot precede a required one (CS1737).\n\nThe multi-stream internal constructors already matched this shape and are\nunchanged.\n\nTest call sites that passed a logger positionally now name it, since the fourth\npositional slot is `options`.\n\n330 unit + 9 doc-example tests pass in Release with TreatWarningsAsErrors.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\n\n* feat(options): options records for all four stages, inheriting the Abstractions 0.24 base records (ADR-0009, part 1) — draft until 0.24.0 publishes (#297)\n\n* feat(options): options records for all four stages inheriting the Abstractions 0.24 base records (ADR-0009, part 1)\n\nXmlSingleStreamExtractorOptions and XmlSingleStreamLoaderOptions become\nsealed records (they were classes) inheriting ExtractorOptions /\nLoaderOptions, and gain ReaderSettings / WriterSettings plus, on the\nloader, IsDryRun. New XmlMultiStreamExtractorOptions and\nXmlMultiStreamLoaderOptions carry the same for the multi-stream stages. The\nreader/writer settings travel on the record the way Json carries\nSerializerOptions - nested as the XmlReaderSettings / XmlWriterSettings\ninstance, not flattened.\n\nThe single-stream stages' private core constructors chain base(options)\nand take the settings from the record when none were passed positionally;\nthe multi-stream stages gain (source, options, logger = null) record\nconstructors (streams; streamFactory; bufferWriterFactory) that chain\nbase(options). options is optional: every existing call keeps binding\nwhere it binds today (a compile-time guard test covers the positional-null\nshapes). The settings-taking and single-argument constructors are unchanged\nhere; hiding them is part 2.\n\nISupportDryRun dropped from both loaders (Abstractions 0.24 removes it);\nthe two dry-run contract tests use the now non-generic TestKit base.\nAbstractions / ErrorPolicies / TestKit / TestKit.Xunit 0.23.2 -> 0.24.0 -\nnot published yet; built against the local feed, PR stays draft.\n\nPublicAPI: 47 added entries (the converted records' synthesized members\nincluded; derived-record <Clone>$ lines left out as unmatchable); ten\npre-existing unrecorded XmlReport members re-surfaced and tracked in #296.\nApiCompat: CP0008 x10 for ISupportDryRun; the class->record conversion\nreported no break. Tests: XmlOptionsRecordTests (9 cases). CHANGELOG\nAdded / Changed / Removed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* chore(deps): the examples project references the 0.24.0 family too (missed in 861d29b)\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>\n\n* feat(options): hide the fifteen superseded ctors; deprecate the IsDryRun setters; README + migration guide (ADR-0009, part 2) (#298)\n\nFifteen constructors get [EditorBrowsable(Never)] and a remarks block and\nare retained permanently: the single-argument ones from #253 / #281 and\nevery overload that took XmlReaderSettings / XmlWriterSettings or a logger\npositionally, all superseded by (source, options, logger) with the\nsettings on the record. Not [Obsolete]: positional calls bind to them by\nexact match, so a warning could only be silenced by rewriting the call,\nand removal is a MissingMethodException for un-rebuilt callers. The\n(source, logger = null) and (source, options, logger = null) overloads\nstay visible.\n\nThe two IsDryRun setters are [Obsolete] on the accessor (reads stay\nclean); the constructor assignments sit under a CS0618 pragma as the\nsupported replacement; the four test initializers configure IsDryRun\nthrough the records.\n\nREADME: the \"Constructor overloads\" section describes the record shape\nwith an example and the four records' members. docs/migrations/\nv0.8-to-v0.9.md is the first real migration guide in this repo. CHANGELOG\nChanged / Deprecated. No PublicAPI text change.\n\nNot done: the internal timer-injection constructors still take the\nsettings positionally (14 test call sites, one of which asserts the null\nguard); converting them to the record is a follow-up if wanted.\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>\n\n* chore: merge main into vNext (Dependabot #287/#288/#289) ahead of the 0.9.0 release (#300)\n\n* chore(deps): bump the github-actions group across 1 directory with 4 updates\n\nBumps the github-actions group with 4 updates in the / directory: [github/codeql-action/init](https://github.com/github/codeql-action), [github/codeql-action/analyze](https://github.com/github/codeql-action), [github/codeql-action/upload-sarif](https://github.com/github/codeql-action) and [softprops/action-gh-release](https://github.com/softprops/action-gh-release).\n\n\nUpdates `github/codeql-action/init` from 4.37.7 to 4.37.9\n- [Release notes](https://github.com/github/codeql-action/releases)\n- [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/github/codeql-action/compare/ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd...cdf488f595d80d6e07e03d4674febd5ab45fa938)\n\nUpdates `github/codeql-action/analyze` from 4.37.7 to 4.37.9\n- [Release notes](https://github.com/github/codeql-action/releases)\n- [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/github/codeql-action/compare/ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd...cdf488f595d80d6e07e03d4674febd5ab45fa938)\n\nUpdates `github/codeql-action/upload-sarif` from 4.37.7 to 4.37.9\n- [Release notes](https://github.com/github/codeql-action/releases)\n- [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/github/codeql-action/compare/ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd...cdf488f595d80d6e07e03d4674febd5ab45fa938)\n\nUpdates `softprops/action-gh-release` from 3.0.2 to 3.0.3\n- [Release notes](https://github.com/softprops/action-gh-release/releases)\n- [Changelog](https://github.com/softprops/action-gh-release/blob/master/CHANGELOG.md)\n- [Commits](https://github.com/softprops/action-gh-release/compare/3d0d9888cb7fd7b750713d6e236d1fcb99157228...efb35369e0ad2afab669f228072c1b0d510eae64)\n\n---\nupdated-dependencies:\n- dependency-name: github/codeql-action/init\n  dependency-version: 4.37.9\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: github-actions\n- dependency-name: github/codeql-action/analyze\n  dependency-version: 4.37.9\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: github-actions\n- dependency-name: github/codeql-action/upload-sarif\n  dependency-version: 4.37.9\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: github-actions\n- dependency-name: softprops/action-gh-release\n  dependency-version: 3.0.3\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: github-actions\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\n\n* Bump the dotnet-dependencies group with 7 updates\n\nBumps Meziantou.Analyzer from 3.0.172 to 3.0.201\nBumps Roslynator.Analyzers from 4.16.1 to 5.0.0\nBumps SonarAnalyzer.CSharp from 10.32.0.713 to 10.33.0.1635\nBumps Wolfgang.Etl.Abstractions from 0.23.2 to 0.23.4\nBumps Wolfgang.Etl.ErrorPolicies from 0.23.2 to 0.23.4\nBumps Wolfgang.Etl.TestKit from 0.23.2 to 0.23.4\nBumps Wolfgang.Etl.TestKit.Xunit from 0.23.2 to 0.23.4\n\n---\nupdated-dependencies:\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.201\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Roslynator.Analyzers\n  dependency-version: 5.0.0\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n  dependency-group: dotnet-dependencies\n- dependency-name: SonarAnalyzer.CSharp\n  dependency-version: 10.33.0.1635\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: Wolfgang.Etl.Abstractions\n  dependency-version: 0.23.4\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Wolfgang.Etl.ErrorPolicies\n  dependency-version: 0.23.4\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Wolfgang.Etl.ErrorPolicies\n  dependency-version: 0.23.4\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Wolfgang.Etl.TestKit\n  dependency-version: 0.23.4\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Wolfgang.Etl.TestKit\n  dependency-version: 0.23.4\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Wolfgang.Etl.TestKit.Xunit\n  dependency-version: 0.23.4\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\n\n* Bump the dotnet-dependencies group with 7 updates\n\nBumps Meziantou.Analyzer from 3.0.201 to 3.0.234\nBumps Microsoft.Bcl.AsyncInterfaces from 10.0.11 to 10.0.12\nBumps Microsoft.Extensions.Logging.Abstractions from 10.0.11 to 10.0.12\nBumps Microsoft.Extensions.Logging.Console from 10.0.11 to 10.0.12\nBumps Microsoft.SourceLink.GitHub from 10.0.400 to 10.0.401\nBumps SonarAnalyzer.CSharp from 10.33.0.1635 to 10.34.0.3385\nBumps System.Diagnostics.DiagnosticSource from 10.0.11 to 10.0.12\n\n---\nupdated-dependencies:\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.234\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.Bcl.AsyncInterfaces\n  dependency-version: 10.0.12\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.Bcl.AsyncInterfaces\n  dependency-version: 10.0.12\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.Extensions.Logging.Abstractions\n  dependency-version: 10.0.12\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.Extensions.Logging.Console\n  dependency-version: 10.0.12\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.SourceLink.GitHub\n  dependency-version: 10.0.401\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: SonarAnalyzer.CSharp\n  dependency-version: 10.34.0.3385\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: System.Diagnostics.DiagnosticSource\n  dependency-version: 10.0.12\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\n\n---------\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>\n\n* release: v0.9.0\n\noptions records for all four stages inherit the Abstractions 0.24 base records; 15 superseded constructors hidden; IsDryRun setters deprecated MINOR bump from v0.8.1.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n* fix: RequiresUnreferencedCode on the three multi-stream record constructors; observable ReaderSettings/WriterSettings tests (review on #302)\n\nThe record constructors added in #297 on XmlMultiStreamExtractor\n(streams, options, logger) and XmlMultiStreamLoader (streamFactory /\nbufferWriterFactory, options, logger) reach XmlSerializer like every\nother public constructor but lacked the trim/AOT annotation, so a\ntrimming caller got no IL2026 at those entry points.\n\nXmlOptionsRecordTests gains four facts that observe the nested settings\nthrough behaviour rather than assignment: a one-character\nMaxCharactersInDocument on the record's ReaderSettings fails the read on\nboth extractors, and OmitXmlDeclaration on the record's WriterSettings\nis visible in both loaders' output.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n---------\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: Claude Opus 4.8 <noreply@anthropic.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-09-16T23:01:47-04:00",
+          "tree_id": "a1d1d05a74f56f9efebf8adfe1169bba2210bd45",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/ded4a70d14f929469bbd571e078ee3afb1751296"
+        },
+        "date": 1789614243953,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 33739.534159342445,
+            "unit": "ns",
+            "range": "± 927.4068041141812"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 334578.21175130206,
+            "unit": "ns",
+            "range": "± 4720.200846602271"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 3429535.2604166665,
+            "unit": "ns",
+            "range": "± 12267.966529945643"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 14116.550872802734,
+            "unit": "ns",
+            "range": "± 541.0053003738851"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 142909.87337239584,
+            "unit": "ns",
+            "range": "± 7120.873463793521"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 1399487.7565104167,
+            "unit": "ns",
+            "range": "± 21833.681301489145"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 19775.844940185547,
+            "unit": "ns",
+            "range": "± 301.21216710932134"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 160845.07918294272,
+            "unit": "ns",
+            "range": "± 1202.5235924201818"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 1542545.2662760417,
+            "unit": "ns",
+            "range": "± 2014.631231620675"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 9473.66416422526,
+            "unit": "ns",
+            "range": "± 120.3355368685739"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 10)",
+            "value": 8335.286244710287,
+            "unit": "ns",
+            "range": "± 260.8489300586331"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 75614.52494303386,
+            "unit": "ns",
+            "range": "± 20.4266023211248"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 100)",
+            "value": 61238.98352050781,
+            "unit": "ns",
+            "range": "± 978.7188406484235"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 920119.6324869791,
+            "unit": "ns",
+            "range": "± 7163.2412091249635"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 1000)",
+            "value": 792016.451171875,
+            "unit": "ns",
+            "range": "± 8579.48631166274"
           }
         ]
       }
