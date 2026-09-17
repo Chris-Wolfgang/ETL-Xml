@@ -67,8 +67,23 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 For scenarios where each record lives in its own XML file:
 
 ```csharp
-// Extract from multiple XML files
-var extractor = new XmlMultiStreamExtractor<Person>(xmlStreams);
+using System.IO;
+using System.Linq;
+using System.Xml;
+using Wolfgang.Etl.Xml;
+
+// Extract from multiple XML files, one document each. The sequence is lazy: each file is
+// opened when the extractor reaches it and disposed after it is read, so only one is open
+// at a time. ReaderSettings (and the shared options: SkipItemCount, MaximumItemCount,
+// ReportingInterval, ErrorPolicy) travel on the options record.
+var extractor = new XmlMultiStreamExtractor<Person>
+(
+    Directory.EnumerateFiles("data", "*.xml").Select(File.OpenRead),
+    new XmlMultiStreamExtractorOptions
+    {
+        ReaderSettings = new XmlReaderSettings { IgnoreComments = true, IgnoreWhitespace = true },
+    }
+);
 
 // Load to individual XML files via a stream factory
 var loader = new XmlMultiStreamLoader<Person>
