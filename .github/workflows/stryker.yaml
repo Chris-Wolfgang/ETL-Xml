@@ -81,6 +81,7 @@ jobs:
       # run reports a 0 % score (#306; same fix as Etl-Csv). Restoring up front
       # removes the race.
       - name: Restore packages for every target framework
+        if: steps.check.outputs.found == 'true'
         run: dotnet restore
 
       - name: Run Stryker
