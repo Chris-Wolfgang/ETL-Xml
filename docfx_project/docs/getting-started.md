@@ -67,6 +67,11 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 For scenarios where each record lives in its own XML file:
 
 ```csharp
+using System.IO;
+using System.Linq;
+using System.Xml;
+using Wolfgang.Etl.Xml;
+
 // Extract from multiple XML files, one document each. The sequence is lazy: each file is
 // opened when the extractor reaches it and disposed after it is read, so only one is open
 // at a time. ReaderSettings (and the shared options: SkipItemCount, MaximumItemCount,
