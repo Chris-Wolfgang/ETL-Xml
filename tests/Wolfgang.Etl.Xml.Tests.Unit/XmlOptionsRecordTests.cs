@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Serialization;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
 using Xunit;
@@ -145,5 +149,114 @@ public class XmlOptionsRecordTests
 
         Assert.NotNull(extractor);
         Assert.NotNull(loader);
+    }
+
+
+
+    // ---- the nested settings on the records are applied, observed through behaviour
+
+    private static readonly PersonRecord[] Sample = [new() { FirstName = "Alice", LastName = "Smith", Age = 30 }];
+
+    private static byte[] SerializedPeopleDocument()
+    {
+        using var ms = new MemoryStream();
+        new XmlSerializer(typeof(PersonRecord[]), new XmlRootAttribute("ArrayOfPersonRecord")).Serialize(ms, Sample);
+        return ms.ToArray();
+    }
+
+    private static byte[] SerializedPersonDocument()
+    {
+        using var ms = new MemoryStream();
+        new XmlSerializer(typeof(PersonRecord)).Serialize(ms, Sample[0]);
+        return ms.ToArray();
+    }
+
+    private static async Task<int> CountAsync<T>(IAsyncEnumerable<T> items)
+    {
+        var n = 0;
+        await foreach (var _ in items)
+        {
+            n++;
+        }
+
+        return n;
+    }
+
+    private static bool ChainContains<TException>(Exception ex)
+        where TException : Exception
+    {
+        for (Exception? e = ex; e is not null; e = e.InnerException)
+        {
+            if (e is TException)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+
+    [Fact]
+    public async Task XmlSingleStreamExtractor_applies_ReaderSettings_from_the_record()
+    {
+        // A one-character document limit makes the read fail if, and only if, the record's settings reach the reader.
+        var options = new XmlSingleStreamExtractorOptions { ReaderSettings = new XmlReaderSettings { MaxCharactersInDocument = 1 } };
+        var limited = new XmlSingleStreamExtractor<PersonRecord>(new MemoryStream(SerializedPeopleDocument()), options);
+        var unlimited = new XmlSingleStreamExtractor<PersonRecord>(new MemoryStream(SerializedPeopleDocument()), new XmlSingleStreamExtractorOptions());
+
+        var ex = await Assert.ThrowsAnyAsync<Exception>(() => CountAsync(limited.ExtractAsync()));
+
+        Assert.True(ChainContains<XmlException>(ex), ex.ToString());
+        Assert.Equal(1, await CountAsync(unlimited.ExtractAsync()));
+    }
+
+
+
+    [Fact]
+    public async Task XmlMultiStreamExtractor_applies_ReaderSettings_from_the_record()
+    {
+        var options = new XmlMultiStreamExtractorOptions { ReaderSettings = new XmlReaderSettings { MaxCharactersInDocument = 1 } };
+        var limited = new XmlMultiStreamExtractor<PersonRecord>([new MemoryStream(SerializedPersonDocument())], options);
+        var unlimited = new XmlMultiStreamExtractor<PersonRecord>([new MemoryStream(SerializedPersonDocument())], new XmlMultiStreamExtractorOptions());
+
+        var ex = await Assert.ThrowsAnyAsync<Exception>(() => CountAsync(limited.ExtractAsync()));
+
+        Assert.True(ChainContains<XmlException>(ex), ex.ToString());
+        Assert.Equal(1, await CountAsync(unlimited.ExtractAsync()));
+    }
+
+
+
+    [Fact]
+    public async Task XmlSingleStreamLoader_applies_WriterSettings_from_the_record()
+    {
+        // OmitXmlDeclaration is visible in the first bytes of the output; the default writer emits the declaration.
+        var stream = new MemoryStream();
+        var options = new XmlSingleStreamLoaderOptions { WriterSettings = new XmlWriterSettings { OmitXmlDeclaration = true }, LeaveOpen = true };
+
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, options);
+        await sut.LoadAsync(Sample.ToAsyncEnumerable());
+
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+        Assert.DoesNotContain("<?xml", content, StringComparison.Ordinal);
+        Assert.Contains("<ArrayOfPersonRecord", content, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task XmlMultiStreamLoader_applies_WriterSettings_from_the_record()
+    {
+        var streams = new List<MemoryStream>();
+        var options = new XmlMultiStreamLoaderOptions { WriterSettings = new XmlWriterSettings { OmitXmlDeclaration = true } };
+
+        var sut = new XmlMultiStreamLoader<PersonRecord>(_ => { var s = new MemoryStream(); streams.Add(s); return s; }, options);
+        await sut.LoadAsync(Sample.ToAsyncEnumerable());
+
+        var content = Encoding.UTF8.GetString(Assert.Single(streams).ToArray());
+        Assert.DoesNotContain("<?xml", content, StringComparison.Ordinal);
+        Assert.Contains("<PersonRecord", content, StringComparison.Ordinal);
     }
 }

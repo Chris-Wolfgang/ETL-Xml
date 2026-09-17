@@ -243,6 +243,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="LoaderOptions"/>; <see langword="null"/> keeps every default.</param>
     /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
     /// <exception cref="ArgumentNullException"><paramref name="streamFactory"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
@@ -268,6 +269,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="LoaderOptions"/>; <see langword="null"/> keeps every default.</param>
     /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
     /// <exception cref="ArgumentNullException"><paramref name="bufferWriterFactory"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader
     (
         Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,

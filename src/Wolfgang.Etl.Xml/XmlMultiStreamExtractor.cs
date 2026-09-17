@@ -151,6 +151,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="ExtractorOptions"/>; <see langword="null"/> keeps every default.</param>
     /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
     /// <exception cref="ArgumentNullException"><paramref name="streams"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
