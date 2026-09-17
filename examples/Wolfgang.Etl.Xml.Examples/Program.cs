@@ -71,10 +71,14 @@ static async Task ErrorPolicyDeadLetterAsync()
     };
 
     var deadLetters = new List<ItemErrorContext>();
-    var extractor = new XmlMultiStreamExtractor<Person>(streams)
-    {
-        ErrorPolicy = Wolfgang.Etl.ErrorPolicies.ItemErrorPolicy.SkipAndDeadLetter(deadLetters),
-    };
+    var extractor = new XmlMultiStreamExtractor<Person>
+    (
+        streams,
+        new XmlMultiStreamExtractorOptions
+        {
+            ErrorPolicy = Wolfgang.Etl.ErrorPolicies.ItemErrorPolicy.SkipAndDeadLetter(deadLetters),
+        }
+    );
 
     await foreach (var person in extractor.ExtractAsync().ConfigureAwait(false))
     {
@@ -479,7 +483,16 @@ static async Task MultiStreamExtractPipelineAsync()
     var streams = CreateSampleMultiStreams();
 
     // --- Extract → Transform → Load pipeline ---
-    var extractor = new XmlMultiStreamExtractor<Person>(streams);
+    // The record carries the reader settings and the shared options (ReportingInterval here).
+    var extractor = new XmlMultiStreamExtractor<Person>
+    (
+        streams,
+        new XmlMultiStreamExtractorOptions
+        {
+            ReaderSettings = new XmlReaderSettings { IgnoreComments = true },
+            ReportingInterval = 1,
+        }
+    );
 
     var transformer = new TestTransformer<Person>();
     var loader = new TestLoader<Person>(collectItems: true);
