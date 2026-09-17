@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/docfx_project/docs/getting-started.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.9.0/docfx_project/docs/getting-started.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -120,8 +120,23 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 </code></pre>
 <h3 id="multi-stream-one-item-per-file">Multi-stream (one item per file)</h3>
 <p>For scenarios where each record lives in its own XML file:</p>
-<pre><code class="lang-csharp">// Extract from multiple XML files
-var extractor = new XmlMultiStreamExtractor&lt;Person&gt;(xmlStreams);
+<pre><code class="lang-csharp">using System.IO;
+using System.Linq;
+using System.Xml;
+using Wolfgang.Etl.Xml;
+
+// Extract from multiple XML files, one document each. The sequence is lazy: each file is
+// opened when the extractor reaches it and disposed after it is read, so only one is open
+// at a time. ReaderSettings (and the shared options: SkipItemCount, MaximumItemCount,
+// ReportingInterval, ErrorPolicy) travel on the options record.
+var extractor = new XmlMultiStreamExtractor&lt;Person&gt;
+(
+    Directory.EnumerateFiles(&quot;data&quot;, &quot;*.xml&quot;).Select(File.OpenRead),
+    new XmlMultiStreamExtractorOptions
+    {
+        ReaderSettings = new XmlReaderSettings { IgnoreComments = true, IgnoreWhitespace = true },
+    }
+);
 
 // Load to individual XML files via a stream factory
 var loader = new XmlMultiStreamLoader&lt;Person&gt;
@@ -145,7 +160,7 @@ var loader = new XmlMultiStreamLoader&lt;Person&gt;
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.8.1/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.9.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>

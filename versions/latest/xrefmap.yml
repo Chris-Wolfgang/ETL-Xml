@@ -101,6 +101,25 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, String)
   nameWithType: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(EtlPipeline, string)
   nameWithType.vb: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(EtlPipeline, String)
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions
+  name: XmlMultiStreamExtractorOptions
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.html
+  commentId: T:Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions
+  nameWithType: XmlMultiStreamExtractorOptions
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.ReaderSettings
+  name: ReaderSettings
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.html#Wolfgang_Etl_Xml_XmlMultiStreamExtractorOptions_ReaderSettings
+  commentId: P:Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.ReaderSettings
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.ReaderSettings
+  nameWithType: XmlMultiStreamExtractorOptions.ReaderSettings
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.ReaderSettings*
+  name: ReaderSettings
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.html#Wolfgang_Etl_Xml_XmlMultiStreamExtractorOptions_ReaderSettings_
+  commentId: Overload:Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.ReaderSettings
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.ReaderSettings
+  nameWithType: XmlMultiStreamExtractorOptions.ReaderSettings
 - uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1
   name: XmlMultiStreamExtractor<TRecord>
   href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html
@@ -110,33 +129,24 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamExtractor(Of TRecord)
   nameWithType: XmlMultiStreamExtractor<TRecord>
   nameWithType.vb: XmlMultiStreamExtractor(Of TRecord)
-- uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor(System.Collections.Generic.IEnumerable{System.IO.Stream})
-  name: XmlMultiStreamExtractor(IEnumerable<Stream>)
-  href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html#Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1__ctor_System_Collections_Generic_IEnumerable_System_IO_Stream__
-  commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor(System.Collections.Generic.IEnumerable{System.IO.Stream})
-  name.vb: New(IEnumerable(Of Stream))
-  fullName: Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream>)
-  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamExtractor(Of TRecord).New(System.Collections.Generic.IEnumerable(Of System.IO.Stream))
-  nameWithType: XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(IEnumerable<Stream>)
-  nameWithType.vb: XmlMultiStreamExtractor(Of TRecord).New(IEnumerable(Of Stream))
 - uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor(System.Collections.Generic.IEnumerable{System.IO.Stream},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamExtractor{`0}})
-  name: XmlMultiStreamExtractor(IEnumerable<Stream>, ILogger<XmlMultiStreamExtractor<TRecord>>)
+  name: XmlMultiStreamExtractor(IEnumerable<Stream>, ILogger<XmlMultiStreamExtractor<TRecord>>?)
   href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html#Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1__ctor_System_Collections_Generic_IEnumerable_System_IO_Stream__Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamExtractor__0___
   commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor(System.Collections.Generic.IEnumerable{System.IO.Stream},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamExtractor{`0}})
   name.vb: New(IEnumerable(Of Stream), ILogger(Of XmlMultiStreamExtractor(Of TRecord)))
-  fullName: Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream>, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>>)
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream>, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>>?)
   fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamExtractor(Of TRecord).New(System.Collections.Generic.IEnumerable(Of System.IO.Stream), Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlMultiStreamExtractor(Of TRecord)))
-  nameWithType: XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(IEnumerable<Stream>, ILogger<XmlMultiStreamExtractor<TRecord>>)
+  nameWithType: XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(IEnumerable<Stream>, ILogger<XmlMultiStreamExtractor<TRecord>>?)
   nameWithType.vb: XmlMultiStreamExtractor(Of TRecord).New(IEnumerable(Of Stream), ILogger(Of XmlMultiStreamExtractor(Of TRecord)))
-- uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor(System.Collections.Generic.IEnumerable{System.IO.Stream},System.Xml.XmlReaderSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamExtractor{`0}})
-  name: XmlMultiStreamExtractor(IEnumerable<Stream>, XmlReaderSettings, ILogger<XmlMultiStreamExtractor<TRecord>>)
-  href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html#Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1__ctor_System_Collections_Generic_IEnumerable_System_IO_Stream__System_Xml_XmlReaderSettings_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamExtractor__0___
-  commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor(System.Collections.Generic.IEnumerable{System.IO.Stream},System.Xml.XmlReaderSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamExtractor{`0}})
-  name.vb: New(IEnumerable(Of Stream), XmlReaderSettings, ILogger(Of XmlMultiStreamExtractor(Of TRecord)))
-  fullName: Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream>, System.Xml.XmlReaderSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>>)
-  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamExtractor(Of TRecord).New(System.Collections.Generic.IEnumerable(Of System.IO.Stream), System.Xml.XmlReaderSettings, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlMultiStreamExtractor(Of TRecord)))
-  nameWithType: XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(IEnumerable<Stream>, XmlReaderSettings, ILogger<XmlMultiStreamExtractor<TRecord>>)
-  nameWithType.vb: XmlMultiStreamExtractor(Of TRecord).New(IEnumerable(Of Stream), XmlReaderSettings, ILogger(Of XmlMultiStreamExtractor(Of TRecord)))
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor(System.Collections.Generic.IEnumerable{System.IO.Stream},Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamExtractor{`0}})
+  name: XmlMultiStreamExtractor(IEnumerable<Stream>, XmlMultiStreamExtractorOptions?, ILogger<XmlMultiStreamExtractor<TRecord>>?)
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html#Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1__ctor_System_Collections_Generic_IEnumerable_System_IO_Stream__Wolfgang_Etl_Xml_XmlMultiStreamExtractorOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamExtractor__0___
+  commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor(System.Collections.Generic.IEnumerable{System.IO.Stream},Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamExtractor{`0}})
+  name.vb: New(IEnumerable(Of Stream), XmlMultiStreamExtractorOptions, ILogger(Of XmlMultiStreamExtractor(Of TRecord)))
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream>, Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>>?)
+  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamExtractor(Of TRecord).New(System.Collections.Generic.IEnumerable(Of System.IO.Stream), Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlMultiStreamExtractor(Of TRecord)))
+  nameWithType: XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(IEnumerable<Stream>, XmlMultiStreamExtractorOptions?, ILogger<XmlMultiStreamExtractor<TRecord>>?)
+  nameWithType.vb: XmlMultiStreamExtractor(Of TRecord).New(IEnumerable(Of Stream), XmlMultiStreamExtractorOptions, ILogger(Of XmlMultiStreamExtractor(Of TRecord)))
 - uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor*
   name: XmlMultiStreamExtractor
   href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html#Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1__ctor_
@@ -199,6 +209,38 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamExtractor(Of TRecord).ExtractWorkerAsync
   nameWithType: XmlMultiStreamExtractor<TRecord>.ExtractWorkerAsync
   nameWithType.vb: XmlMultiStreamExtractor(Of TRecord).ExtractWorkerAsync
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions
+  name: XmlMultiStreamLoaderOptions
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.html
+  commentId: T:Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions
+  nameWithType: XmlMultiStreamLoaderOptions
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.IsDryRun
+  name: IsDryRun
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.html#Wolfgang_Etl_Xml_XmlMultiStreamLoaderOptions_IsDryRun
+  commentId: P:Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.IsDryRun
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.IsDryRun
+  nameWithType: XmlMultiStreamLoaderOptions.IsDryRun
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.IsDryRun*
+  name: IsDryRun
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.html#Wolfgang_Etl_Xml_XmlMultiStreamLoaderOptions_IsDryRun_
+  commentId: Overload:Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.IsDryRun
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.IsDryRun
+  nameWithType: XmlMultiStreamLoaderOptions.IsDryRun
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.WriterSettings
+  name: WriterSettings
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.html#Wolfgang_Etl_Xml_XmlMultiStreamLoaderOptions_WriterSettings
+  commentId: P:Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.WriterSettings
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.WriterSettings
+  nameWithType: XmlMultiStreamLoaderOptions.WriterSettings
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.WriterSettings*
+  name: WriterSettings
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.html#Wolfgang_Etl_Xml_XmlMultiStreamLoaderOptions_WriterSettings_
+  commentId: Overload:Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.WriterSettings
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.WriterSettings
+  nameWithType: XmlMultiStreamLoaderOptions.WriterSettings
 - uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1
   name: XmlMultiStreamLoader<TRecord>
   href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html
@@ -208,60 +250,42 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord)
   nameWithType: XmlMultiStreamLoader<TRecord>
   nameWithType.vb: XmlMultiStreamLoader(Of TRecord)
-- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.Buffers.IBufferWriter{System.Byte}})
-  name: XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>>)
-  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_Buffers_IBufferWriter_System_Byte___
-  commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.Buffers.IBufferWriter{System.Byte}})
-  name.vb: New(Func(Of TRecord, IBufferWriter(Of Byte)))
-  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>>)
-  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).New(System.Func(Of TRecord, System.Buffers.IBufferWriter(Of Byte)))
-  nameWithType: XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>>)
-  nameWithType.vb: XmlMultiStreamLoader(Of TRecord).New(Func(Of TRecord, IBufferWriter(Of Byte)))
 - uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.Buffers.IBufferWriter{System.Byte}},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
-  name: XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>>, ILogger<XmlMultiStreamLoader<TRecord>>)
+  name: XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>>, ILogger<XmlMultiStreamLoader<TRecord>>?)
   href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_Buffers_IBufferWriter_System_Byte___Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamLoader__0___
   commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.Buffers.IBufferWriter{System.Byte}},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
   name.vb: New(Func(Of TRecord, IBufferWriter(Of Byte)), ILogger(Of XmlMultiStreamLoader(Of TRecord)))
-  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>>, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>>)
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>>, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>>?)
   fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).New(System.Func(Of TRecord, System.Buffers.IBufferWriter(Of Byte)), Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord)))
-  nameWithType: XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>>, ILogger<XmlMultiStreamLoader<TRecord>>)
+  nameWithType: XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>>, ILogger<XmlMultiStreamLoader<TRecord>>?)
   nameWithType.vb: XmlMultiStreamLoader(Of TRecord).New(Func(Of TRecord, IBufferWriter(Of Byte)), ILogger(Of XmlMultiStreamLoader(Of TRecord)))
-- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.Buffers.IBufferWriter{System.Byte}},System.Xml.XmlWriterSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
-  name: XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>>, XmlWriterSettings, ILogger<XmlMultiStreamLoader<TRecord>>)
-  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_Buffers_IBufferWriter_System_Byte___System_Xml_XmlWriterSettings_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamLoader__0___
-  commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.Buffers.IBufferWriter{System.Byte}},System.Xml.XmlWriterSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
-  name.vb: New(Func(Of TRecord, IBufferWriter(Of Byte)), XmlWriterSettings, ILogger(Of XmlMultiStreamLoader(Of TRecord)))
-  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>>, System.Xml.XmlWriterSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>>)
-  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).New(System.Func(Of TRecord, System.Buffers.IBufferWriter(Of Byte)), System.Xml.XmlWriterSettings, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord)))
-  nameWithType: XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>>, XmlWriterSettings, ILogger<XmlMultiStreamLoader<TRecord>>)
-  nameWithType.vb: XmlMultiStreamLoader(Of TRecord).New(Func(Of TRecord, IBufferWriter(Of Byte)), XmlWriterSettings, ILogger(Of XmlMultiStreamLoader(Of TRecord)))
-- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.IO.Stream})
-  name: XmlMultiStreamLoader(Func<TRecord, Stream>)
-  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_IO_Stream__
-  commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.IO.Stream})
-  name.vb: New(Func(Of TRecord, Stream))
-  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream>)
-  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).New(System.Func(Of TRecord, System.IO.Stream))
-  nameWithType: XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(Func<TRecord, Stream>)
-  nameWithType.vb: XmlMultiStreamLoader(Of TRecord).New(Func(Of TRecord, Stream))
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.Buffers.IBufferWriter{System.Byte}},Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
+  name: XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>>, XmlMultiStreamLoaderOptions?, ILogger<XmlMultiStreamLoader<TRecord>>?)
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_Buffers_IBufferWriter_System_Byte___Wolfgang_Etl_Xml_XmlMultiStreamLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamLoader__0___
+  commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.Buffers.IBufferWriter{System.Byte}},Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
+  name.vb: New(Func(Of TRecord, IBufferWriter(Of Byte)), XmlMultiStreamLoaderOptions, ILogger(Of XmlMultiStreamLoader(Of TRecord)))
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>>, Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>>?)
+  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).New(System.Func(Of TRecord, System.Buffers.IBufferWriter(Of Byte)), Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord)))
+  nameWithType: XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>>, XmlMultiStreamLoaderOptions?, ILogger<XmlMultiStreamLoader<TRecord>>?)
+  nameWithType.vb: XmlMultiStreamLoader(Of TRecord).New(Func(Of TRecord, IBufferWriter(Of Byte)), XmlMultiStreamLoaderOptions, ILogger(Of XmlMultiStreamLoader(Of TRecord)))
 - uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.IO.Stream},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
-  name: XmlMultiStreamLoader(Func<TRecord, Stream>, ILogger<XmlMultiStreamLoader<TRecord>>)
+  name: XmlMultiStreamLoader(Func<TRecord, Stream>, ILogger<XmlMultiStreamLoader<TRecord>>?)
   href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_IO_Stream__Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamLoader__0___
   commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.IO.Stream},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
   name.vb: New(Func(Of TRecord, Stream), ILogger(Of XmlMultiStreamLoader(Of TRecord)))
-  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream>, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>>)
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream>, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>>?)
   fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).New(System.Func(Of TRecord, System.IO.Stream), Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord)))
-  nameWithType: XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(Func<TRecord, Stream>, ILogger<XmlMultiStreamLoader<TRecord>>)
+  nameWithType: XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(Func<TRecord, Stream>, ILogger<XmlMultiStreamLoader<TRecord>>?)
   nameWithType.vb: XmlMultiStreamLoader(Of TRecord).New(Func(Of TRecord, Stream), ILogger(Of XmlMultiStreamLoader(Of TRecord)))
-- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.IO.Stream},System.Xml.XmlWriterSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
-  name: XmlMultiStreamLoader(Func<TRecord, Stream>, XmlWriterSettings, ILogger<XmlMultiStreamLoader<TRecord>>)
-  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_IO_Stream__System_Xml_XmlWriterSettings_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamLoader__0___
-  commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.IO.Stream},System.Xml.XmlWriterSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
-  name.vb: New(Func(Of TRecord, Stream), XmlWriterSettings, ILogger(Of XmlMultiStreamLoader(Of TRecord)))
-  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream>, System.Xml.XmlWriterSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>>)
-  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).New(System.Func(Of TRecord, System.IO.Stream), System.Xml.XmlWriterSettings, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord)))
-  nameWithType: XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(Func<TRecord, Stream>, XmlWriterSettings, ILogger<XmlMultiStreamLoader<TRecord>>)
-  nameWithType.vb: XmlMultiStreamLoader(Of TRecord).New(Func(Of TRecord, Stream), XmlWriterSettings, ILogger(Of XmlMultiStreamLoader(Of TRecord)))
+- uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.IO.Stream},Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
+  name: XmlMultiStreamLoader(Func<TRecord, Stream>, XmlMultiStreamLoaderOptions?, ILogger<XmlMultiStreamLoader<TRecord>>?)
+  href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_IO_Stream__Wolfgang_Etl_Xml_XmlMultiStreamLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamLoader__0___
+  commentId: M:Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.IO.Stream},Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})
+  name.vb: New(Func(Of TRecord, Stream), XmlMultiStreamLoaderOptions, ILogger(Of XmlMultiStreamLoader(Of TRecord)))
+  fullName: Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream>, Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>>?)
+  fullName.vb: Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord).New(System.Func(Of TRecord, System.IO.Stream), Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlMultiStreamLoader(Of TRecord)))
+  nameWithType: XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(Func<TRecord, Stream>, XmlMultiStreamLoaderOptions?, ILogger<XmlMultiStreamLoader<TRecord>>?)
+  nameWithType.vb: XmlMultiStreamLoader(Of TRecord).New(Func(Of TRecord, Stream), XmlMultiStreamLoaderOptions, ILogger(Of XmlMultiStreamLoader(Of TRecord)))
 - uid: Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor*
   name: XmlMultiStreamLoader
   href: api/Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html#Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_
@@ -399,6 +423,19 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.LeaveOpen
   nameWithType: XmlSingleStreamExtractorOptions.LeaveOpen
+- uid: Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.ReaderSettings
+  name: ReaderSettings
+  href: api/Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.html#Wolfgang_Etl_Xml_XmlSingleStreamExtractorOptions_ReaderSettings
+  commentId: P:Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.ReaderSettings
+  fullName: Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.ReaderSettings
+  nameWithType: XmlSingleStreamExtractorOptions.ReaderSettings
+- uid: Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.ReaderSettings*
+  name: ReaderSettings
+  href: api/Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.html#Wolfgang_Etl_Xml_XmlSingleStreamExtractorOptions_ReaderSettings_
+  commentId: Overload:Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.ReaderSettings
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.ReaderSettings
+  nameWithType: XmlSingleStreamExtractorOptions.ReaderSettings
 - uid: Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1
   name: XmlSingleStreamExtractor<TRecord>
   href: api/Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html
@@ -408,33 +445,6 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamExtractor(Of TRecord)
   nameWithType: XmlSingleStreamExtractor<TRecord>
   nameWithType.vb: XmlSingleStreamExtractor(Of TRecord)
-- uid: Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamExtractor{`0}})
-  name: XmlSingleStreamExtractor(Stream, ILogger<XmlSingleStreamExtractor<TRecord>>)
-  href: api/Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html#Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamExtractor__0___
-  commentId: M:Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamExtractor{`0}})
-  name.vb: New(Stream, ILogger(Of XmlSingleStreamExtractor(Of TRecord)))
-  fullName: Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>>)
-  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamExtractor(Of TRecord).New(System.IO.Stream, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlSingleStreamExtractor(Of TRecord)))
-  nameWithType: XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(Stream, ILogger<XmlSingleStreamExtractor<TRecord>>)
-  nameWithType.vb: XmlSingleStreamExtractor(Of TRecord).New(Stream, ILogger(Of XmlSingleStreamExtractor(Of TRecord)))
-- uid: Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,System.Xml.XmlReaderSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamExtractor{`0}},Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)
-  name: XmlSingleStreamExtractor(Stream, XmlReaderSettings, ILogger<XmlSingleStreamExtractor<TRecord>>, XmlSingleStreamExtractorOptions?)
-  href: api/Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html#Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1__ctor_System_IO_Stream_System_Xml_XmlReaderSettings_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamExtractor__0___Wolfgang_Etl_Xml_XmlSingleStreamExtractorOptions_
-  commentId: M:Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,System.Xml.XmlReaderSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamExtractor{`0}},Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)
-  name.vb: New(Stream, XmlReaderSettings, ILogger(Of XmlSingleStreamExtractor(Of TRecord)), XmlSingleStreamExtractorOptions)
-  fullName: Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream, System.Xml.XmlReaderSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>>, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions?)
-  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamExtractor(Of TRecord).New(System.IO.Stream, System.Xml.XmlReaderSettings, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlSingleStreamExtractor(Of TRecord)), Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)
-  nameWithType: XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(Stream, XmlReaderSettings, ILogger<XmlSingleStreamExtractor<TRecord>>, XmlSingleStreamExtractorOptions?)
-  nameWithType.vb: XmlSingleStreamExtractor(Of TRecord).New(Stream, XmlReaderSettings, ILogger(Of XmlSingleStreamExtractor(Of TRecord)), XmlSingleStreamExtractorOptions)
-- uid: Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)
-  name: XmlSingleStreamExtractor(Stream, XmlSingleStreamExtractorOptions?)
-  href: api/Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html#Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1__ctor_System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamExtractorOptions_
-  commentId: M:Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)
-  name.vb: New(Stream, XmlSingleStreamExtractorOptions)
-  fullName: Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions?)
-  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamExtractor(Of TRecord).New(System.IO.Stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)
-  nameWithType: XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(Stream, XmlSingleStreamExtractorOptions?)
-  nameWithType.vb: XmlSingleStreamExtractor(Of TRecord).New(Stream, XmlSingleStreamExtractorOptions)
 - uid: Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1.#ctor(System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamExtractor{`0}})
   name: XmlSingleStreamExtractor(Stream, XmlSingleStreamExtractorOptions?, ILogger<XmlSingleStreamExtractor<TRecord>>?)
   href: api/Wolfgang.Etl.Xml.XmlSingleStreamExtractor-1.html#Wolfgang_Etl_Xml_XmlSingleStreamExtractor_1__ctor_System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamExtractorOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamExtractor__0___
@@ -512,6 +522,19 @@ references:
   commentId: T:Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions
   fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions
   nameWithType: XmlSingleStreamLoaderOptions
+- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.IsDryRun
+  name: IsDryRun
+  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.html#Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_IsDryRun
+  commentId: P:Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.IsDryRun
+  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.IsDryRun
+  nameWithType: XmlSingleStreamLoaderOptions.IsDryRun
+- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.IsDryRun*
+  name: IsDryRun
+  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.html#Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_IsDryRun_
+  commentId: Overload:Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.IsDryRun
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.IsDryRun
+  nameWithType: XmlSingleStreamLoaderOptions.IsDryRun
 - uid: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.LeaveOpen
   name: LeaveOpen
   href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.html#Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_LeaveOpen
@@ -538,6 +561,19 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.RootElementName
   nameWithType: XmlSingleStreamLoaderOptions.RootElementName
+- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.WriterSettings
+  name: WriterSettings
+  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.html#Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_WriterSettings
+  commentId: P:Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.WriterSettings
+  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.WriterSettings
+  nameWithType: XmlSingleStreamLoaderOptions.WriterSettings
+- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.WriterSettings*
+  name: WriterSettings
+  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.html#Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_WriterSettings_
+  commentId: Overload:Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.WriterSettings
+  isSpec: "True"
+  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.WriterSettings
+  nameWithType: XmlSingleStreamLoaderOptions.WriterSettings
 - uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1
   name: XmlSingleStreamLoader<TRecord>
   href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html
@@ -547,33 +583,6 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord)
   nameWithType: XmlSingleStreamLoader<TRecord>
   nameWithType.vb: XmlSingleStreamLoader(Of TRecord)
-- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})
-  name: XmlSingleStreamLoader(IBufferWriter<byte>, ILogger<XmlSingleStreamLoader<TRecord>>)
-  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_Buffers_IBufferWriter_System_Byte__Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___
-  commentId: M:Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})
-  name.vb: New(IBufferWriter(Of Byte), ILogger(Of XmlSingleStreamLoader(Of TRecord)))
-  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>>)
-  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord).New(System.Buffers.IBufferWriter(Of Byte), Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord)))
-  nameWithType: XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(IBufferWriter<byte>, ILogger<XmlSingleStreamLoader<TRecord>>)
-  nameWithType.vb: XmlSingleStreamLoader(Of TRecord).New(IBufferWriter(Of Byte), ILogger(Of XmlSingleStreamLoader(Of TRecord)))
-- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},System.Xml.XmlWriterSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  name: XmlSingleStreamLoader(IBufferWriter<byte>, XmlWriterSettings, ILogger<XmlSingleStreamLoader<TRecord>>, XmlSingleStreamLoaderOptions?)
-  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_Buffers_IBufferWriter_System_Byte__System_Xml_XmlWriterSettings_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_
-  commentId: M:Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},System.Xml.XmlWriterSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  name.vb: New(IBufferWriter(Of Byte), XmlWriterSettings, ILogger(Of XmlSingleStreamLoader(Of TRecord)), XmlSingleStreamLoaderOptions)
-  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>, System.Xml.XmlWriterSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>>, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions?)
-  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord).New(System.Buffers.IBufferWriter(Of Byte), System.Xml.XmlWriterSettings, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord)), Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  nameWithType: XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(IBufferWriter<byte>, XmlWriterSettings, ILogger<XmlSingleStreamLoader<TRecord>>, XmlSingleStreamLoaderOptions?)
-  nameWithType.vb: XmlSingleStreamLoader(Of TRecord).New(IBufferWriter(Of Byte), XmlWriterSettings, ILogger(Of XmlSingleStreamLoader(Of TRecord)), XmlSingleStreamLoaderOptions)
-- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  name: XmlSingleStreamLoader(IBufferWriter<byte>, XmlSingleStreamLoaderOptions?)
-  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_Buffers_IBufferWriter_System_Byte__Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_
-  commentId: M:Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  name.vb: New(IBufferWriter(Of Byte), XmlSingleStreamLoaderOptions)
-  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.Buffers.IBufferWriter<byte>, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions?)
-  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord).New(System.Buffers.IBufferWriter(Of Byte), Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  nameWithType: XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(IBufferWriter<byte>, XmlSingleStreamLoaderOptions?)
-  nameWithType.vb: XmlSingleStreamLoader(Of TRecord).New(IBufferWriter(Of Byte), XmlSingleStreamLoaderOptions)
 - uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})
   name: XmlSingleStreamLoader(IBufferWriter<byte>, XmlSingleStreamLoaderOptions?, ILogger<XmlSingleStreamLoader<TRecord>>?)
   href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_Buffers_IBufferWriter_System_Byte__Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___
@@ -583,33 +592,6 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord).New(System.Buffers.IBufferWriter(Of Byte), Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord)))
   nameWithType: XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(IBufferWriter<byte>, XmlSingleStreamLoaderOptions?, ILogger<XmlSingleStreamLoader<TRecord>>?)
   nameWithType.vb: XmlSingleStreamLoader(Of TRecord).New(IBufferWriter(Of Byte), XmlSingleStreamLoaderOptions, ILogger(Of XmlSingleStreamLoader(Of TRecord)))
-- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})
-  name: XmlSingleStreamLoader(Stream, ILogger<XmlSingleStreamLoader<TRecord>>)
-  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___
-  commentId: M:Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})
-  name.vb: New(Stream, ILogger(Of XmlSingleStreamLoader(Of TRecord)))
-  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>>)
-  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord).New(System.IO.Stream, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord)))
-  nameWithType: XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(Stream, ILogger<XmlSingleStreamLoader<TRecord>>)
-  nameWithType.vb: XmlSingleStreamLoader(Of TRecord).New(Stream, ILogger(Of XmlSingleStreamLoader(Of TRecord)))
-- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,System.Xml.XmlWriterSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  name: XmlSingleStreamLoader(Stream, XmlWriterSettings, ILogger<XmlSingleStreamLoader<TRecord>>, XmlSingleStreamLoaderOptions?)
-  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_IO_Stream_System_Xml_XmlWriterSettings_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_
-  commentId: M:Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,System.Xml.XmlWriterSettings,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  name.vb: New(Stream, XmlWriterSettings, ILogger(Of XmlSingleStreamLoader(Of TRecord)), XmlSingleStreamLoaderOptions)
-  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream, System.Xml.XmlWriterSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>>, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions?)
-  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord).New(System.IO.Stream, System.Xml.XmlWriterSettings, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord)), Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  nameWithType: XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(Stream, XmlWriterSettings, ILogger<XmlSingleStreamLoader<TRecord>>, XmlSingleStreamLoaderOptions?)
-  nameWithType.vb: XmlSingleStreamLoader(Of TRecord).New(Stream, XmlWriterSettings, ILogger(Of XmlSingleStreamLoader(Of TRecord)), XmlSingleStreamLoaderOptions)
-- uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  name: XmlSingleStreamLoader(Stream, XmlSingleStreamLoaderOptions?)
-  href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_
-  commentId: M:Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  name.vb: New(Stream, XmlSingleStreamLoaderOptions)
-  fullName: Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions?)
-  fullName.vb: Wolfgang.Etl.Xml.XmlSingleStreamLoader(Of TRecord).New(System.IO.Stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
-  nameWithType: XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(Stream, XmlSingleStreamLoaderOptions?)
-  nameWithType.vb: XmlSingleStreamLoader(Of TRecord).New(Stream, XmlSingleStreamLoaderOptions)
 - uid: Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})
   name: XmlSingleStreamLoader(Stream, XmlSingleStreamLoaderOptions?, ILogger<XmlSingleStreamLoader<TRecord>>?)
   href: api/Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html#Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___
