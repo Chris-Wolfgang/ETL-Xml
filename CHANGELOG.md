@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+
+## [0.9.0] - 2026-09-16
+
+### Added
+
 - **Options records for all four stages** (ADR-0009, Chris-Wolfgang/ETL-Abstractions#455). `XmlSingleStreamExtractorOptions` and
   `XmlSingleStreamLoaderOptions` become `sealed record`s (they were classes) and gain `ReaderSettings` / `WriterSettings`
   and, on the loader, `IsDryRun`; new `XmlMultiStreamExtractorOptions` and `XmlMultiStreamLoaderOptions` carry the same for
@@ -227,7 +242,8 @@ Initial public release.
 ### Fixed
 - Dropped `netcoreapp3.1` from the test TFM matrix where the CI image does not provide the SDK ([#16](https://github.com/Chris-Wolfgang/ETL-Xml/pull/16)).
 
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.8.1...v0.9.0
 [0.2.2]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v.0.1.0...v0.2.0
