@@ -1,6 +1,7 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.ExceptionServices;
@@ -34,7 +35,7 @@ namespace Wolfgang.Etl.Xml;
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
-public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>, ISupportDryRun
+public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML multi-stream loading of {typeof(TRecord).Name}";
@@ -63,7 +64,14 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streamFactory"/> is <c>null</c>.
     /// </exception>
+    /// <remarks>
+    /// Retained for binary compatibility with assemblies compiled before the optional-logger overload existed: a
+    /// single-argument call in such an assembly is bound to this exact signature, and removing it would fail at runtime
+    /// with <see cref="MissingMethodException"/> with no compile-time signal. Hidden from IntelliSense; source code
+    /// binds here too, so nothing changes for callers. New code has no reason to name this overload.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamLoader(Func<TRecord, Stream> streamFactory)
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
@@ -81,19 +89,22 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// A factory function that receives the item to be written and returns a <see cref="Stream"/> to write it to.
     /// The loader will dispose the stream after writing.
     /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="streamFactory"/> or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="streamFactory"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
-        ILogger<XmlMultiStreamLoader<TRecord>> logger
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
     )
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _writerSettings = null;
     }
 
@@ -108,21 +119,31 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// The loader will dispose the stream after writing.
     /// </param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="streamFactory"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="streamFactory"/> or <paramref name="writerSettings"/> is <c>null</c>.
     /// </exception>
+    /// <remarks>
+    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
+    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
+    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
+    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
         XmlWriterSettings writerSettings,
-        ILogger<XmlMultiStreamLoader<TRecord>> logger
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
     )
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
         _writerSettings = writerSettings ?? throw new ArgumentNullException(nameof(writerSettings));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -137,7 +158,14 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// of bytes to write it to.
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="bufferWriterFactory"/> is <c>null</c>.</exception>
+    /// <remarks>
+    /// Retained for binary compatibility with assemblies compiled before the optional-logger overload existed: a
+    /// single-argument call in such an assembly is bound to this exact signature, and removing it would fail at runtime
+    /// with <see cref="MissingMethodException"/> with no compile-time signal. Hidden from IntelliSense; source code
+    /// binds here too, so nothing changes for callers. New code has no reason to name this overload.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>> bufferWriterFactory)
         : this(ToStreamFactory(bufferWriterFactory))
     {
@@ -153,15 +181,18 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
     /// of bytes to write it to.
     /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="bufferWriterFactory"/> or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="bufferWriterFactory"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamLoader
     (
         Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
-        ILogger<XmlMultiStreamLoader<TRecord>> logger
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
     )
         : this(ToStreamFactory(bufferWriterFactory), logger)
     {
@@ -178,18 +209,74 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// of bytes to write it to.
     /// </param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="bufferWriterFactory"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="bufferWriterFactory"/> or <paramref name="writerSettings"/> is <c>null</c>.
     /// </exception>
+    /// <remarks>
+    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
+    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
+    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
+    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamLoader
     (
         Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
         XmlWriterSettings writerSettings,
-        ILogger<XmlMultiStreamLoader<TRecord>> logger
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
     )
         : this(ToStreamFactory(bufferWriterFactory), writerSettings, logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class configured through an options record.
+    /// </summary>
+    /// <param name="streamFactory">The factory that supplies the destination stream for each record.</param>
+    /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="LoaderOptions"/>; <see langword="null"/> keeps every default.</param>
+    /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="streamFactory"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlMultiStreamLoader
+    (
+        Func<TRecord, Stream> streamFactory,
+        XmlMultiStreamLoaderOptions? options,
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
+    )
+        : base(options)
+    {
+        _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
+        _writerSettings = options?.WriterSettings;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+#pragma warning disable CS0618 // the constructor is the supported replacement for the setter; it necessarily writes it
+        IsDryRun = options?.IsDryRun ?? false;
+#pragma warning restore CS0618
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class writing to buffer writers, configured through an options record.
+    /// </summary>
+    /// <param name="bufferWriterFactory">The factory that supplies the destination buffer writer for each record.</param>
+    /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="LoaderOptions"/>; <see langword="null"/> keeps every default.</param>
+    /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="bufferWriterFactory"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlMultiStreamLoader
+    (
+        Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
+        XmlMultiStreamLoaderOptions? options,
+        ILogger<XmlMultiStreamLoader<TRecord>>? logger = null
+    )
+        : this(ToStreamFactory(bufferWriterFactory), options, logger)
     {
     }
 
@@ -225,14 +312,14 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// A factory function that receives the item to be written and returns a <see cref="Stream"/> to write it to.
     /// </param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
-    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
+    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     internal XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
         XmlWriterSettings writerSettings,
-        ILogger? logger,
-        IProgressTimer timer
+        IProgressTimer timer,
+        ILogger? logger = null
     )
     {
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
@@ -251,7 +338,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// counters, and logs as usual, but never invokes the destination-stream factory and
     /// writes nothing. Defaults to <see langword="false"/>.
     /// </summary>
-    public bool IsDryRun { get; set; }
+    public bool IsDryRun { get; [Obsolete("Configure IsDryRun through XmlMultiStreamLoaderOptions passed to the constructor instead. The setter will be removed in a later release.")] set; }
 
 
 

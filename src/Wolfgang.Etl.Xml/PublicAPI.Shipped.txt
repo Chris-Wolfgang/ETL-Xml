@@ -3,17 +3,32 @@ Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions
 Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions
 Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>
 Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>!>! logger) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams, System.Xml.XmlReaderSettings! readerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>!>! logger) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams, System.Xml.XmlReaderSettings! readerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>.XmlMultiStreamExtractor(System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams, Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamExtractor<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions
+Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.Equals(Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions? other) -> bool
+Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.ReaderSettings.get -> System.Xml.XmlReaderSettings?
+Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.ReaderSettings.init -> void
+Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.XmlMultiStreamExtractorOptions() -> void
 Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>
 Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.IsDryRun.get -> bool
 Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.IsDryRun.set -> void
 Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>! logger) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>! logger) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.Buffers.IBufferWriter<byte>!>! bufferWriterFactory, Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>! logger) -> void
-Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>! logger) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory, System.Xml.XmlWriterSettings! writerSettings, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>.XmlMultiStreamLoader(System.Func<TRecord, System.IO.Stream!>! streamFactory, Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlMultiStreamLoader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions
+Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.Equals(Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions? other) -> bool
+Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.IsDryRun.get -> bool
+Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.IsDryRun.init -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.WriterSettings.get -> System.Xml.XmlWriterSettings?
+Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.WriterSettings.init -> void
+Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.XmlMultiStreamLoaderOptions() -> void
 Wolfgang.Etl.Xml.XmlReport
 Wolfgang.Etl.Xml.XmlReport.CurrentSkippedItemCount.get -> int
 Wolfgang.Etl.Xml.XmlReport.XmlReport(int currentItemCount, int currentSkippedItemCount) -> void
@@ -23,8 +38,11 @@ Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(Syst
 Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? options = null) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>.XmlSingleStreamExtractor(System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamExtractor<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions
+Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.Equals(Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? other) -> bool
 Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.LeaveOpen.get -> bool
 Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.LeaveOpen.init -> void
+Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.ReaderSettings.get -> System.Xml.XmlReaderSettings?
+Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.ReaderSettings.init -> void
 Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.XmlSingleStreamExtractorOptions() -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>
 Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.IsDryRun.get -> bool
@@ -38,14 +56,43 @@ Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.
 Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>.XmlSingleStreamLoader(System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.Xml.XmlSingleStreamLoader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions
+Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.Equals(Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? other) -> bool
+Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.IsDryRun.get -> bool
+Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.IsDryRun.init -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.LeaveOpen.get -> bool
 Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.LeaveOpen.init -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.RootElementName.get -> string?
 Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.RootElementName.init -> void
+Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.WriterSettings.get -> System.Xml.XmlWriterSettings?
+Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.WriterSettings.init -> void
 Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.XmlSingleStreamLoaderOptions() -> void
+override Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.Equals(object? obj) -> bool
+override Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.GetHashCode() -> int
+override Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.ToString() -> string!
+override Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.Equals(object? obj) -> bool
+override Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.GetHashCode() -> int
+override Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.ToString() -> string!
+override Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.Equals(object? obj) -> bool
+override Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.GetHashCode() -> int
+override Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.ToString() -> string!
+override Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.Equals(object? obj) -> bool
+override Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.GetHashCode() -> int
+override Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.ToString() -> string!
+override sealed Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.Equals(Wolfgang.Etl.Abstractions.ExtractorOptions? other) -> bool
+override sealed Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.Equals(Wolfgang.Etl.Abstractions.LoaderOptions? other) -> bool
+override sealed Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.Equals(Wolfgang.Etl.Abstractions.ExtractorOptions? other) -> bool
+override sealed Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.Equals(Wolfgang.Etl.Abstractions.LoaderOptions? other) -> bool
 static Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader<T>(this Wolfgang.Etl.Abstractions.IEtlPipeline<T>! pipeline, System.Func<T, System.IO.Stream!>! streamFactory) -> Wolfgang.Etl.Abstractions.IEtlPipelineSink!
 static Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(this Wolfgang.Etl.Abstractions.IEtlPipeline<T>! pipeline, System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> Wolfgang.Etl.Abstractions.IEtlPipelineSink!
 static Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(this Wolfgang.Etl.Abstractions.IEtlPipeline<T>! pipeline, string! path, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? options = null) -> Wolfgang.Etl.Abstractions.IEtlPipelineSink!
 static Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor<T>(this Wolfgang.Etl.Abstractions.EtlPipeline! pipeline, System.Collections.Generic.IEnumerable<System.IO.Stream!>! streams) -> Wolfgang.Etl.Abstractions.IEtlPipeline<T>!
 static Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(this Wolfgang.Etl.Abstractions.EtlPipeline! pipeline, System.IO.Stream! stream, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? options = null) -> Wolfgang.Etl.Abstractions.IEtlPipeline<T>!
 static Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(this Wolfgang.Etl.Abstractions.EtlPipeline! pipeline, string! path) -> Wolfgang.Etl.Abstractions.IEtlPipeline<T>!
+static Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.operator !=(Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions? left, Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions? right) -> bool
+static Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.operator ==(Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions? left, Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions? right) -> bool
+static Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.operator !=(Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions? left, Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions? right) -> bool
+static Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.operator ==(Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions? left, Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions? right) -> bool
+static Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.operator !=(Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? left, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? right) -> bool
+static Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.operator ==(Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? left, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? right) -> bool
+static Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.operator !=(Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? left, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? right) -> bool
+static Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.operator ==(Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? left, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? right) -> bool

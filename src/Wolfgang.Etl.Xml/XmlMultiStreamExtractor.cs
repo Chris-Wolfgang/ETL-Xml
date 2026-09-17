@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -65,7 +66,14 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streams"/> is <c>null</c>.
     /// </exception>
+    /// <remarks>
+    /// Retained for binary compatibility with assemblies compiled before the optional-logger overload existed: a
+    /// single-argument call in such an assembly is bound to this exact signature, and removing it would fail at runtime
+    /// with <see cref="MissingMethodException"/> with no compile-time signal. Hidden from IntelliSense; source code
+    /// binds here too, so nothing changes for callers. New code has no reason to name this overload.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamExtractor(IEnumerable<Stream> streams)
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
@@ -80,19 +88,22 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// with a logger.
     /// </summary>
     /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="streams"/> or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="streams"/> is <c>null</c>.
     /// </exception>
     [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
-        ILogger<XmlMultiStreamExtractor<TRecord>> logger
+        ILogger<XmlMultiStreamExtractor<TRecord>>? logger = null
     )
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _readerSettings = null;
     }
 
@@ -104,21 +115,54 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// </summary>
     /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
     /// <param name="readerSettings">The XML reader settings to use for deserialization.</param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger instance for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="streams"/>, <paramref name="readerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
+    /// Thrown when <paramref name="streams"/> or <paramref name="readerSettings"/> is <c>null</c>.
     /// </exception>
+    /// <remarks>
+    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
+    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
+    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
+    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// </remarks>
     [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
         XmlReaderSettings readerSettings,
-        ILogger<XmlMultiStreamExtractor<TRecord>> logger
+        ILogger<XmlMultiStreamExtractor<TRecord>>? logger = null
     )
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));
         _readerSettings = readerSettings ?? throw new ArgumentNullException(nameof(readerSettings));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlMultiStreamExtractor{TRecord}"/> class configured through an options record.
+    /// </summary>
+    /// <param name="streams">The streams to read, one XML document each, in order.</param>
+    /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="ExtractorOptions"/>; <see langword="null"/> keeps every default.</param>
+    /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="streams"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    public XmlMultiStreamExtractor
+    (
+        IEnumerable<Stream> streams,
+        XmlMultiStreamExtractorOptions? options,
+        ILogger<XmlMultiStreamExtractor<TRecord>>? logger = null
+    )
+        : base(options)
+    {
+        _streams = streams ?? throw new ArgumentNullException(nameof(streams));
+        _readerSettings = options?.ReaderSettings;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -129,14 +173,14 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// </summary>
     /// <param name="streams">An enumerable of streams, each containing a single XML document.</param>
     /// <param name="readerSettings">The XML reader settings to use for deserialization.</param>
-    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     /// <param name="timer">The progress timer to inject.</param>
+    /// <param name="logger">An optional logger instance for diagnostic output.</param>
     internal XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
         XmlReaderSettings readerSettings,
-        ILogger? logger,
-        IProgressTimer timer
+        IProgressTimer timer,
+        ILogger? logger = null
     )
     {
         _streams = streams ?? throw new ArgumentNullException(nameof(streams));

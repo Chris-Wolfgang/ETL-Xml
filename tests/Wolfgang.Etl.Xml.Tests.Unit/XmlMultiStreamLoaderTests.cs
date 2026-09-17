@@ -50,8 +50,8 @@ public class XmlMultiStreamLoaderTests
         (
             _ => new MemoryStream(),
             new XmlWriterSettings(),
-            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance,
-            timer
+            timer,
+            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
         );
 
 
@@ -232,16 +232,17 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
-    public void Constructor_StreamFactory_Logger_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_StreamFactory_Logger_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        // logger is now an optional trailing parameter: null means "no logging"
+        // (NullLogger.Instance) rather than an argument error.
+        var sut = new XmlMultiStreamLoader<PersonRecord>
         (
-            () => new XmlMultiStreamLoader<PersonRecord>
-            (
-                _ => new MemoryStream(),
-                logger: null!
-            )
+            _ => new MemoryStream(),
+            logger: null
         );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -271,8 +272,8 @@ public class XmlMultiStreamLoaderTests
             (
                 null!,
                 new XmlWriterSettings(),
-                NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance,
-                new ManualProgressTimer()
+                new ManualProgressTimer(),
+                NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
             )
         );
     }
@@ -286,8 +287,8 @@ public class XmlMultiStreamLoaderTests
         (
             _ => new MemoryStream(),
             new XmlWriterSettings(),
-            logger: null,
-            new ManualProgressTimer()
+            new ManualProgressTimer(),
+            logger: null
         );
 
         await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
@@ -306,8 +307,8 @@ public class XmlMultiStreamLoaderTests
             (
                 _ => new MemoryStream(),
                 new XmlWriterSettings(),
-                NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance,
-                timer: null!
+                timer: null!,
+                NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
             )
         );
     }

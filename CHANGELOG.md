@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+
+## [0.9.0] - 2026-09-16
+
+### Added
+
+- **Options records for all four stages** (ADR-0009, Chris-Wolfgang/ETL-Abstractions#455). `XmlSingleStreamExtractorOptions` and
+  `XmlSingleStreamLoaderOptions` become `sealed record`s (they were classes) and gain `ReaderSettings` / `WriterSettings`
+  and, on the loader, `IsDryRun`; new `XmlMultiStreamExtractorOptions` and `XmlMultiStreamLoaderOptions` carry the same for
+  the multi-stream stages. All four inherit the Wolfgang.Etl.Abstractions 0.24 base records (`ExtractorOptions` /
+  `LoaderOptions`), so `ReportingInterval`, `MaximumItemCount`, `SkipItemCount` and `ErrorPolicy` are configured through
+  the same object as every XML setting and applied by the base constructor.
+- `XmlMultiStreamExtractor<T>(streams, options, logger = null)`, `XmlMultiStreamLoader<T>(streamFactory, options,
+  logger = null)` and `XmlMultiStreamLoader<T>(bufferWriterFactory, options, logger = null)`: the record constructors the
+  single-stream stages already had. The existing constructors are unchanged in this release.
+
+### Changed
+
+- Fifteen constructors are hidden from IntelliSense (`[EditorBrowsable(Never)]`) and retained permanently for binary
+  compatibility: the single-argument ones (#253, #281) and every overload that took the reader/writer settings or a
+  logger positionally, all superseded by `(source, options, logger)` with the settings on the record. Not `[Obsolete]`:
+  positional calls bind to them by exact match, so a warning could only be silenced by rewriting the call, and removal
+  would fail un-rebuilt callers at runtime. Nothing changes for callers.
+- `Wolfgang.Etl.Abstractions` / `.ErrorPolicies` 0.23.2 → 0.24.0 (`.TestKit` / `.TestKit.Xunit` for the test project). The two
+  dry-run contract tests use the now non-generic TestKit base.
+
+- **`logger` is now an optional trailing constructor parameter on the multi-stream types.** The six
+  required-logger constructors on `XmlMultiStreamExtractor<T>` and `XmlMultiStreamLoader<T>`
+  (including the `IBufferWriter<byte>` factory overloads) now declare `ILogger<T>? logger = null`.
+  Passing `null` — or omitting it — resolves to `NullLogger.Instance` instead of throwing
+  `ArgumentNullException`.
+
+  This completes the constructor convergence begun on the single-stream types: every extractor and
+  loader in the package now takes the logger last and optional, matching the fleet-wide convention.
+  A side effect is that `XmlReaderSettings` / `XmlWriterSettings` can now be supplied *without* also
+  supplying a logger, which previously required passing one.
+
+  Not a breaking change: each parameter list is unchanged, so the emitted signatures are identical
+  and PackageValidation against the published baseline passes.
+
+### Deprecated
+
+- `XmlSingleStreamLoader<T>.IsDryRun` and `XmlMultiStreamLoader<T>.IsDryRun` setters — `[Obsolete]` on the **setter accessor**
+  (reads stay warning-free), pointing at the options record. Nothing is removed; removal follows in a later release.
+
+### Removed
+
+- `XmlSingleStreamLoader<TRecord>` and `XmlMultiStreamLoader<TRecord>` no longer implement `ISupportDryRun`;
+  Wolfgang.Etl.Abstractions 0.24 removes the interface (Chris-Wolfgang/ETL-Abstractions#457). `IsDryRun` itself is
+  unchanged for readers and now also configurable through the loaders' options records.
+
 ## [0.8.1] - 2026-08-21
 
 Maintenance release — no `Wolfgang.Etl.Xml` source-behaviour changes since 0.8.0. Closes the
@@ -180,7 +242,8 @@ Initial public release.
 ### Fixed
 - Dropped `netcoreapp3.1` from the test TFM matrix where the CI image does not provide the SDK ([#16](https://github.com/Chris-Wolfgang/ETL-Xml/pull/16)).
 
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.8.1...v0.9.0
 [0.2.2]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v.0.1.0...v0.2.0

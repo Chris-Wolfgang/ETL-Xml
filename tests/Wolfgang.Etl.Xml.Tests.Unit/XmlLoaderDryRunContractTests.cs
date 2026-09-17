@@ -13,7 +13,7 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// output stream, and in a real run it does.
 /// </summary>
 public sealed class XmlSingleStreamLoaderDryRunContractTests
-    : SupportsDryRunContractTests<XmlSingleStreamLoader<PersonRecord>>
+    : SupportsDryRunContractTests
 {
     private static readonly PersonRecord[] Sample =
     {
@@ -21,8 +21,6 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
     };
 
 
-    protected override XmlSingleStreamLoader<PersonRecord> CreateSut() =>
-        new(new MemoryStream());
 
 
     protected override async Task<bool> RunAndReportSideEffectAsync(bool isDryRun)
@@ -31,11 +29,8 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
         var loader = new XmlSingleStreamLoader<PersonRecord>
         (
             stream,
-            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
-        )
-        {
-            IsDryRun = isDryRun,
-        };
+            new XmlSingleStreamLoaderOptions { LeaveOpen = true, IsDryRun = isDryRun }
+        );
 
         await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
 
@@ -50,11 +45,8 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
         var loader = new XmlSingleStreamLoader<PersonRecord>
         (
             stream,
-            new XmlSingleStreamLoaderOptions { LeaveOpen = false }
-        )
-        {
-            IsDryRun = true,
-        };
+            new XmlSingleStreamLoaderOptions { LeaveOpen = false, IsDryRun = true }
+        );
 
         await loader.LoadAsync(Sample.ToAsyncEnumerable());
 
@@ -70,7 +62,7 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
 /// destination-stream factory or writes, and in a real run it does.
 /// </summary>
 public sealed class XmlMultiStreamLoaderDryRunContractTests
-    : SupportsDryRunContractTests<XmlMultiStreamLoader<PersonRecord>>
+    : SupportsDryRunContractTests
 {
     private static readonly PersonRecord[] Sample =
     {
@@ -78,8 +70,6 @@ public sealed class XmlMultiStreamLoaderDryRunContractTests
     };
 
 
-    protected override XmlMultiStreamLoader<PersonRecord> CreateSut() =>
-        new(_ => new MemoryStream());
 
 
     protected override async Task<bool> RunAndReportSideEffectAsync(bool isDryRun)
@@ -92,11 +82,9 @@ public sealed class XmlMultiStreamLoaderDryRunContractTests
                 var ms = new MemoryStream();
                 buffers.Add(ms);
                 return ms;
-            }
-        )
-        {
-            IsDryRun = isDryRun,
-        };
+            },
+            new XmlMultiStreamLoaderOptions { IsDryRun = isDryRun }
+        );
 
         await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
 
