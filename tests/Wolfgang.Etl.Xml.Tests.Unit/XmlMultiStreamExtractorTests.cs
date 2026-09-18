@@ -47,26 +47,21 @@ public class XmlMultiStreamExtractorTests
 
 
 
-    protected override XmlMultiStreamExtractor<PersonRecord> CreateSut(int itemCount) =>
-        new(CreateXmlStreams(itemCount));
+    protected override XmlMultiStreamExtractor<PersonRecord> CreateSut(int itemCount, int maximumItemCount, int skipItemCount, int reportingInterval) =>
+        new
+        (
+            CreateXmlStreams(itemCount),
+            new XmlMultiStreamExtractorOptions
+            {
+                MaximumItemCount = maximumItemCount,
+                SkipItemCount = skipItemCount,
+                ReportingInterval = reportingInterval,
+            }
+        );
 
 
 
     protected override IReadOnlyList<PersonRecord> CreateExpectedItems() => ExpectedItems;
-
-
-
-    protected override XmlMultiStreamExtractor<PersonRecord> CreateSutWithTimer
-    (
-        IProgressTimer timer
-    ) =>
-        new
-        (
-            CreateXmlStreams(ExpectedItems.Count),
-            new XmlReaderSettings(),
-            timer,
-            NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
-        );
 
 
 

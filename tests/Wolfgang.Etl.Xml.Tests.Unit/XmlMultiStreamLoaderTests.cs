@@ -33,26 +33,21 @@ public class XmlMultiStreamLoaderTests
 
 
 
-    protected override XmlMultiStreamLoader<PersonRecord> CreateSut(int itemCount) =>
-        new(_ => new MemoryStream());
+    protected override XmlMultiStreamLoader<PersonRecord> CreateSut(int itemCount, int maximumItemCount, int skipItemCount, int reportingInterval) =>
+        new
+        (
+            _ => new MemoryStream(),
+            new XmlMultiStreamLoaderOptions
+            {
+                MaximumItemCount = maximumItemCount,
+                SkipItemCount = skipItemCount,
+                ReportingInterval = reportingInterval,
+            }
+        );
 
 
 
     protected override IReadOnlyList<PersonRecord> CreateSourceItems() => SourceItems;
-
-
-
-    protected override XmlMultiStreamLoader<PersonRecord> CreateSutWithTimer
-    (
-        IProgressTimer timer
-    ) =>
-        new
-        (
-            _ => new MemoryStream(),
-            new XmlWriterSettings(),
-            timer,
-            NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
-        );
 
 
 

@@ -32,32 +32,24 @@ public class XmlSingleStreamLoaderTests
 
 
 
-    protected override XmlSingleStreamLoader<PersonRecord> CreateSut(int itemCount)
-    {
-        var stream = new MemoryStream();
-        return new XmlSingleStreamLoader<PersonRecord>(stream);
-    }
-
-
-
-    protected override IReadOnlyList<PersonRecord> CreateSourceItems() => SourceItems;
-
-
-
-    protected override XmlSingleStreamLoader<PersonRecord> CreateSutWithTimer
-    (
-        IProgressTimer timer
-    )
+    protected override XmlSingleStreamLoader<PersonRecord> CreateSut(int itemCount, int maximumItemCount, int skipItemCount, int reportingInterval)
     {
         var stream = new MemoryStream();
         return new XmlSingleStreamLoader<PersonRecord>
         (
             stream,
-            new XmlWriterSettings(),
-            timer,
-            logger: NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
+            new XmlSingleStreamLoaderOptions
+            {
+                MaximumItemCount = maximumItemCount,
+                SkipItemCount = skipItemCount,
+                ReportingInterval = reportingInterval,
+            }
         );
     }
+
+
+
+    protected override IReadOnlyList<PersonRecord> CreateSourceItems() => SourceItems;
 
 
 
