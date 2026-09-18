@@ -96,3 +96,13 @@ static Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.operator !=(Wolfgang.Etl
 static Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.operator ==(Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? left, Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions? right) -> bool
 static Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.operator !=(Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? left, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? right) -> bool
 static Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.operator ==(Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? left, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions? right) -> bool
+Wolfgang.Etl.Xml.XmlReport.XmlReport(Wolfgang.Etl.Xml.XmlReport! original) -> void
+override Wolfgang.Etl.Xml.XmlReport.EqualityContract.get -> System.Type!
+override Wolfgang.Etl.Xml.XmlReport.Equals(object? obj) -> bool
+override Wolfgang.Etl.Xml.XmlReport.GetHashCode() -> int
+override Wolfgang.Etl.Xml.XmlReport.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override Wolfgang.Etl.Xml.XmlReport.ToString() -> string!
+override sealed Wolfgang.Etl.Xml.XmlReport.Equals(Wolfgang.Etl.Abstractions.Report? other) -> bool
+static Wolfgang.Etl.Xml.XmlReport.operator !=(Wolfgang.Etl.Xml.XmlReport? left, Wolfgang.Etl.Xml.XmlReport? right) -> bool
+static Wolfgang.Etl.Xml.XmlReport.operator ==(Wolfgang.Etl.Xml.XmlReport? left, Wolfgang.Etl.Xml.XmlReport? right) -> bool
+virtual Wolfgang.Etl.Xml.XmlReport.Equals(Wolfgang.Etl.Xml.XmlReport? other) -> bool

@@ -1,0 +1,6 @@
+#nullable enable
+override Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.<Clone>$() -> Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions!
+override Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions.<Clone>$() -> Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions!
+override Wolfgang.Etl.Xml.XmlReport.<Clone>$() -> Wolfgang.Etl.Xml.XmlReport!
+override Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions.<Clone>$() -> Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions!
+override Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.<Clone>$() -> Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions!
