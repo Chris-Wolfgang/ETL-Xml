@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789618954082,
+  "lastUpdate": 1789705305457,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -1260,6 +1260,76 @@ window.BENCHMARK_DATA = {
             "value": 2145751418.3333333,
             "unit": "ns",
             "range": "± 19291273.35240692"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "efad7989bfbe5867cde6235e2afe46aa9e71d864",
+          "message": "docs: tell contributors how to enable the shipped gitleaks pre-commit hook (#316)\n\n* docs: tell contributors how to enable the shipped gitleaks pre-commit hook\n\nThe template upgrade added .githooks/pre-commit, but git only runs it after\n`git config core.hooksPath .githooks`, and nothing in the repository said so.\nAdds the template's Getting Started step (hook, CLI install, --no-verify).\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n* docs: secret-scan step - Linux install path, \"secrets\" not \"credentials\", comma\n\nReview feedback (repo-template#577 carries the same wording upstream).\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Chris Wolfgang <cwolfgan@ptd.net>\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-18T02:23:03Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/efad7989bfbe5867cde6235e2afe46aa9e71d864"
+        },
+        "date": 1789705302799,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1804248.5989583333,
+            "unit": "ns",
+            "range": "± 214.15236674065355"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 875304.5065104166,
+            "unit": "ns",
+            "range": "± 7956.539102552826"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 2808226.9270833335,
+            "unit": "ns",
+            "range": "± 104486.02474114475"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 28547536.270833332,
+            "unit": "ns",
+            "range": "± 50369.70709888895"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 183251578.11111107,
+            "unit": "ns",
+            "range": "± 471680.0429241527"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 91402209.5,
+            "unit": "ns",
+            "range": "± 6332958.252906594"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 285616862.6666667,
+            "unit": "ns",
+            "range": "± 1510766.5510731079"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 3129686404.3333335,
+            "unit": "ns",
+            "range": "± 16755859.6538543"
           }
         ]
       }
