@@ -9,6 +9,7 @@ Extractors and loaders for working with XML files using the Wolfgang.Etl design 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-Multi--Targeted-purple.svg)](https://dotnet.microsoft.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/Chris-Wolfgang/ETL-Xml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Chris-Wolfgang/ETL-Xml/badge)](https://scorecard.dev/viewer/?uri=github.com/Chris-Wolfgang/ETL-Xml)
 
 ---
 
