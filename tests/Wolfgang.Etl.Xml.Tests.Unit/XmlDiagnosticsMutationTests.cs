@@ -43,10 +43,7 @@ public sealed class XmlDiagnosticsMutationTests
         using var source = await BuildXmlAsync(ThreePeople);
         var logger = new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>();
 
-        var extractor = new XmlSingleStreamExtractor<PersonRecord>(source, logger)
-        {
-            SkipItemCount = 1,
-        };
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>(source, new XmlSingleStreamExtractorOptions { SkipItemCount = 1 }, logger);
 
         await DrainAsync(extractor);
 
@@ -71,11 +68,8 @@ public sealed class XmlDiagnosticsMutationTests
             stream,
             new XmlWriterSettings(),
             logger,
-            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
-        )
-        {
-            SkipItemCount = 1,
-        };
+            new XmlSingleStreamLoaderOptions { LeaveOpen = true, SkipItemCount = 1 }
+        );
 
         await loader.LoadAsync(ThreePeople.ToAsyncEnumerable());
 

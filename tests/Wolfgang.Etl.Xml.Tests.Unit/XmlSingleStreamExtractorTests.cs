@@ -60,26 +60,21 @@ public class XmlSingleStreamExtractorTests
 
 
 
-    protected override XmlSingleStreamExtractor<PersonRecord> CreateSut(int itemCount) =>
-        new(CreateXmlStream(itemCount));
+    protected override XmlSingleStreamExtractor<PersonRecord> CreateSut(int itemCount, int maximumItemCount, int skipItemCount, int reportingInterval) =>
+        new
+        (
+            CreateXmlStream(itemCount),
+            new XmlSingleStreamExtractorOptions
+            {
+                MaximumItemCount = maximumItemCount,
+                SkipItemCount = skipItemCount,
+                ReportingInterval = reportingInterval,
+            }
+        );
 
 
 
     protected override IReadOnlyList<PersonRecord> CreateExpectedItems() => ExpectedItems;
-
-
-
-    protected override XmlSingleStreamExtractor<PersonRecord> CreateSutWithTimer
-    (
-        IProgressTimer timer
-    ) =>
-        new
-        (
-            CreateXmlStream(ExpectedItems.Count),
-            new XmlReaderSettings(),
-            timer,
-            logger: NullLogger<XmlSingleStreamExtractor<PersonRecord>>.Instance
-        );
 
 
 

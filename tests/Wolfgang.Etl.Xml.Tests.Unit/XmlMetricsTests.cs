@@ -122,11 +122,8 @@ public sealed class XmlMetricsTests
             var loader = new XmlSingleStreamLoader<MetricProbe>
             (
                 ms,
-                new XmlSingleStreamLoaderOptions { LeaveOpen = true }
-            )
-            {
-                SkipItemCount = 1,
-            };
+                new XmlSingleStreamLoaderOptions { LeaveOpen = true, SkipItemCount = 1 }
+            );
             await loader.LoadAsync(Sample.ToAsyncEnumerable());
         });
 
@@ -141,10 +138,7 @@ public sealed class XmlMetricsTests
 
         var measurements = await CollectAsync(async () =>
         {
-            var extractor = new XmlSingleStreamExtractor<MetricProbe>(source)
-            {
-                SkipItemCount = 1,
-            };
+            var extractor = new XmlSingleStreamExtractor<MetricProbe>(source, new XmlSingleStreamExtractorOptions { SkipItemCount = 1 });
             await foreach (var _ in extractor.ExtractAsync())
             {
             }
