@@ -101,3 +101,4 @@ jobs:
           $flags = @()
           if ($env:DRY_RUN) { $flags += '-DryRun' }
           pwsh ./scripts/security-alerts.ps1 -Repository $env:GITHUB_REPOSITORY -RequestAutofix -AlertNumbers $env:ALERTS @flags
+# guard negative test: comment-only workflow change
