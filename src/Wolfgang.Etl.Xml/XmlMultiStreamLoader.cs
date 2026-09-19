@@ -255,9 +255,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         _streamFactory = streamFactory ?? throw new ArgumentNullException(nameof(streamFactory));
         _writerSettings = options?.WriterSettings;
         _logger = logger ?? (ILogger)NullLogger.Instance;
-#pragma warning disable CS0618 // the constructor is the supported replacement for the setter; it necessarily writes it
-        IsDryRun = options?.IsDryRun ?? false;
-#pragma warning restore CS0618
+        _isDryRun = options?.IsDryRun ?? false;
     }
 
 
@@ -330,6 +328,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
 
 
 
+    private bool _isDryRun;
+
     /// <summary>
     /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
     /// When <see langword="true"/>, the load enumerates the source, honours
@@ -338,7 +338,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// counters, and logs as usual, but never invokes the destination-stream factory and
     /// writes nothing. Defaults to <see langword="false"/>.
     /// </summary>
-    public bool IsDryRun { get; [Obsolete("Configure IsDryRun through XmlMultiStreamLoaderOptions passed to the constructor instead. The setter will be removed in a later release.")] set; }
+    public bool IsDryRun { get => _isDryRun; [Obsolete("Configure IsDryRun through XmlMultiStreamLoaderOptions passed to the constructor instead. The setter will be removed in a later release.")] set => _isDryRun = value; }
 
 
 

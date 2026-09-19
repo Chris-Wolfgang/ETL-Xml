@@ -244,9 +244,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         var resolved = options ?? new XmlSingleStreamLoaderOptions();
         _leaveOpen = resolved.LeaveOpen;
         _rootElementName = ResolveRootElementName(resolved.RootElementName);
-#pragma warning disable CS0618 // the constructor is the supported replacement for the setter; it necessarily writes it
-        IsDryRun = resolved.IsDryRun;
-#pragma warning restore CS0618
+        _isDryRun = resolved.IsDryRun;
     }
 
 
@@ -396,6 +394,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
 
 
+    private bool _isDryRun;
+
     /// <summary>
     /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
     /// When <see langword="true"/>, the load enumerates the source, honours
@@ -404,7 +404,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// counters, and logs as usual, but writes nothing to the output stream. Defaults to
     /// <see langword="false"/>.
     /// </summary>
-    public bool IsDryRun { get; [Obsolete("Configure IsDryRun through XmlSingleStreamLoaderOptions passed to the constructor instead. The setter will be removed in a later release.")] set; }
+    public bool IsDryRun { get => _isDryRun; [Obsolete("Configure IsDryRun through XmlSingleStreamLoaderOptions passed to the constructor instead. The setter will be removed in a later release.")] set => _isDryRun = value; }
 
 
 
