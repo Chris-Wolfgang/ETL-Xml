@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789781120790,
+  "lastUpdate": 1789783284757,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "BenchmarkDotNet": [
@@ -2736,6 +2736,120 @@ window.BENCHMARK_DATA = {
             "value": 706211.6969401041,
             "unit": "ns",
             "range": "± 6434.044121260452"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "15cdeb6f52c5b5d2c802d700fbaaf2be76fe4054",
+          "message": "refactor: options constructor assigns backing fields, not the deprecated setters (#347) (#352)\n\nEvery `{ get; [Obsolete] set; }` property now has an explicit backing field the constructor / ApplyOptions writes, so the constructor no longer calls the setters it deprecates and the CS0618 pragma blocks that wrapped those writes are dropped (observation-only reads keep theirs). Neither loader's deprecated setter validates, so no record-side guard was needed.\n\nVerified locally: Release build 0 errors; unit suites green on net462 / net10.0; coverage gate reproduced with no class below 90 %.\n\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-18T21:58:45-04:00",
+          "tree_id": "a05ca0ae4df6f48668e6095cb45667c5922123e9",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/15cdeb6f52c5b5d2c802d700fbaaf2be76fe4054"
+        },
+        "date": 1789783282271,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 43137.12705485026,
+            "unit": "ns",
+            "range": "± 173.01170080644093"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 436098.7578125,
+            "unit": "ns",
+            "range": "± 11372.051381985639"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 4337083.216145833,
+            "unit": "ns",
+            "range": "± 20779.07288953872"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 19070.39676920573,
+            "unit": "ns",
+            "range": "± 170.08655146990358"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 190439.44067382812,
+            "unit": "ns",
+            "range": "± 6406.337114698304"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 1823317.8020833333,
+            "unit": "ns",
+            "range": "± 41519.281556471135"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 25782.562123616535,
+            "unit": "ns",
+            "range": "± 267.2180162292"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 196870.75496419272,
+            "unit": "ns",
+            "range": "± 540.324921565593"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 1873980.0670572917,
+            "unit": "ns",
+            "range": "± 2422.8253995387568"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 14567.977147420248,
+            "unit": "ns",
+            "range": "± 154.41843156286603"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 10)",
+            "value": 12765.61491394043,
+            "unit": "ns",
+            "range": "± 126.89722996919451"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 104148.2998860677,
+            "unit": "ns",
+            "range": "± 733.3314524894687"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 100)",
+            "value": 87155.81473795573,
+            "unit": "ns",
+            "range": "± 1512.096684962338"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 1286631.21484375,
+            "unit": "ns",
+            "range": "± 64153.47038159234"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 1000)",
+            "value": 1021268.68359375,
+            "unit": "ns",
+            "range": "± 9112.68861402706"
           }
         ]
       }
