@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789705305457,
+  "lastUpdate": 1789791666304,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -1330,6 +1330,76 @@ window.BENCHMARK_DATA = {
             "value": 3129686404.3333335,
             "unit": "ns",
             "range": "± 16755859.6538543"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "7bd470c369de9f23b30888ee5e46d4854c53817b",
+          "message": "docs(pack): add THIRD-PARTY-NOTICES.md and ship it in the package (#283) (#354)\n\nAdds the hand-maintained licence notices for the shipped runtime dependencies (Microsoft.Bcl.AsyncInterfaces, Microsoft.Extensions.Logging.Abstractions, System.Diagnostics.DiagnosticSource on the down-level targets — all MIT) in the Etl-Csv house format, and packs it unconditionally so a missing file fails `dotnet pack`.\n\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-19T02:16:16Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/7bd470c369de9f23b30888ee5e46d4854c53817b"
+        },
+        "date": 1789791663770,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1838564.9752604167,
+            "unit": "ns",
+            "range": "± 13459.99412720955"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 879034.4814453125,
+            "unit": "ns",
+            "range": "± 8305.235639548246"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 2813045.828125,
+            "unit": "ns",
+            "range": "± 128775.99051994634"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 27836379.104166668,
+            "unit": "ns",
+            "range": "± 45480.56031753787"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 188746452.11111107,
+            "unit": "ns",
+            "range": "± 1473056.3292346476"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 88185713.16666667,
+            "unit": "ns",
+            "range": "± 757918.885480223"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 280470887,
+            "unit": "ns",
+            "range": "± 843194.6804071999"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 3088628987.6666665,
+            "unit": "ns",
+            "range": "± 2542199.1191888046"
           }
         ]
       }
