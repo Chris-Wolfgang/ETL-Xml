@@ -1,0 +1,21 @@
+# Per-src-project overrides for Wolfgang.Etl.Xml
+#
+# Solution-wide analyzer rules live in the root .editorconfig. Only add
+# entries here when the rule itself is genuinely wrong for THIS whole
+# project — not for individual call-sites (use `#pragma warning disable`
+# or [SuppressMessage] at the call-site instead).
+
+[*.cs]
+
+# S1133 ("remove this deprecated code someday") — every [Obsolete] member in
+# this project is a deliberate deprecation marker for the dated removal wave
+# (#311, not before 2026-12-15). The rule is wrong for the whole project
+# until then.
+dotnet_diagnostic.S1133.severity = none
+
+# S3427 ("signature overlaps … default parameter value can't be used") —
+# the single-argument constructors that make every optional-logger overload
+# overlap are exactly what #253 / #281 retires in the same 2026-12-15 wave;
+# dropping the defaults now only to restore them then is churn. Remove this
+# entry together with those constructors.
+dotnet_diagnostic.S3427.severity = none
