@@ -70,7 +70,7 @@ jobs:
 
       - name: Install dotnet-stryker
         if: steps.check.outputs.found == 'true'
-        run: dotnet tool update -g dotnet-stryker || dotnet tool install -g dotnet-stryker
+        run: dotnet tool restore
 
       # dotnet-stryker 5.0.0 analyses each project with a design-time build and,
       # when the packages are not already restored, restores on the fly per target
