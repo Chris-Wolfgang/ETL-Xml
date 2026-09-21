@@ -1782,9 +1782,13 @@ jobs:
             8.0.x
             10.0.x
 
-      - name: Install dotnet-stryker
+      - name: Restore CI tools (dotnet-stryker)
         if: steps.changed.outputs.run == 'true'
-        run: dotnet tool update -g dotnet-stryker || dotnet tool install -g dotnet-stryker
+        # Pinned in .config/dotnet-tools.json. A global install no longer works here: once
+        # the manifest lists dotnet-stryker the SDK routes `dotnet stryker` through it and
+        # refuses the global copy ("Run dotnet tool restore ..."), which is why this gate
+        # has failed on every src/ change since the manifest landed.
+        run: dotnet tool restore
 
       # dotnet-stryker 5.0.0 analyses each project with a design-time build and,
       # when the packages are not already restored, restores on the fly per target
