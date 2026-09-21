@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789844186866,
+  "lastUpdate": 1790023755188,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "BenchmarkDotNet": [
@@ -3078,6 +3078,120 @@ window.BENCHMARK_DATA = {
             "value": 1093285.361328125,
             "unit": "ns",
             "range": "± 7379.256458491723"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a8091824f0cc6146fbb1b01558d71833c1814a2e",
+          "message": "fix(pack): ship the generated per-package THIRD-PARTY-NOTICES.md only (#377)\n\nrelease.yaml (previous PR) now renders obj/THIRD-PARTY-NOTICES.md per project\nand Directory.Build.props packs it at the package root; the csproj items that\npacked the repository-wide file to the same path made `dotnet pack` fail with\nNU5118 (warning-as-error, duplicate file) - the release would have died at the\npack step (ETL-Abstractions#633). The PR pipeline never packs, so this only\nshows at release time.\n\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-21T16:46:31-04:00",
+          "tree_id": "64752f5b91dd80cb6a9a79dfe0a48fc235e47b83",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/a8091824f0cc6146fbb1b01558d71833c1814a2e"
+        },
+        "date": 1790023751549,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 39573.97385660807,
+            "unit": "ns",
+            "range": "± 88.12265193708276"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 396443.25341796875,
+            "unit": "ns",
+            "range": "± 3918.9961477138386"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 3989264.4583333335,
+            "unit": "ns",
+            "range": "± 9997.340396146332"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 20318.085215250652,
+            "unit": "ns",
+            "range": "± 327.86799278005367"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 203181.99959309897,
+            "unit": "ns",
+            "range": "± 2077.05644952882"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 2016881.3059895833,
+            "unit": "ns",
+            "range": "± 11926.424923828585"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 26923.233917236328,
+            "unit": "ns",
+            "range": "± 317.45292089844713"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 175148.70857747397,
+            "unit": "ns",
+            "range": "± 490.5345143300106"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 1670220.056640625,
+            "unit": "ns",
+            "range": "± 10334.540305209317"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 12979.590520222982,
+            "unit": "ns",
+            "range": "± 68.97698982078869"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 10)",
+            "value": 11626.335932413736,
+            "unit": "ns",
+            "range": "± 69.31480482921107"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 88833.07596842448,
+            "unit": "ns",
+            "range": "± 217.83839788923896"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 100)",
+            "value": 72141.58955891927,
+            "unit": "ns",
+            "range": "± 293.80091189277323"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 956214.5794270834,
+            "unit": "ns",
+            "range": "± 27997.869404526195"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 1000)",
+            "value": 842163.9345703125,
+            "unit": "ns",
+            "range": "± 2957.268359060442"
           }
         ]
       }
