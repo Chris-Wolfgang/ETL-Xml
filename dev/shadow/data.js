@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789878110587,
+  "lastUpdate": 1790050899520,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -1470,6 +1470,76 @@ window.BENCHMARK_DATA = {
             "value": 2996584789.6666665,
             "unit": "ns",
             "range": "± 5383719.495740128"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "6d0c32d2652ad31600b0518ad82840ed8e1c2940",
+          "message": "ci(template): take the template's scorecard.yaml stryker.yaml (second pass after the workflow sync) (#379)\n\nThe 2026-09-21 template sync kept these files because they had their own\nshape (older template generations or hand-written variants). The template\nversions are a functional superset - same triggers plus the runner/tool\ndetection, SARIF filtering and score-history steps the fleet standardised on -\nand read the same tool manifest, so they are taken wholesale from\nrepo-template 3821e57.\n\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-21T21:16:53Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/6d0c32d2652ad31600b0518ad82840ed8e1c2940"
+        },
+        "date": 1790050897141,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1037396.4759114584,
+            "unit": "ns",
+            "range": "± 9945.705375536245"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 443180.35367838544,
+            "unit": "ns",
+            "range": "± 6608.010715335964"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 1610066.0859375,
+            "unit": "ns",
+            "range": "± 41219.883064613525"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 18402901.96875,
+            "unit": "ns",
+            "range": "± 297330.4932089656"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 116525692.26666667,
+            "unit": "ns",
+            "range": "± 880074.464230778"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 47947747.03030303,
+            "unit": "ns",
+            "range": "± 239376.11625378832"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 170787539.66666666,
+            "unit": "ns",
+            "range": "± 6131816.228767161"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 1898264541.3333333,
+            "unit": "ns",
+            "range": "± 29801922.439293414"
           }
         ]
       }
