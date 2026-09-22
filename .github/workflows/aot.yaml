@@ -19,6 +19,10 @@ on:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
 
+concurrency:
+  group: aot-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
