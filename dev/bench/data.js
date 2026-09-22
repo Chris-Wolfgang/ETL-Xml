@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790082760100,
+  "lastUpdate": 1790094242312,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "BenchmarkDotNet": [
@@ -3306,6 +3306,120 @@ window.BENCHMARK_DATA = {
             "value": 1051042.478515625,
             "unit": "ns",
             "range": "± 10224.026118261"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5dd40af6e333344bf2bb2344e11e00212abf5055",
+          "message": "Release v0.10.0 — net5–7 assets, notices fix, Abstractions 0.26.0 (#385)\n\n* release: v0.10.0\n\nMINOR from 0.9.0: adopting Abstractions 0.25.0 brought the deprecated\nbase-stage setters and the bulk Increment* overloads into this package's\nsurface, and net5.0/net6.0/net7.0 assemblies now ship. Also the NU5118\nnotices pack fix and the 0.26.0 Abstractions adoption (trim/AOT-compatible,\nno API change). CHANGELOG assembled from the 9 fragments.\n\nVerified locally: dotnet pack at 0.10.0 (ApiCompat clean against the 0.9.0\nbaseline, one THIRD-PARTY-NOTICES.md in the package) and dotnet test -c\nRelease -f net10.0 (347 tests, 0 failures).\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n* chore: pre-release clean-up - the PR-build badge tracks the pull_request event\n\npr.yaml moved to `pull_request` with the template migration, but the badge\nstill filtered on `event=pull_request_target`, so it would have read\n\"no status\" from here on.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-22T12:21:23-04:00",
+          "tree_id": "c01704b8c4c29fe6b4527a4cf800d5264956b5b9",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/5dd40af6e333344bf2bb2344e11e00212abf5055"
+        },
+        "date": 1790094239156,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 41125.99888102213,
+            "unit": "ns",
+            "range": "± 394.79771779689924"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 405740.19514973956,
+            "unit": "ns",
+            "range": "± 4204.8875178231065"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 4102531.5208333335,
+            "unit": "ns",
+            "range": "± 12896.131553644662"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 17204.218780517578,
+            "unit": "ns",
+            "range": "± 111.3599886577622"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 167138.92724609375,
+            "unit": "ns",
+            "range": "± 2075.5098624325224"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 1681661.9303385417,
+            "unit": "ns",
+            "range": "± 25690.210679440024"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 23883.594772338867,
+            "unit": "ns",
+            "range": "± 100.00713020391842"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 192509.123046875,
+            "unit": "ns",
+            "range": "± 790.0308833227592"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 1918103.9453125,
+            "unit": "ns",
+            "range": "± 4797.099115952102"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 11635.564463297525,
+            "unit": "ns",
+            "range": "± 33.68323340929279"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 10)",
+            "value": 10338.095087687174,
+            "unit": "ns",
+            "range": "± 75.56260493864998"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 94859.92395019531,
+            "unit": "ns",
+            "range": "± 393.244845885426"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 100)",
+            "value": 76709.07267252605,
+            "unit": "ns",
+            "range": "± 200.60779274765582"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 1153840.1243489583,
+            "unit": "ns",
+            "range": "± 16924.67854453399"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 1000)",
+            "value": 1020546.4466145834,
+            "unit": "ns",
+            "range": "± 11616.744319049405"
           }
         ]
       }
