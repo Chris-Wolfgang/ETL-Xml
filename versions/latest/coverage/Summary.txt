@@ -1,37 +1,67 @@
 Summary
-  Generated on: 9/17/2026 - 6:39:29 PM
-  Coverage date: 9/17/2026 - 6:39:22 PM - 9/17/2026 - 6:39:25 PM
+  Generated on: 9/23/2026 - 12:43:32 AM
+  Coverage date: 9/23/2026 - 12:43:27 AM - 9/23/2026 - 12:43:29 AM
   Parser: MultiReport (2x Cobertura)
-  Assemblies: 1
-  Classes: 15
-  Files: 15
-  Line coverage: 94.8%
-  Covered lines: 576
-  Uncovered lines: 31
-  Coverable lines: 607
-  Total lines: 2637
-  Branch coverage: 85.5% (219 of 256)
-  Covered branches: 219
-  Total branches: 256
-  Method coverage: 94.3% (101 of 107)
-  Full method coverage: 87.8% (94 of 107)
-  Covered methods: 101
-  Fully covered methods: 94
-  Total methods: 107
+  Assemblies: 3
+  Classes: 41
+  Files: 37
+  Line coverage: 98.1%
+  Covered lines: 2720
+  Uncovered lines: 51
+  Coverable lines: 2771
+  Total lines: 7248
+  Branch coverage: 81.6% (467 of 572)
+  Covered branches: 467
+  Total branches: 572
+  Method coverage: 97.9% (378 of 386)
+  Full method coverage: 92.2% (356 of 386)
+  Covered methods: 378
+  Fully covered methods: 356
+  Total methods: 386
 
-Wolfgang.Etl.Xml                                     94.8%
-  Wolfgang.Etl.Xml.BufferWriterStream                93.5%
-  Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions       100%
-  Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions     100%
-  Wolfgang.Etl.Xml.XmlLogMessages                     100%
-  Wolfgang.Etl.Xml.XmlMetrics                         100%
-  Wolfgang.Etl.Xml.XmlMultiStreamExtractor<T>        96.2%
-  Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions     100%
-  Wolfgang.Etl.Xml.XmlMultiStreamLoader<T>           92.4%
-  Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions        100%
-  Wolfgang.Etl.Xml.XmlReport                          100%
-  Wolfgang.Etl.Xml.XmlSerializerNamespacesCache       100%
-  Wolfgang.Etl.Xml.XmlSingleStreamExtractor<T>       94.1%
-  Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions    100%
-  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>          92.6%
-  Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions       100%
+Wolfgang.Etl.Xml                                                           94.8%
+  Wolfgang.Etl.Xml.BufferWriterStream                                      93.5%
+  Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions                             100%
+  Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions                           100%
+  Wolfgang.Etl.Xml.XmlLogMessages                                           100%
+  Wolfgang.Etl.Xml.XmlMetrics                                               100%
+  Wolfgang.Etl.Xml.XmlMultiStreamExtractor<T>                              96.2%
+  Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions                           100%
+  Wolfgang.Etl.Xml.XmlMultiStreamLoader<T>                                 92.4%
+  Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions                              100%
+  Wolfgang.Etl.Xml.XmlReport                                                100%
+  Wolfgang.Etl.Xml.XmlSerializerNamespacesCache                             100%
+  Wolfgang.Etl.Xml.XmlSingleStreamExtractor<T>                             94.1%
+  Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions                          100%
+  Wolfgang.Etl.Xml.XmlSingleStreamLoader<T>                                92.6%
+  Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions                             100%
+
+Wolfgang.Etl.Xml.Tests.DocExamples                                         97.2%
+  Wolfgang.Etl.Xml.Tests.DocExamples.DocExample                             100%
+  Wolfgang.Etl.Xml.Tests.DocExamples.DocExampleCompilationTests             100%
+  Wolfgang.Etl.Xml.Tests.DocExamples.DocExampleCompiler                    96.5%
+  Wolfgang.Etl.Xml.Tests.DocExamples.DocExampleSource                      96.4%
+
+Wolfgang.Etl.Xml.Tests.Unit                                                99.2%
+  Wolfgang.Etl.Xml.Tests.Unit.EtlPipelineXmlExtensionsTests                 100%
+  Wolfgang.Etl.Xml.Tests.Unit.Globalization.GlobalizationTests              100%
+  Wolfgang.Etl.Xml.Tests.Unit.MetricProbe                                   100%
+  Wolfgang.Etl.Xml.Tests.Unit.TestBufferWriter                              100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlConcurrencyStressTests                     100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlConstructorConvergenceTests                 99%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlCoverageTests                              100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlDiagnosticsMutationTests                  97.4%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlFuzzTests                                 96.4%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlLoaderBufferWriterTests                    100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlMetricsTests                               100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlMultiStreamErrorPolicyTests               98.4%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlMultiStreamExtractorTests                  100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlMultiStreamLoaderDryRunContractTests       100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlMultiStreamLoaderTests                    97.1%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlOptionsRecordTests                          99%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlReportTests                                100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlSingleStreamExtractorTests                 100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlSingleStreamExtractorXsdValidationTests    100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlSingleStreamLoaderDryRunContractTests      100%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlSingleStreamLoaderTests                   99.5%
+  Wolfgang.Etl.Xml.Tests.Unit.XmlSnapshotTests                              100%
