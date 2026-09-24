@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790137379027,
+  "lastUpdate": 1790223767086,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -1610,6 +1610,76 @@ window.BENCHMARK_DATA = {
             "value": 2911167632.3333335,
             "unit": "ns",
             "range": "± 4072455.2528800527"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "89dd6a8b546026498d608cc4930bf67dd14dd8b0",
+          "message": "chore(pack): advance PackageValidation baseline to 0.10.0 (#393)\n\nv0.10.0 published and the flatcontainer index has it, so the baseline can move off 0.9.0.\nDoing this before the CDN catches up fails the pack with NU1102.\n\nCarries an `internal` changelog fragment rather than the `no-changelog` label — the change is\nreal, just not consumer-visible.\n\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-23T01:28:24Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/89dd6a8b546026498d608cc4930bf67dd14dd8b0"
+        },
+        "date": 1790223764138,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1818546.109375,
+            "unit": "ns",
+            "range": "± 45246.15029725447"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 914780.0667317709,
+            "unit": "ns",
+            "range": "± 24289.01519426257"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 2895195.3072916665,
+            "unit": "ns",
+            "range": "± 51512.40376663166"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 28172689.447916668,
+            "unit": "ns",
+            "range": "± 46502.51886887139"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 187034666.55555558,
+            "unit": "ns",
+            "range": "± 2523085.3744091108"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 88840881.83333333,
+            "unit": "ns",
+            "range": "± 731502.5045730078"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 273309293.3333333,
+            "unit": "ns",
+            "range": "± 3151553.1947015165"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 2965403887,
+            "unit": "ns",
+            "range": "± 10872876.29848013"
           }
         ]
       }
