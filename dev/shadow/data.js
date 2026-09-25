@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790223767086,
+  "lastUpdate": 1790310155258,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -1680,6 +1680,76 @@ window.BENCHMARK_DATA = {
             "value": 2965403887,
             "unit": "ns",
             "range": "± 10872876.29848013"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "79a398b68d367bd966ceefd22e32998d0359c9c8",
+          "message": "Bump the dotnet-dependencies group with 2 updates (#396)\n\nBumps Meziantou.Analyzer from 3.0.259 to 3.0.290\nBumps nuget-license from 4.0.17 to 4.0.18\n\n---\nupdated-dependencies:\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.290\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: nuget-license\n  dependency-version: 4.0.18\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-09-25T02:08:57Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/79a398b68d367bd966ceefd22e32998d0359c9c8"
+        },
+        "date": 1790310151229,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1407923.88671875,
+            "unit": "ns",
+            "range": "± 1344.6026511835587"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 658035.9215494791,
+            "unit": "ns",
+            "range": "± 3920.6177397005754"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 2569472.2213541665,
+            "unit": "ns",
+            "range": "± 238747.51405689493"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 22305168.5,
+            "unit": "ns",
+            "range": "± 121425.57922193262"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 145801331.5,
+            "unit": "ns",
+            "range": "± 1167614.4271119372"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 62982803,
+            "unit": "ns",
+            "range": "± 336311.30069650034"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 209460060,
+            "unit": "ns",
+            "range": "± 1334918.3776755792"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 2297897399,
+            "unit": "ns",
+            "range": "± 4821082.358899607"
           }
         ]
       }
