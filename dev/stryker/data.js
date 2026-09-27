@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789884475202,
+  "lastUpdate": 1790489495386,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Stryker mutation score": [
@@ -134,6 +134,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "Mutation score",
             "value": 70.96,
+            "unit": "%"
+          }
+        ]
+      }
+    ],
+    "Mutation score": [
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "79a398b68d367bd966ceefd22e32998d0359c9c8",
+          "message": "Bump the dotnet-dependencies group with 2 updates (#396)\n\nBumps Meziantou.Analyzer from 3.0.259 to 3.0.290\nBumps nuget-license from 4.0.17 to 4.0.18\n\n---\nupdated-dependencies:\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.290\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: nuget-license\n  dependency-version: 4.0.18\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-09-25T02:08:57Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/79a398b68d367bd966ceefd22e32998d0359c9c8"
+        },
+        "date": 1790489484768,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score",
+            "value": 71.51,
             "unit": "%"
           }
         ]
