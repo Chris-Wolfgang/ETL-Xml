@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit.TestModels;
@@ -8,7 +7,6 @@ namespace Wolfgang.Etl.Xml.Tests.Unit.TestModels;
 /// A <see cref="MemoryStream"/> that captures its buffer into a list when disposed,
 /// so the content can be inspected after the stream is closed.
 /// </summary>
-[ExcludeFromCodeCoverage]
 internal sealed class CapturingMemoryStream : MemoryStream
 {
     private readonly IList<byte[]> _capturedBuffers;

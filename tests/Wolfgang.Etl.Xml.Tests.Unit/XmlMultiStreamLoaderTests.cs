@@ -35,7 +35,7 @@ public class XmlMultiStreamLoaderTests
     protected override XmlMultiStreamLoader<PersonRecord> CreateSut(int itemCount, int maximumItemCount, int skipItemCount, int reportingInterval) =>
         new
         (
-            _ => new MemoryStream(),
+            NewMemoryStream,
             new XmlMultiStreamLoaderOptions
             {
                 MaximumItemCount = maximumItemCount,
@@ -47,6 +47,12 @@ public class XmlMultiStreamLoaderTests
 
 
     protected override IReadOnlyList<PersonRecord> CreateSourceItems() => SourceItems;
+
+
+
+    // Shared stream factory: CreateSut invokes it; the constructor-argument tests that never
+    // load an item pass it as a method group instead of a lambda that would never run.
+    private static Stream NewMemoryStream(PersonRecord _) => new MemoryStream();
 
 
 
@@ -134,19 +140,25 @@ public class XmlMultiStreamLoaderTests
     [Fact]
     public async Task LoadAsync_when_empty_sequence_creates_no_streams()
     {
-        var streamCount = 0;
-        var sut = new XmlMultiStreamLoader<PersonRecord>
-        (
-            _ =>
-            {
-                streamCount++;
-                return new MemoryStream();
-            }
-        );
+        var factory = new CountingStreamFactory();
+        var sut = new XmlMultiStreamLoader<PersonRecord>(factory.Create);
 
         await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
 
-        Assert.Equal(0, streamCount);
+        Assert.Equal(0, factory.CallCount);
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_two_items_creates_one_stream_per_item()
+    {
+        var factory = new CountingStreamFactory();
+        var sut = new XmlMultiStreamLoader<PersonRecord>(factory.Create);
+
+        await sut.LoadAsync(SourceItems.Take(2).ToAsyncEnumerable());
+
+        Assert.Equal(2, factory.CallCount);
     }
 
 
@@ -232,7 +244,7 @@ public class XmlMultiStreamLoaderTests
         // (NullLogger.Instance) rather than an argument error.
         var sut = new XmlMultiStreamLoader<PersonRecord>
         (
-            _ => new MemoryStream(),
+            NewMemoryStream,
             logger: null
         );
 
@@ -248,7 +260,7 @@ public class XmlMultiStreamLoaderTests
         (
             () => new XmlMultiStreamLoader<PersonRecord>
             (
-                _ => new MemoryStream(),
+                NewMemoryStream,
                 writerSettings: null!,
                 NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
             )
@@ -279,7 +291,7 @@ public class XmlMultiStreamLoaderTests
     {
         var sut = new XmlMultiStreamLoader<PersonRecord>
         (
-            _ => new MemoryStream(),
+            NewMemoryStream,
             new XmlWriterSettings(),
             new ManualProgressTimer(),
             logger: null
@@ -299,7 +311,7 @@ public class XmlMultiStreamLoaderTests
         (
             () => new XmlMultiStreamLoader<PersonRecord>
             (
-                _ => new MemoryStream(),
+                NewMemoryStream,
                 new XmlWriterSettings(),
                 timer: null!,
                 NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance

@@ -182,6 +182,14 @@ public class XmlOptionsRecordTests
         return n;
     }
 
+    [Fact]
+    public void ChainContains_when_no_exception_in_the_chain_matches_returns_false()
+    {
+        var ex = new InvalidOperationException("outer", new ArgumentException("inner"));
+
+        Assert.False(ChainContains<XmlException>(ex));
+    }
+
     private static bool ChainContains<TException>(Exception ex)
         where TException : Exception
     {
