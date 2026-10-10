@@ -188,11 +188,7 @@ public sealed class XmlConstructorConvergenceTests
 
         var extractor = new XmlSingleStreamExtractor<PersonRecord>(source);
 
-        var results = new List<PersonRecord>();
-        await foreach (var item in extractor.ExtractAsync())
-        {
-            results.Add(item);
-        }
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Empty(results);
     }
