@@ -33,6 +33,15 @@ public sealed class XmlMultiStreamErrorPolicyTests
     }
 
 
+    [Fact]
+    public void ConditionalRecord_when_not_exploding_returns_ok_and_discards_set()
+    {
+        var record = new ConditionalRecord { Value = "ignored" };
+
+        Assert.Equal("ok", record.Value);
+    }
+
+
     // === Extractor: a stream that fails to deserialize ===
 
     [Fact]
