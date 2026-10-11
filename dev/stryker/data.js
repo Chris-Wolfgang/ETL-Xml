@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791100660394,
+  "lastUpdate": 1791699097625,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Stryker mutation score": [
@@ -185,6 +185,33 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/79a398b68d367bd966ceefd22e32998d0359c9c8"
         },
         "date": 1791100652244,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score",
+            "value": 71.51,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "2d2b609485c06dd33e33c4efce29c16a09f108f0",
+          "message": "build(deps): bump urllib3 from 2.7.0 to 2.8.0 in /.github/requirements (#409)\n\nBumps [urllib3](https://github.com/urllib3/urllib3) from 2.7.0 to 2.8.0.\n- [Release notes](https://github.com/urllib3/urllib3/releases)\n- [Changelog](https://github.com/urllib3/urllib3/blob/main/CHANGES.rst)\n- [Commits](https://github.com/urllib3/urllib3/compare/2.7.0...2.8.0)\n\n---\nupdated-dependencies:\n- dependency-name: urllib3\n  dependency-version: 2.8.0\n  dependency-type: indirect\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-10-11T01:29:26Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/2d2b609485c06dd33e33c4efce29c16a09f108f0"
+        },
+        "date": 1791699090759,
         "tool": "customBiggerIsBetter",
         "benches": [
           {
