@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790310155258,
+  "lastUpdate": 1791692646260,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -1750,6 +1750,76 @@ window.BENCHMARK_DATA = {
             "value": 2297897399,
             "unit": "ns",
             "range": "± 4821082.358899607"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "2d2b609485c06dd33e33c4efce29c16a09f108f0",
+          "message": "build(deps): bump urllib3 from 2.7.0 to 2.8.0 in /.github/requirements (#409)\n\nBumps [urllib3](https://github.com/urllib3/urllib3) from 2.7.0 to 2.8.0.\n- [Release notes](https://github.com/urllib3/urllib3/releases)\n- [Changelog](https://github.com/urllib3/urllib3/blob/main/CHANGES.rst)\n- [Commits](https://github.com/urllib3/urllib3/compare/2.7.0...2.8.0)\n\n---\nupdated-dependencies:\n- dependency-name: urllib3\n  dependency-version: 2.8.0\n  dependency-type: indirect\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-10-11T01:29:26Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/2d2b609485c06dd33e33c4efce29c16a09f108f0"
+        },
+        "date": 1791692642657,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1794046.9225260417,
+            "unit": "ns",
+            "range": "± 6267.984999237762"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 927509.6194661459,
+            "unit": "ns",
+            "range": "± 13316.30169461637"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 2859625.0078125,
+            "unit": "ns",
+            "range": "± 112061.4878307401"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 29113493.322916668,
+            "unit": "ns",
+            "range": "± 102796.91644641366"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 185507455.33333334,
+            "unit": "ns",
+            "range": "± 1810380.2602131225"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 90159190.66666667,
+            "unit": "ns",
+            "range": "± 2201251.854132912"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 313593823,
+            "unit": "ns",
+            "range": "± 2225525.384602701"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 2982576193,
+            "unit": "ns",
+            "range": "± 5847267.559544031"
           }
         ]
       }
