@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791692646260,
+  "lastUpdate": 1791779433904,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -1820,6 +1820,76 @@ window.BENCHMARK_DATA = {
             "value": 2982576193,
             "unit": "ns",
             "range": "± 5847267.559544031"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "c0ed207bad3cc2f6cacb566f4b6608ce00146d1c",
+          "message": "ci(semgrep): explain --no-deps without the removed PyJWT override (#450)\n\nThe install step's comment still described --no-deps as carrying an override\nof semgrep's PyJWT pin (and, in older copies, pointed at semgrep-overrides.txt).\nThe override is gone: semgrep 1.179.0+ declares pyjwt>=2.15.0, so the lock\nneeds none. The flag stays; the comment now gives the reason that still holds.\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-10-12T02:23:34Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/c0ed207bad3cc2f6cacb566f4b6608ce00146d1c"
+        },
+        "date": 1791779430742,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1795231.4990234375,
+            "unit": "ns",
+            "range": "± 8402.898154580458"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 867615.9547526041,
+            "unit": "ns",
+            "range": "± 17160.59081611018"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 2780293.421875,
+            "unit": "ns",
+            "range": "± 104440.6119485495"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 30007949.25,
+            "unit": "ns",
+            "range": "± 1040011.7577871716"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 185595214.77777776,
+            "unit": "ns",
+            "range": "± 188284.25107012078"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 87208392.83333333,
+            "unit": "ns",
+            "range": "± 722821.8975246138"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 272572275,
+            "unit": "ns",
+            "range": "± 2258369.2968004593"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 2902272531,
+            "unit": "ns",
+            "range": "± 3406278.330519542"
           }
         ]
       }
