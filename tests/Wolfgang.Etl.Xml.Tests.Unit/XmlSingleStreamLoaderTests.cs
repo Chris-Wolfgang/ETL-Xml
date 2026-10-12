@@ -93,16 +93,35 @@ public class XmlSingleStreamLoaderTests
         // Should be valid XML — parse it to verify
         var settings = new XmlReaderSettings { Async = true };
         using var xmlReader = XmlReader.Create(new StringReader(content), settings);
+
+        Assert.Equal("ArrayOfPersonRecord", await FirstElementNameAsync(xmlReader));
+    }
+
+
+
+    [Fact]
+    public async Task FirstElementNameAsync_when_input_has_no_element_returns_null()
+    {
+        var settings = new XmlReaderSettings { Async = true, ConformanceLevel = ConformanceLevel.Fragment };
+        using var xmlReader = XmlReader.Create(new StringReader("<!-- no element -->"), settings);
+
+        Assert.Null(await FirstElementNameAsync(xmlReader));
+    }
+
+
+
+    // Local name of the first element the reader reaches, or null when it reaches none.
+    private static async Task<string?> FirstElementNameAsync(XmlReader xmlReader)
+    {
         while (await xmlReader.ReadAsync())
         {
             if (xmlReader.NodeType == XmlNodeType.Element)
             {
-                Assert.Equal("ArrayOfPersonRecord", xmlReader.LocalName);
-                return;
+                return xmlReader.LocalName;
             }
         }
 
-        Assert.Fail("No element found in output XML.");
+        return null;
     }
 
 

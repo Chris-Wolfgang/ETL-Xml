@@ -30,9 +30,8 @@ public sealed class MetricProbe
 /// unique to this test class.
 /// </summary>
 // Serializer-shape probe: XmlSerializer only emits a property that has a public setter, and the
-// loader test serializes (never deserializes) it, so the setter can never execute; the getter's
-// non-throwing branch is likewise unreachable from the only test that uses it (Explode = true).
-[ExcludeFromCodeCoverage]
+// loader test serializes (never deserializes) it, so the loader test never runs the setter;
+// XmlMetricsTests.ExplodingMetricProbe_when_not_exploding_returns_ok_and_discards_set pins it.
 public sealed class ExplodingMetricProbe
 {
     public bool Explode { get; set; }
@@ -54,6 +53,15 @@ public sealed class ExplodingMetricProbe
 /// </summary>
 public sealed class XmlMetricsTests
 {
+    [Fact]
+    public void ExplodingMetricProbe_when_not_exploding_returns_ok_and_discards_set()
+    {
+        var probe = new ExplodingMetricProbe { Value = "ignored" };
+
+        Assert.Equal("ok", probe.Value);
+    }
+
+
     private const string ProbeType = nameof(MetricProbe);
 
 

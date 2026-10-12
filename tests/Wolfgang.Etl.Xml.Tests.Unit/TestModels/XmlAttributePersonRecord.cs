@@ -1,9 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit.TestModels;
 
-[ExcludeFromCodeCoverage]
 [XmlRoot("person")]
 public record XmlAttributePersonRecord
 {
