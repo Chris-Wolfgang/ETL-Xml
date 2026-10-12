@@ -53,6 +53,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Wolfgang.Etl.Xml.Tests.DocExamples/Wolfgang.Etl.Xml.Tests.DocExamples.csproj" />
+    <Project Path="tests/Wolfgang.Etl.Xml.Tests.SourceLink/Wolfgang.Etl.Xml.Tests.SourceLink.csproj" />
     <Project Path="tests/Wolfgang.Etl.Xml.Tests.Unit/Wolfgang.Etl.Xml.Tests.Unit.csproj" />
   </Folder>
   <Folder Name="/tools/">
