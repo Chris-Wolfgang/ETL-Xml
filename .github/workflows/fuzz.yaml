@@ -26,6 +26,9 @@ jobs:
     name: CsCheck fuzz (Category=Fuzz)
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write   # file an issue when the fuzz step falsifies a property
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,9 +41,48 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Run fuzz suite
+        id: fuzz
         env:
           # workflow_dispatch input when present, else the weekly default.
           CsCheck_Time: ${{ github.event.inputs.seconds || '300' }}
-        run: >-
-          dotnet test tests/Wolfgang.Etl.Xml.Tests.Unit/Wolfgang.Etl.Xml.Tests.Unit.csproj
-          -c Release -f net10.0 --filter "Category=Fuzz"
+        run: |
+          # pipefail so a failing dotnet test propagates through `| tee`.
+          set -o pipefail
+          dotnet test tests/Wolfgang.Etl.Xml.Tests.Unit/Wolfgang.Etl.Xml.Tests.Unit.csproj \
+            -c Release -f net10.0 --filter "Category=Fuzz" \
+            --logger "console;verbosity=detailed" 2>&1 | tee fuzz-output.txt
+
+      - name: Upload fuzz log
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: fuzz-output
+          path: fuzz-output.txt
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: File issue on failure
+        # Only when the fuzz step itself failed, so a runner/setup failure does
+        # not file a "property falsified" issue. A scheduled failure is
+        # otherwise invisible; this makes it land on the issue list.
+        if: failure() && steps.fuzz.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # CsCheck prints the shrunk counter-example and a replayable seed in
+          # the failure output; the issue carries the log tail so the seed can
+          # be pinned as a deterministic regression in the unit suite.
+          {
+            echo "The scheduled fuzz sweep falsified a property."
+            echo ""
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo ""
+            echo '```'
+            tail -c 4000 fuzz-output.txt || true
+            echo '```'
+          } > issue-body.txt
+          gh issue create \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Fuzz sweep falsified a property ($(date -u +%Y-%m-%d))" \
+            --label bug \
+            --body-file issue-body.txt
