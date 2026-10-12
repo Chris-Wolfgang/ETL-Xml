@@ -163,11 +163,7 @@ public sealed class XmlDiagnosticsMutationTests
 
         var extractor = new XmlSingleStreamExtractor<PersonRecord>(source);
 
-        var results = new List<PersonRecord>();
-        await foreach (var item in extractor.ExtractAsync())
-        {
-            results.Add(item);
-        }
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Empty(results);
     }
@@ -178,22 +174,18 @@ public sealed class XmlDiagnosticsMutationTests
     [Fact]
     public async Task MultiStreamLoader_dry_run_logs_stream_index_and_never_invokes_factory()
     {
-        var factoryCalls = 0;
+        var factory = new CountingStreamFactory();
         var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
         var loader = new XmlMultiStreamLoader<PersonRecord>
         (
-            _ =>
-            {
-                factoryCalls++;
-                return new MemoryStream();
-            },
+            factory.Create,
             new XmlMultiStreamLoaderOptions { IsDryRun = true },
             logger
         );
 
         await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
 
-        Assert.Equal(0, factoryCalls);
+        Assert.Equal(0, factory.CallCount);
         Assert.Equal(2, loader.CurrentItemCount);
         Assert.Contains(logger.Messages, m => m.Contains("Loaded item 1 to stream 0.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Loaded item 2 to stream 1.", StringComparison.Ordinal));
@@ -320,6 +312,15 @@ public sealed class XmlDiagnosticsMutationTests
             ms.Position = 0;
             yield return ms;
         }
+    }
+
+
+    [Fact]
+    public void CapturingLogger_BeginScope_returns_no_scope()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+
+        Assert.Null(logger.BeginScope("scope"));
     }
 
 
