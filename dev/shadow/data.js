@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791779433904,
+  "lastUpdate": 1792124474096,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -1890,6 +1890,76 @@ window.BENCHMARK_DATA = {
             "value": 2902272531,
             "unit": "ns",
             "range": "± 3406278.330519542"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "ae71df626c35f1eff8ae304912bafa104da5efe7",
+          "message": "build(deps): bump the github-actions group with 6 updates (#454)\n\nBumps the github-actions group with 6 updates:\n\n| Package | From | To |\n| --- | --- | --- |\n| [github/codeql-action/upload-sarif](https://github.com/github/codeql-action) | `4.38.2` | `4.38.3` |\n| [github/codeql-action/init](https://github.com/github/codeql-action) | `4.38.2` | `4.38.3` |\n| [github/codeql-action/analyze](https://github.com/github/codeql-action) | `4.38.2` | `4.38.3` |\n| [actions/upload-artifact](https://github.com/actions/upload-artifact) | `7.0.1` | `7.0.2` |\n| [actions/download-artifact](https://github.com/actions/download-artifact) | `8.0.1` | `8.0.2` |\n| [ossf/scorecard-action](https://github.com/ossf/scorecard-action) | `2.4.4` | `2.5.0` |\n\n\nUpdates `github/codeql-action/upload-sarif` from 4.38.2 to 4.38.3\n- [Release notes](https://github.com/github/codeql-action/releases)\n- [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/github/codeql-action/compare/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2...24c54180a607b1449ed407dd24f251e4e9147c8d)\n\nUpdates `github/codeql-action/init` from 4.38.2 to 4.38.3\n- [Release notes](https://github.com/github/codeql-action/releases)\n- [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/github/codeql-action/compare/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2...24c54180a607b1449ed407dd24f251e4e9147c8d)\n\nUpdates `github/codeql-action/analyze` from 4.38.2 to 4.38.3\n- [Release notes](https://github.com/github/codeql-action/releases)\n- [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/github/codeql-action/compare/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2...24c54180a607b1449ed407dd24f251e4e9147c8d)\n\nUpdates `actions/upload-artifact` from 7.0.1 to 7.0.2\n- [Release notes](https://github.com/actions/upload-artifact/releases)\n- [Commits](https://github.com/actions/upload-artifact/compare/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a...cf430e030ddbb5b0abf93d22962f4752f3646cd9)\n\nUpdates `actions/download-artifact` from 8.0.1 to 8.0.2\n- [Release notes](https://github.com/actions/download-artifact/releases)\n- [Commits](https://github.com/actions/download-artifact/compare/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c...9000827ccba6bdab643e8b6fd33ac0654aef8333)\n\nUpdates `ossf/scorecard-action` from 2.4.4 to 2.5.0\n- [Release notes](https://github.com/ossf/scorecard-action/releases)\n- [Changelog](https://github.com/ossf/scorecard-action/blob/main/RELEASE.md)\n- [Commits](https://github.com/ossf/scorecard-action/compare/2d1146689b8cda280b9bc96326124645441f03bc...fa7117db83c52d787ae5a89f350999701505d78e)\n\n---\nupdated-dependencies:\n- dependency-name: github/codeql-action/upload-sarif\n  dependency-version: 4.38.3\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: github-actions\n- dependency-name: github/codeql-action/init\n  dependency-version: 4.38.3\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: github-actions\n- dependency-name: github/codeql-action/analyze\n  dependency-version: 4.38.3\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: github-actions\n- dependency-name: actions/upload-artifact\n  dependency-version: 7.0.2\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: github-actions\n- dependency-name: actions/download-artifact\n  dependency-version: 8.0.2\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: github-actions\n- dependency-name: ossf/scorecard-action\n  dependency-version: 2.5.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: github-actions\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\nCo-authored-by: Chris Wolfgang <210299580+Chris-Wolfgang@users.noreply.github.com>",
+          "timestamp": "2026-10-15T18:04:58Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/ae71df626c35f1eff8ae304912bafa104da5efe7"
+        },
+        "date": 1792124471111,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1953446.3606770833,
+            "unit": "ns",
+            "range": "± 20438.271209159793"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 886254.6022135416,
+            "unit": "ns",
+            "range": "± 6185.838571973151"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 3075125.0677083335,
+            "unit": "ns",
+            "range": "± 434059.43185111944"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 28295552.354166668,
+            "unit": "ns",
+            "range": "± 84431.30807724179"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 183517460.66666666,
+            "unit": "ns",
+            "range": "± 846593.307088532"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 88054970.66666667,
+            "unit": "ns",
+            "range": "± 318122.03815255134"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 277115832.6666667,
+            "unit": "ns",
+            "range": "± 1777282.6860762283"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 2994269348,
+            "unit": "ns",
+            "range": "± 8575411.36561547"
           }
         ]
       }
