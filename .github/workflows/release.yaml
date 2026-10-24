@@ -11,7 +11,7 @@ permissions:
 env:
   # Same two gates as pr.yaml: production assemblies (anything under src/) and test assemblies
   # (anything under tests/). Keep both values in step with pr.yaml's env block.
-  CODECOV_MINIMUM: 90
+  CODECOV_MINIMUM: 95
   CODECOV_TEST_MINIMUM: 100
 
 concurrency:
