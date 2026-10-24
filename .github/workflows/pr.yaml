@@ -369,7 +369,19 @@ jobs:
           # SARIF level=error fails the job; warnings still upload (visible in
           # Security → Code scanning) but don't gate merge — raise to `error`
           # later when the noise floor is acceptable.
-          count=$(jq '[.runs[].results[] | select(.level=="error")] | length' inspect.sarif)
+          # A gate that cannot read its input must fail, not report "no findings".
+          if [ ! -s inspect.sarif ]; then
+            echo "::error::inspect.sarif is missing or empty - InspectCode produced no results to gate on"
+            exit 1
+          fi
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "::error::jq is not available - cannot read inspect.sarif"
+            exit 1
+          fi
+          if ! count=$(jq '[.runs[].results[] | select(.level=="error")] | length' inspect.sarif) || ! [[ "$count" =~ ^[0-9]+$ ]]; then
+            echo "::error::inspect.sarif could not be parsed - refusing to report no findings"
+            exit 1
+          fi
           if [ "$count" -gt 0 ]; then
             echo "::error::$count InspectCode error-severity finding(s) — see Security → Code scanning"
             exit 1
@@ -1005,6 +1017,12 @@ jobs:
           $testProjects | ForEach-Object { Write-Host $_.FullName -ForegroundColor White }
           Write-Host ""
 
+          # Ledger of test assemblies that ran a coverage-collecting TFM (net5.0+) on this stage, as
+          # Stage 1 keeps. The coverage steps below require a coverage file and a Summary.txt row for
+          # each one, so a project whose coverage is never collected fails instead of dropping out.
+          $ranLedger = Join-Path $env:RUNNER_TEMP 'stage2-ran-test-assemblies.txt'
+          Set-Content -Path $ranLedger -Value @() -NoNewline
+
           foreach ($testProj in $testProjects) {
             Write-Host "==========================================" -ForegroundColor Cyan
             Write-Host "Testing project: $($testProj.FullName)" -ForegroundColor Cyan
@@ -1133,6 +1151,13 @@ jobs:
                 exit 1
               }
             }
+
+            # Same assembly-name rule as the coverage gate below.
+            if (@($frameworks | Where-Object { $_ -match '^net([5-9]|[1-9][0-9]+)\.' }).Count -gt 0) {
+              $m = [regex]::Match((Get-Content $testProj.FullName -Raw), '<AssemblyName>([^<]+)</AssemblyName>')
+              $asm = if ($m.Success) { $m.Groups[1].Value.Trim() } else { $testProj.BaseName }
+              Add-Content -Path $ranLedger -Value $asm
+            }
             Write-Host ""
           }
 
@@ -1143,6 +1168,13 @@ jobs:
             echo "has-coverage=true" >> $env:GITHUB_OUTPUT
             Write-Host "✅ Coverage files found"
           } else {
+            $ranLedger = Join-Path $env:RUNNER_TEMP 'stage2-ran-test-assemblies.txt'
+            $ran = @(if (Test-Path $ranLedger) { Get-Content $ranLedger | Where-Object { $_ } })
+            if ($ran.Count -gt 0) {
+              Write-Host "❌ Tests ran but produced no coverage files - the coverage gate cannot be evaluated. Test assemblies that ran:"
+              $ran | Sort-Object -Unique | ForEach-Object { Write-Host "  $_" }
+              exit 1
+            }
             echo "has-coverage=false" >> $env:GITHUB_OUTPUT
             Write-Host "ℹ️  No coverage files found - skipping coverage report generation"
           }
@@ -1250,6 +1282,21 @@ jobs:
           if ($matchedCount -eq 0) {
             Write-Error "❌ Coverage parser matched 0 modules in Summary.txt — regex or report format is out of sync. Refusing to silently pass the gate."
             exit 1
+          }
+
+          # Every test assembly that ran a coverage TFM must appear as a top-level row; a missing
+          # row means its coverage was never collected, and an unmeasured assembly must not pass.
+          # Exact name match on the first column, so X.Tests is not satisfied by X.Tests.Unit.
+          $ranLedger = Join-Path $env:RUNNER_TEMP 'stage2-ran-test-assemblies.txt'
+          if (Test-Path $ranLedger) {
+            $rows = @(Get-Content "CoverageReport/Summary.txt" | Where-Object { $_ -match '^(\S+)' } | ForEach-Object { ($_ -split '\s+')[0] })
+            foreach ($asm in (Get-Content $ranLedger | Where-Object { $_ } | Sort-Object -Unique)) {
+              if ($rows -notcontains $asm) {
+                Write-Host "Checking test module: '$asm' - Coverage: none collected"
+                Write-Host "  ❌ FAIL: tests ran but no coverage was recorded (is coverlet.collector referenced?)" -ForegroundColor Red
+                $failedProjects += "$asm (no coverage data)"
+              }
+            }
           }
 
           if ($failedProjects.Count -gt 0) {
