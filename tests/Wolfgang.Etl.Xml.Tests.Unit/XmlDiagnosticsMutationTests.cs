@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+using Wolfgang.Etl.TestKit.Xunit;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
 using Xunit;
 
@@ -113,6 +114,127 @@ public sealed class XmlDiagnosticsMutationTests
         Assert.Contains(logger.Messages, m => m.Contains("Loaded item 1 to stream 0.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Loaded item 2 to stream 1.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Loaded: 2, skipped: 0, streams: 2.", StringComparison.Ordinal));
+    }
+
+
+    // ── Every logger-taking constructor forwards the logger (Stryker: `logger ?? NullLogger`
+    //    remove-left survivors on the settings, options and timer overloads) ──────────
+
+    [Fact]
+    public async Task MultiStreamExtractor_settings_constructor_forwards_the_logger()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>(SerializeEach(TwoPeople), new XmlReaderSettings(), logger);
+
+        await DrainAsync(extractor);
+
+        Assert.Contains(logger.Messages, m => m.Contains("Reading stream 0.", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_options_constructor_forwards_the_logger()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>(SerializeEach(TwoPeople), new XmlMultiStreamExtractorOptions(), logger);
+
+        await DrainAsync(extractor);
+
+        Assert.Contains(logger.Messages, m => m.Contains("Reading stream 0.", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_timer_constructor_forwards_the_logger()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>
+        (
+            SerializeEach(TwoPeople),
+            new XmlReaderSettings(),
+            new ManualProgressTimer(),
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        Assert.Contains(logger.Messages, m => m.Contains("Reading stream 0.", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_settings_constructor_forwards_the_logger()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>(_ => new MemoryStream(), new XmlWriterSettings(), logger);
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains(logger.Messages, m => m.Contains("Loaded item 1 to stream 0.", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_timer_constructor_forwards_the_logger()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ => new MemoryStream(),
+            new XmlWriterSettings(),
+            new ManualProgressTimer(),
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains(logger.Messages, m => m.Contains("Loaded item 1 to stream 0.", StringComparison.Ordinal));
+    }
+
+
+    // ── Exception messages (Stryker string-mutation survivors) ───────────────
+
+    [Fact]
+    public void SingleStreamLoader_when_RootElementName_is_whitespace_message_names_the_problem()
+    {
+        var ex = Assert.Throws<ArgumentException>
+        (
+            () => new XmlSingleStreamLoader<PersonRecord>(new MemoryStream(), new XmlSingleStreamLoaderOptions { RootElementName = " " })
+        );
+
+        Assert.StartsWith("Root element name cannot be empty or whitespace.", ex.Message, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public void SingleStreamLoader_when_RootElementName_is_not_an_NCName_message_quotes_the_name()
+    {
+        var ex = Assert.Throws<ArgumentException>
+        (
+            () => new XmlSingleStreamLoader<PersonRecord>(new MemoryStream(), new XmlSingleStreamLoaderOptions { RootElementName = "1bad" })
+        );
+
+        Assert.StartsWith("Root element name '1bad' is not a valid XML local name.", ex.Message, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_factory_returns_null_message_names_the_item_number()
+    {
+        var loader = new XmlMultiStreamLoader<PersonRecord>((Func<PersonRecord, Stream>)(_ => null!));
+
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>
+        (
+            () => loader.LoadAsync(TwoPeople.ToAsyncEnumerable())
+        );
+
+        Assert.Equal("Stream factory returned null for item number 1.", ex.Message);
     }
 
 
