@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Wolfgang.Etl.Xml;
 
 /// <summary>
-/// A write-only <see cref="Stream"/> adapter over an <see cref="IBufferWriter{T}"/> of bytes (#8).
+/// A write-only <see cref="Stream"/> adapter over an <see cref="IBufferWriter{T}"/> of bytes.
 /// The XML writer streams its serialized bytes straight into the caller's buffer writer (for
 /// example a <c>System.IO.Pipelines.PipeWriter</c> or an <c>ArrayBufferWriter&lt;byte&gt;</c>) with no
 /// intermediate <see cref="MemoryStream"/>. Reads and seeks are not supported; the underlying
