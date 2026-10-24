@@ -28,7 +28,7 @@
 .PARAMETER TestCoverageThreshold
     Minimum line coverage for TEST assemblies (anything under tests/).
     Defaults to 100 — test code that never executes has no purpose. Mirrors
-    CODECOV_TEST_MINIMUM in pr.yaml.
+    CODECOV_TEST_MINIMUM in pr.yaml (and release.yaml); keep the three in step.
 
 .EXAMPLE
     pwsh ./scripts/build-pr.ps1

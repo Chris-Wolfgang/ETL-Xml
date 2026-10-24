@@ -9,7 +9,10 @@ permissions:
   contents: read  # Default to read-only; individual jobs declare write where required
 
 env:
+  # Same two gates as pr.yaml: production assemblies (anything under src/) and test assemblies
+  # (anything under tests/). Keep both values in step with pr.yaml's env block.
   CODECOV_MINIMUM: 90
+  CODECOV_TEST_MINIMUM: 100
 
 concurrency:
   # Serialize releases so a duplicate / re-published Release event can't run two
@@ -278,7 +281,7 @@ jobs:
           $coverageFiles = Get-ChildItem -Path "TestResults" -Recurse -Filter "coverage.cobertura.xml" -ErrorAction SilentlyContinue
 
           if ($coverageFiles.Count -eq 0) {
-            Write-Error "❌ No coverage files found - coverage data is required to enforce the 90% threshold"
+            Write-Error "❌ No coverage files found - coverage data is required to enforce the coverage thresholds"
             exit 1
           }
 
@@ -295,26 +298,42 @@ jobs:
           Get-Content CoverageReport/Summary.txt
           Write-Host ""
 
-          # Parse coverage and enforce threshold per module (matching pr.yaml)
+          # Parse coverage and enforce the thresholds per module, exactly as pr.yaml's Stage 2 gate
+          # does: src assemblies at CODECOV_MINIMUM, test assemblies (identified by LOCATION under
+          # tests/, never by name) at CODECOV_TEST_MINIMUM, percent floored to a whole number.
           $summaryContent = Get-Content CoverageReport/Summary.txt
-          $threshold = if ($env:CODECOV_MINIMUM) { [int]$env:CODECOV_MINIMUM } else { 90 }
+          $threshold     = if ($env:CODECOV_MINIMUM) { [int]$env:CODECOV_MINIMUM } else { 90 }
+          $testThreshold = if ($env:CODECOV_TEST_MINIMUM) { [int]$env:CODECOV_TEST_MINIMUM } else { 100 }
           $failedModules = @()
           $coverageFound = $false
 
+          $testAssemblies = @()
+          if (Test-Path "tests") {
+            Get-ChildItem -Path "tests" -Recurse -File -Include *.csproj,*.vbproj,*.fsproj | ForEach-Object {
+              $m = [regex]::Match((Get-Content $_.FullName -Raw), '<AssemblyName>([^<]+)</AssemblyName>')
+              $testAssemblies += $(if ($m.Success) { $m.Groups[1].Value.Trim() } else { $_.BaseName })
+            }
+          }
+          Write-Host "Test assemblies (gated at ${testThreshold}%): $($testAssemblies -join ', ')"
+
           foreach ($line in $summaryContent) {
-            # Match lines with module names and percentages (skip Summary line)
-            if ($line -match '^([^ ]+)\s+.*\s+(\d+(?:\.\d+)?)%$' -and $line -notmatch '^Summary') {
+            # Top-level assembly rows only (`^(\S+)` skips the indented class rows), and `\s` before
+            # the final percent so a greedy `.*` cannot swallow its leading digits ("100" -> "0").
+            if ($line -match '^(\S+).*\s(\d+(?:\.\d+)?)%\s*$' -and $line -notmatch '^Summary') {
               $coverageFound = $true
-              $module = $matches[1]
-              $coverage = [decimal]$matches[2]
+              $module   = $Matches[1]
+              $coverage = [int][math]::Floor([double]$Matches[2])
+              $isTest   = $testAssemblies -contains $module
+              $applies  = if ($isTest) { $testThreshold } else { $threshold }
+              $kind     = if ($isTest) { "test" } else { "src" }
 
-              Write-Host "Checking module: '$module' - Coverage: ${coverage}%" -ForegroundColor Cyan
+              Write-Host "Checking $kind module: '$module' - Coverage: ${coverage}%" -ForegroundColor Cyan
 
-              if ($coverage -lt $threshold) {
-                Write-Host "  ❌ FAIL: Below ${threshold}% threshold" -ForegroundColor Red
-                $failedModules += "$module (${coverage}%)"
+              if ($coverage -lt $applies) {
+                Write-Host "  ❌ FAIL: Below ${applies}% threshold" -ForegroundColor Red
+                $failedModules += "$module (${coverage}%, needs ${applies}%)"
               } else {
-                Write-Host "  ✅ PASS: Meets ${threshold}% threshold" -ForegroundColor Green
+                Write-Host "  ✅ PASS: Meets ${applies}% threshold" -ForegroundColor Green
               }
             }
           }
@@ -330,13 +349,13 @@ jobs:
             Write-Host "==========================================" -ForegroundColor Red
             Write-Host "❌ COVERAGE GATE FAILED" -ForegroundColor Red
             Write-Host "==========================================" -ForegroundColor Red
-            Write-Host "Modules below ${threshold}% coverage: $($failedModules -join ', ')" -ForegroundColor Red
+            Write-Host "Modules below their coverage threshold: $($failedModules -join ', ')" -ForegroundColor Red
             exit 1
           }
 
           Write-Host ""
           Write-Host "==========================================" -ForegroundColor Green
-          Write-Host "✅ All modules meet ${threshold}% coverage threshold" -ForegroundColor Green
+          Write-Host "✅ All modules meet their coverage threshold (src ${threshold}%, tests ${testThreshold}%)" -ForegroundColor Green
           Write-Host "==========================================" -ForegroundColor Green
 
       - name: Upload coverage report
