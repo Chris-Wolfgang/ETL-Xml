@@ -182,6 +182,32 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
+    public async Task MultiStreamExtractor_error_policy_emits_items_errored_counter_tagged_multistream()
+    {
+        var streams = new Stream[]
+        {
+            SerializeProbe(Sample[0]),
+            new MemoryStream(System.Text.Encoding.UTF8.GetBytes("<NotAMetricProbe><garbage/></NotAMetricProbe>")),
+        };
+
+        var measurements = await CollectAsync(async () =>
+        {
+            var extractor = new XmlMultiStreamExtractor<MetricProbe>(streams)
+            {
+                ErrorPolicy = ItemErrorPolicy.Skip,
+            };
+            await foreach (var _ in extractor.ExtractAsync())
+            {
+            }
+        });
+
+        var errored = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.errored")).ToList();
+        Assert.Equal(1, errored.Sum(m => m.Value));
+        Assert.All(errored, m => AssertTags(m, "extract", "XmlMultiStream"));
+    }
+
+
+    [Fact]
     public async Task MultiStreamLoader_emits_items_loaded_counter_and_duration_tagged_multistream()
     {
         var measurements = await CollectAsync(async () =>
