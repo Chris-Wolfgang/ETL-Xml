@@ -143,7 +143,12 @@ static async Task XsdValidationAsync(ILoggerFactory loggerFactory)
 
     // Valid source — validates cleanly and yields the records.
     using var validStream = CreateSampleXmlStream();
-    var validExtractor = new XmlSingleStreamExtractor<Person>(validStream, ValidatingSettings(), logger);
+    var validExtractor = new XmlSingleStreamExtractor<Person>
+    (
+        validStream,
+        new XmlSingleStreamExtractorOptions { ReaderSettings = ValidatingSettings() },
+        logger
+    );
     var validated = 0;
     await foreach (var _ in validExtractor.ExtractAsync().ConfigureAwait(false))
     {
@@ -157,7 +162,12 @@ static async Task XsdValidationAsync(ILoggerFactory loggerFactory)
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
         + "<ArrayOfPerson><Person><FirstName>Dave</FirstName><Age>middle-aged</Age></Person></ArrayOfPerson>";
     using var invalidStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(invalidXml));
-    var invalidExtractor = new XmlSingleStreamExtractor<Person>(invalidStream, ValidatingSettings(), logger);
+    var invalidExtractor = new XmlSingleStreamExtractor<Person>
+    (
+        invalidStream,
+        new XmlSingleStreamExtractorOptions { ReaderSettings = ValidatingSettings() },
+        logger
+    );
 
     try
     {
@@ -389,7 +399,7 @@ static async Task SingleStreamExtractPipelineAsync()
 // Demonstrates loading to XML with a custom root element name.
 // By default the root element is ArrayOf{TypeName}; this shows
 // how to override that with a domain-meaningful name.
-// Also demonstrates leaveOpen: false so the stream is closed
+// Also demonstrates LeaveOpen = false so the stream is closed
 // automatically when loading completes.
 static async Task SingleStreamLoadWithCustomRootAsync()
 {
@@ -405,7 +415,7 @@ static async Task SingleStreamLoadWithCustomRootAsync()
     var extractor = new TestExtractor<Person>(people);
     var transformer = new TestTransformer<Person>();
 
-    // leaveOpen: false — the MemoryStream is closed automatically after LoadAsync returns.
+    // LeaveOpen = false — the MemoryStream is closed automatically after LoadAsync returns.
     var outputStream = new MemoryStream();
     var loader = new XmlSingleStreamLoader<Person>
     (
@@ -423,7 +433,7 @@ static async Task SingleStreamLoadWithCustomRootAsync()
     Console.WriteLine();
 
     // MemoryStream.ToArray() returns the buffer regardless of disposal state.
-    // For non-MemoryStream targets, read before disposing or use leaveOpen: true.
+    // For non-MemoryStream targets, read before disposing or use LeaveOpen = true.
     var content = System.Text.Encoding.UTF8.GetString(outputStream.ToArray());
     Console.WriteLine(content);
 }
@@ -453,7 +463,7 @@ static async Task SingleStreamLoadPipelineAsync(ILoggerFactory loggerFactory)
     var loader = new XmlSingleStreamLoader<Person>
     (
         outputStream,
-        new XmlWriterSettings { Indent = true },
+        new XmlSingleStreamLoaderOptions { WriterSettings = new XmlWriterSettings { Indent = true } },
         loggerFactory.CreateLogger<XmlSingleStreamLoader<Person>>()
     );
 
@@ -539,7 +549,7 @@ static async Task MultiStreamLoadPipelineAsync(ILoggerFactory loggerFactory)
             buffers[key] = ms;
             return ms;
         },
-        new XmlWriterSettings { Indent = true },
+        new XmlMultiStreamLoaderOptions { WriterSettings = new XmlWriterSettings { Indent = true } },
         loggerFactory.CreateLogger<XmlMultiStreamLoader<Person>>()
     );
 

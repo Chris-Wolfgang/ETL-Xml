@@ -18,7 +18,12 @@ This library implements the Extract-Transform-Load (ETL) pattern for XML data. I
 - **Skip and maximum** — `SkipItemCount` and `MaximumItemCount` properties for paging through large XML sources.
 - **Custom XML settings** — Accepts `XmlReaderSettings` and `XmlWriterSettings` for full control over XML behavior.
 - **Structured logging** — High-performance `LoggerMessage`-based logging with categorized event IDs.
-- **Multi-TFM support** — Targets .NET Framework 4.6.2+, .NET Standard 2.0, .NET 8.0, and .NET 10.0.
+- **`EtlPipeline` factories** — Fluent source and sink extension methods (`XmlSingleStreamExtractor<T>`, `XmlSingleStreamLoader<T>` and the multi-stream pair) that plug straight into an `EtlPipeline` chain.
+- **Error policies and dead-lettering** — The multi-stream extractor and loader honour `ErrorPolicy` to skip or dead-letter a failed stream or record and keep going.
+- **Metrics** — `System.Diagnostics.Metrics` counters and an operation-duration histogram on the `Wolfgang.Etl.Xml` meter.
+- **Dry run** — `IsDryRun` on the loader options enumerates and counts without writing.
+- **`IBufferWriter<byte>` destinations** — Both loaders can write to a buffer writer instead of a `Stream`.
+- **Multi-TFM support** — Targets .NET Framework 4.6.2 and 4.8.1, .NET Standard 2.0, and .NET 5.0, 6.0, 7.0, 8.0 and 10.0.
 
 ## Getting Help
 

@@ -4,7 +4,7 @@ This guide will help you quickly get up and running with Wolfgang.Etl.Xml.
 
 ## Prerequisites
 
-- .NET 8.0 SDK or later (also supports .NET Framework 4.6.2+ and .NET Standard 2.0)
+- .NET 10.0 SDK to build the repository. The package itself runs on .NET Framework 4.6.2+, .NET Standard 2.0 and .NET 5.0+.
 - (Optional) A logging provider (e.g. `Microsoft.Extensions.Logging`)
 
 ## Installation
@@ -32,7 +32,8 @@ using Wolfgang.Etl.TestKit;
 using Wolfgang.Etl.Xml;
 
 // XmlSingleStreamExtractor reads items from a single XML document
-// ILogger is optional — omit for no logging, or pass settings + logger for full control
+// ILogger is optional. For full control pass an XmlSingleStreamExtractorOptions record
+// (ReaderSettings, LeaveOpen, SkipItemCount, ...) and a logger: new(stream, options, logger)
 var extractor = new XmlSingleStreamExtractor<Person>(xmlStream);
 
 // Use TestKit placeholders for the rest of the pipeline
