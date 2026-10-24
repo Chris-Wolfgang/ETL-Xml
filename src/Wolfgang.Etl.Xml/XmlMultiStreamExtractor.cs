@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
@@ -256,7 +257,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// a failed stream — each stream is one independent record, so Skip genuinely skips and
     /// continues. Rethrows the original exception when the policy aborts.
     /// </summary>
-    private async System.Threading.Tasks.Task<TRecord?> DeserializeStreamOrHandleErrorAsync(Stream stream, int oneBasedStreamNumber)
+    private async Task<TRecord?> DeserializeStreamOrHandleErrorAsync(Stream stream, int oneBasedStreamNumber)
     {
         TRecord? item = default;
         Exception? error = null;
