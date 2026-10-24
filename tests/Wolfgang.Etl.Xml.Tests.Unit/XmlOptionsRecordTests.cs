@@ -185,7 +185,7 @@ public class XmlOptionsRecordTests
     [Fact]
     public void ChainContains_when_no_exception_in_the_chain_matches_returns_false()
     {
-        var ex = new InvalidOperationException("outer", new ArgumentException("inner"));
+        var ex = new InvalidOperationException("outer", new FormatException("inner"));
 
         Assert.False(ChainContains<XmlException>(ex));
     }
