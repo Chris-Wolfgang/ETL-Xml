@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Wolfgang.Etl.TestKit.Xunit;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
+using Xunit;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit;
 
@@ -38,7 +40,7 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
     }
 
 
-    [Xunit.Fact]
+    [Fact]
     public async Task DryRun_with_LeaveOpen_false_still_closes_the_destination_stream()
     {
         var stream = new MemoryStream();
@@ -51,7 +53,7 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
         await loader.LoadAsync(Sample.ToAsyncEnumerable());
 
         // Nothing was written, but LeaveOpen = false must still close the stream on completion.
-        Xunit.Assert.Throws<System.ObjectDisposedException>(() => stream.Position);
+        Assert.Throws<ObjectDisposedException>(() => stream.Position);
     }
 }
 
