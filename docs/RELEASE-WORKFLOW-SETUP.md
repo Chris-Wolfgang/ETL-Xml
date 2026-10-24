@@ -7,7 +7,7 @@ This guide explains how to configure a repository to use the standard `release.y
 The release workflow triggers when you **publish a GitHub Release** and implements a comprehensive validation and automatic deployment process that:
 - ✅ Checks the release tag matches a `<Version>` (or `<PackageVersion>`) declared in `src/`
 - ✅ Tests all target frameworks per test project on Windows
-- ✅ Enforces the coverage gate: 90 % line coverage per assembly (`CODECOV_MINIMUM` in `release.yaml`; the PR gate in `pr.yaml` also holds test assemblies to `CODECOV_TEST_MINIMUM`)
+- ✅ Enforces the coverage gate: 95 % line coverage for `src/` assemblies (`CODECOV_MINIMUM`) and 100 % for `tests/` assemblies (`CODECOV_TEST_MINIMUM`), the same values in `release.yaml` and `pr.yaml`
 - ✅ Validates NuGet package integrity with smoke tests and generates a CycloneDX SBOM
 - ✅ Builds the DocFX documentation before publishing, so a docs failure blocks the package
 - ✅ Records a SLSA build-provenance attestation for every package (`gh attestation verify`)
@@ -83,7 +83,7 @@ Ensure the following settings are enabled:
 1. **validate-release** (3-10 minutes, Windows)
    - Checks the tag against the `<Version>` / `<PackageVersion>` values found in `src/`
    - Runs every target framework of every test project with coverage
-   - Enforces the coverage gate (90 % line coverage per assembly (`CODECOV_MINIMUM` in `release.yaml`; the PR gate in `pr.yaml` also holds test assemblies to `CODECOV_TEST_MINIMUM`)) and uploads the report
+   - Enforces the coverage gate (95 % line coverage for `src/` assemblies (`CODECOV_MINIMUM`) and 100 % for `tests/` assemblies (`CODECOV_TEST_MINIMUM`), the same values in `release.yaml` and `pr.yaml`) and uploads the report
 
 2. **pack-and-validate** (2-5 minutes, Windows)
    - Generates `THIRD-PARTY-NOTICES.md` per src project (`scripts/third-party-notices.ps1`: the package's transitive NuGet closure, build-time-only packages omitted) into `obj/`, which `Directory.Build.props` packs into the package root
@@ -150,7 +150,7 @@ Ensure the following settings are enabled:
 **Problem:** The workflow fails at "Verify coverage threshold".
 
 **Solution:**
-1. Review the `CoverageReport/Summary.txt` artifact — the gate is per assembly: 90 % line coverage per assembly (`CODECOV_MINIMUM` in `release.yaml`; the PR gate in `pr.yaml` also holds test assemblies to `CODECOV_TEST_MINIMUM`)
+1. Review the `CoverageReport/Summary.txt` artifact — the gate is per assembly: 95 % line coverage for `src/` assemblies (`CODECOV_MINIMUM`) and 100 % for `tests/` assemblies (`CODECOV_TEST_MINIMUM`), the same values in `release.yaml` and `pr.yaml`
 2. Add tests for the uncovered paths, or delete unreachable test helpers
 3. Ensure tests actually run on every framework — a framework with zero tests fails on its own
 4. Push the fix, then re-publish the release (or re-run the workflow from the Actions tab)
@@ -201,7 +201,7 @@ Before publishing a production GitHub Release (for example `v1.0.0`):
 │  • Tag == a <Version> / <PackageVersion> under src/           │
 │  • Restore & Build (Release)                                 │
 │  • Test every TFM of every test project, with coverage       │
-│  • Coverage gate: 90 % per assembly                          │
+│  • Coverage gates: 95 % src, 100 % tests                     │
 └──────────────────────────────────────────────────────────────┘
                             │
                             ▼ (only if tests pass)
