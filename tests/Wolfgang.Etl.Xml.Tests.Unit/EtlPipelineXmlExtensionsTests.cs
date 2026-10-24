@@ -94,7 +94,7 @@ public sealed class EtlPipelineXmlExtensionsTests
             (
                 () => EtlPipeline
                     .Create()
-                    .From(ToAsync(new List<PersonRecord>()))
+                    .From(new List<PersonRecord>().ToAsyncEnumerable())
                     .XmlSingleStreamLoader(outPath, options)
             );
 
@@ -328,7 +328,7 @@ public sealed class EtlPipelineXmlExtensionsTests
     {
         var stream = new MemoryStream();
         var loader = new XmlSingleStreamLoader<PersonRecord>(stream);
-        await loader.LoadAsync(ToAsync(people));
+        await loader.LoadAsync(people.ToAsyncEnumerable());
         stream.Position = 0;
         return stream;
     }
@@ -355,18 +355,6 @@ public sealed class EtlPipelineXmlExtensionsTests
         }
 
         return results;
-    }
-
-
-
-    private static async IAsyncEnumerable<T> ToAsync<T>(IEnumerable<T> items)
-    {
-        foreach (var item in items)
-        {
-            yield return item;
-        }
-
-        await Task.CompletedTask;
     }
 
 

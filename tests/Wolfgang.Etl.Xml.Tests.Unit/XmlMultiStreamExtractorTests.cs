@@ -132,17 +132,19 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
-    public void Constructor_Streams_Logger_when_logger_is_null_uses_NullLogger()
+    public async Task Constructor_Streams_Logger_when_logger_is_null_uses_NullLogger()
     {
         // logger is now an optional trailing parameter: null means "no logging"
         // (NullLogger.Instance) rather than an argument error.
         var sut = new XmlMultiStreamExtractor<PersonRecord>
         (
-            Array.Empty<Stream>(),
+            CreateXmlStreams(1),
             logger: null
         );
 
-        Assert.NotNull(sut);
+        var extracted = await sut.ExtractAsync().ToListAsync();
+
+        Assert.Single(extracted);
     }
 
 
@@ -180,18 +182,20 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
-    public void Constructor_with_settings_when_logger_is_null_uses_NullLogger()
+    public async Task Constructor_with_settings_when_logger_is_null_uses_NullLogger()
     {
         // logger is now an optional trailing parameter: null means "no logging"
         // (NullLogger.Instance) rather than an argument error.
         var sut = new XmlMultiStreamExtractor<PersonRecord>
         (
-            Array.Empty<Stream>(),
+            CreateXmlStreams(1),
             new XmlReaderSettings(),
             logger: null
         );
 
-        Assert.NotNull(sut);
+        var extracted = await sut.ExtractAsync().ToListAsync();
+
+        Assert.Single(extracted);
     }
 
 
@@ -241,12 +245,15 @@ public class XmlMultiStreamExtractorTests
             logger: null
         );
 
-        await foreach (var item in sut.ExtractAsync())
+        var extracted = 0;
+        await foreach (var _ in sut.ExtractAsync())
         {
-            _ = item;
+            extracted++;
         }
 
-        Assert.NotNull(sut);
+        // A full run with the NullLogger fallback extracts the item and counts it.
+        Assert.Equal(1, extracted);
+        Assert.Equal(1, sut.CurrentItemCount);
     }
 
 

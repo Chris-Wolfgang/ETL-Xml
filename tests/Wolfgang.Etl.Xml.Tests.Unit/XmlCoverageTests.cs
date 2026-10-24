@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,7 +74,7 @@ public sealed class XmlCoverageTests
             NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
         );
 
-        await loader.LoadAsync(ToAsync(Sample));
+        await loader.LoadAsync(Sample.ToAsyncEnumerable());
 
         Assert.Equal(1, loader.CurrentItemCount);
     }
@@ -90,7 +91,7 @@ public sealed class XmlCoverageTests
             NullLogger<XmlMultiStreamLoader<PersonRecord>>.Instance
         );
 
-        await loader.LoadAsync(ToAsync(Sample));
+        await loader.LoadAsync(Sample.ToAsyncEnumerable());
 
         Assert.Equal(1, loader.CurrentItemCount);
         var xml = Encoding.UTF8.GetString(Assert.Single(buffers).ToArray());
@@ -111,7 +112,7 @@ public sealed class XmlCoverageTests
             NullLogger<XmlSingleStreamLoader<PersonRecord>>.Instance
         );
 
-        await loader.LoadAsync(ToAsync(Sample));
+        await loader.LoadAsync(Sample.ToAsyncEnumerable());
 
         Assert.Equal(1, loader.CurrentItemCount);
     }
@@ -163,16 +164,5 @@ public sealed class XmlCoverageTests
         }
 
         return count;
-    }
-
-
-    private static async IAsyncEnumerable<PersonRecord> ToAsync(IEnumerable<PersonRecord> items)
-    {
-        foreach (var item in items)
-        {
-            yield return item;
-        }
-
-        await Task.CompletedTask.ConfigureAwait(false);
     }
 }

@@ -432,9 +432,10 @@ public class XmlSingleStreamLoaderTests
             logger: null
         );
 
-        await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
+        await sut.LoadAsync(SourceItems.ToAsyncEnumerable());
 
-        Assert.NotNull(sut);
+        // A full run with the NullLogger fallback loads and counts every item.
+        Assert.Equal(SourceItems.Count, sut.CurrentItemCount);
     }
 
 
