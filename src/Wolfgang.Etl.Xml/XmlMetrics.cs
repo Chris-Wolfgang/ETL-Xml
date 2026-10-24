@@ -6,7 +6,7 @@ using System.Diagnostics.Metrics;
 namespace Wolfgang.Etl.Xml;
 
 /// <summary>
-/// The <see cref="Meter"/> and instruments the XML extractors and loaders emit to (#12).
+/// The <see cref="Meter"/> and instruments the XML extractors and loaders emit to.
 /// Subscribe with a <c>System.Diagnostics.Metrics.MeterListener</c> or OpenTelemetry using the
 /// meter name <see cref="MeterName"/> (<c>Wolfgang.Etl.Xml</c>). Every instrument is a no-op —
 /// zero measurable overhead — when no listener is registered, so instrumentation is always on and
