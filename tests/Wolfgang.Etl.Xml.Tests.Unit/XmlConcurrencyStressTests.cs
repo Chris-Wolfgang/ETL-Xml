@@ -128,19 +128,8 @@ public class XmlConcurrencyStressTests
             new XmlSingleStreamLoaderOptions { LeaveOpen = true }
         );
 
-        await loader.LoadAsync(ToAsync(people)).ConfigureAwait(false);
+        await loader.LoadAsync(people.ToAsyncEnumerable()).ConfigureAwait(false);
 
         return stream.ToArray();
-    }
-
-
-    private static async IAsyncEnumerable<PersonRecord> ToAsync(IEnumerable<PersonRecord> items)
-    {
-        foreach (var item in items)
-        {
-            yield return item;
-        }
-
-        await Task.CompletedTask.ConfigureAwait(false);
     }
 }

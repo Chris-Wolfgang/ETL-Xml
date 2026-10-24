@@ -282,12 +282,15 @@ public class XmlSingleStreamExtractorTests
             logger: null
         );
 
-        await foreach (var item in sut.ExtractAsync())
+        var extracted = 0;
+        await foreach (var _ in sut.ExtractAsync())
         {
-            _ = item;
+            extracted++;
         }
 
-        Assert.NotNull(sut);
+        // A full run with the NullLogger fallback extracts the item and counts it.
+        Assert.Equal(1, extracted);
+        Assert.Equal(1, sut.CurrentItemCount);
     }
 
 

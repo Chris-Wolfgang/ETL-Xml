@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
@@ -129,19 +130,8 @@ public sealed class XmlSingleStreamExtractorXsdValidationTests
             new XmlSingleStreamLoaderOptions { LeaveOpen = true }
         );
 
-        await loader.LoadAsync(ToAsync(records)).ConfigureAwait(false);
+        await loader.LoadAsync(records.ToAsyncEnumerable()).ConfigureAwait(false);
 
         return stream.ToArray();
-    }
-
-
-    private static async IAsyncEnumerable<PersonRecord> ToAsync(IEnumerable<PersonRecord> items)
-    {
-        foreach (var item in items)
-        {
-            yield return item;
-        }
-
-        await Task.CompletedTask.ConfigureAwait(false);
     }
 }
