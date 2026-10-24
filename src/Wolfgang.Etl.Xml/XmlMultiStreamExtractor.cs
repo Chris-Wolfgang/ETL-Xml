@@ -213,6 +213,15 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
         foreach (var stream in _streams)
         {
             token.ThrowIfCancellationRequested();
+
+            // Stop BEFORE opening the next stream once the maximum is reached (and nothing is left
+            // to skip): reading it first would consume, dispose and discard one stream past the limit.
+            if (skipBudget == 0 && CurrentItemCount >= MaximumItemCount)
+            {
+                XmlLogMessages.ReachedMaximumItemCount(_logger, MaximumItemCount, null);
+                break;
+            }
+
             XmlLogMessages.ReadingStream(_logger, streamIndex, null);
 
             streamIndex++;
@@ -231,12 +240,6 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
                 XmlMetrics.RecordSkipped(MetricTags);
                 XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
                 continue;
-            }
-
-            if (CurrentItemCount >= MaximumItemCount)
-            {
-                XmlLogMessages.ReachedMaximumItemCount(_logger, MaximumItemCount, null);
-                break;
             }
 
             IncrementCurrentItemCount();
