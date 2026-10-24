@@ -94,6 +94,36 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
+    public async Task ExtractAsync_when_MaximumItemCount_stops_early_leaves_unreached_streams_open()
+    {
+        var streams = ExpectedItems.Take(3).Select(item =>
+        {
+            var stream = new MemoryStream();
+            Serializer.Serialize(stream, item);
+            stream.Position = 0;
+            return stream;
+        }).ToList();
+
+        var sut = new XmlMultiStreamExtractor<PersonRecord>(streams, new XmlMultiStreamExtractorOptions { MaximumItemCount = 1 });
+
+        var results = new List<PersonRecord>();
+        await foreach (var item in sut.ExtractAsync())
+        {
+            results.Add(item);
+        }
+
+        Assert.Single(results);
+
+        // The stream that was read is disposed; the ones the enumeration never reached stay
+        // caller-owned and open, as the class remarks document.
+        Assert.Throws<ObjectDisposedException>(() => streams[0].ReadByte());
+        Assert.True(streams[1].CanRead);
+        Assert.True(streams[2].CanRead);
+    }
+
+
+
+    [Fact]
     public async Task ExtractAsync_when_XmlElement_attributes_maps_correctly()
     {
         var serializer = new XmlSerializer(typeof(XmlAttributePersonRecord));
