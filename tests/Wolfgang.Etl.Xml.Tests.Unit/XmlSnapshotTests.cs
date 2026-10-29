@@ -42,7 +42,7 @@ public class XmlSnapshotTests
 
 
     [Fact]
-    public async Task Default_root_element_wraps_records()
+    public async Task LoadAsync_when_RootElementName_is_default_wraps_records_in_ArrayOf_root()
     {
         var xml = await LoadSingleStreamAsync(People, options: null);
 
@@ -51,7 +51,7 @@ public class XmlSnapshotTests
 
 
     [Fact]
-    public async Task Custom_root_element_name()
+    public async Task LoadAsync_when_RootElementName_is_set_wraps_records_in_that_root()
     {
         var options = new XmlSingleStreamLoaderOptions { RootElementName = "People", LeaveOpen = true };
 
@@ -62,7 +62,7 @@ public class XmlSnapshotTests
 
 
     [Fact]
-    public async Task Empty_sequence_writes_empty_root()
+    public async Task LoadAsync_when_source_is_empty_writes_an_empty_root()
     {
         var xml = await LoadSingleStreamAsync(Array.Empty<PersonRecord>(), options: null);
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Wolfgang.Etl.ErrorPolicies;
 using Xunit;
+using static Wolfgang.Etl.Xml.Tests.Unit.TestModels.XmlTestData;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit;
 
@@ -76,7 +77,7 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
-    public async Task SingleStreamExtractor_emits_items_extracted_counter_and_duration_with_tags()
+    public async Task SingleStreamExtractor_when_items_are_extracted_emits_items_extracted_counter_and_duration_with_tags()
     {
         using var source = await BuildXmlAsync(Sample);
 
@@ -99,7 +100,7 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
-    public async Task SingleStreamLoader_emits_items_loaded_counter_and_duration_with_tags()
+    public async Task SingleStreamLoader_when_items_are_loaded_emits_items_loaded_counter_and_duration_with_tags()
     {
         var measurements = await CollectAsync(async () =>
         {
@@ -122,7 +123,7 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
-    public async Task Loader_emits_items_skipped_counter_for_the_skip_budget()
+    public async Task SingleStreamLoader_when_SkipItemCount_is_set_emits_items_skipped_counter()
     {
         var measurements = await CollectAsync(async () =>
         {
@@ -140,7 +141,7 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
-    public async Task SingleStreamExtractor_emits_items_skipped_counter_tagged_extract()
+    public async Task SingleStreamExtractor_when_SkipItemCount_is_set_emits_items_skipped_counter_tagged_extract()
     {
         using var source = await BuildXmlAsync(Sample);
 
@@ -159,7 +160,7 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
-    public async Task MultiStreamExtractor_emits_items_extracted_counter_and_duration_tagged_multistream()
+    public async Task MultiStreamExtractor_when_items_are_extracted_emits_items_extracted_counter_and_duration_tagged_multistream()
     {
         var streams = Sample.Select(SerializeProbe).ToArray();
 
@@ -182,7 +183,7 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
-    public async Task MultiStreamExtractor_error_policy_emits_items_errored_counter_tagged_multistream()
+    public async Task MultiStreamExtractor_when_ErrorPolicy_is_Skip_emits_items_errored_counter_tagged_multistream()
     {
         var streams = new Stream[]
         {
@@ -208,7 +209,7 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
-    public async Task MultiStreamLoader_emits_items_loaded_counter_and_duration_tagged_multistream()
+    public async Task MultiStreamLoader_when_items_are_loaded_emits_items_loaded_counter_and_duration_tagged_multistream()
     {
         var measurements = await CollectAsync(async () =>
         {
@@ -226,7 +227,7 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
-    public async Task MultiStreamLoader_error_policy_emits_items_errored_counter_tagged_multistream()
+    public async Task MultiStreamLoader_when_ErrorPolicy_is_Skip_emits_items_errored_counter_tagged_multistream()
     {
         var measurements = await CollectAsync(
             async () =>
@@ -319,20 +320,6 @@ public sealed class XmlMetricsTests
         var serializer = new System.Xml.Serialization.XmlSerializer(typeof(MetricProbe));
         var ms = new MemoryStream();
         serializer.Serialize(ms, item);
-        ms.Position = 0;
-        return ms;
-    }
-
-
-    private static async Task<MemoryStream> BuildXmlAsync(MetricProbe[] items)
-    {
-        var ms = new MemoryStream();
-        var loader = new XmlSingleStreamLoader<MetricProbe>
-        (
-            ms,
-            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
-        );
-        await loader.LoadAsync(items.ToAsyncEnumerable()).ConfigureAwait(false);
         ms.Position = 0;
         return ms;
     }
