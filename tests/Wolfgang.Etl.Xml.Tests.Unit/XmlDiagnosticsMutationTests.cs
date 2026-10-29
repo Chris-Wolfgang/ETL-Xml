@@ -84,6 +84,8 @@ public sealed class XmlDiagnosticsMutationTests
 
         await DrainAsync(extractor);
 
+        Assert.Contains(logger.Messages, m => m.Contains("Starting XML multi-stream extraction of PersonRecord.", StringComparison.Ordinal));
+
         Assert.Contains(logger.Messages, m => m.Contains("Reading stream 0.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Reading stream 1.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Extracted item 1 from stream 0.", StringComparison.Ordinal));
@@ -320,6 +322,73 @@ public sealed class XmlDiagnosticsMutationTests
     }
 
 
+
+    [Fact]
+    public async Task SingleStreamExtractor_when_a_child_deserializes_to_null_logs_the_skip()
+    {
+        const string xml =
+            "<ArrayOfPersonRecord xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+            "<PersonRecord xsi:nil=\"true\" />" +
+            "</ArrayOfPersonRecord>";
+        using var source = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+        var logger = new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>();
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>(source, logger);
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Skipping element that deserialized to null.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamExtractor_settings_ctor_when_options_also_carry_ReaderSettings_uses_the_settings_argument()
+    {
+        // The explicit settings argument wins over options.ReaderSettings. The argument's tiny
+        // document limit makes the read fail; the options' default settings would read it fine.
+        using var source = await BuildXmlAsync(TwoPeople);
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>
+        (
+            source,
+            new XmlReaderSettings { MaxCharactersInDocument = 10 },
+            new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>(),
+            new XmlSingleStreamExtractorOptions { ReaderSettings = new XmlReaderSettings() }
+        );
+
+        await Assert.ThrowsAsync<XmlException>(() => DrainAsync(extractor));
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamLoader_settings_ctor_when_options_also_carry_WriterSettings_uses_the_settings_argument()
+    {
+        using var stream = new MemoryStream();
+        var loader = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlWriterSettings { Indent = true },
+            new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>(),
+            new XmlSingleStreamLoaderOptions
+            {
+                LeaveOpen = true,
+                WriterSettings = new XmlWriterSettings { Indent = false },
+            }
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        // Only the indented (settings-argument) output puts the records on their own lines.
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+        Assert.Contains
+        (
+            "\n  <PersonRecord>",
+            content.Replace("\r\n", "\n", StringComparison.Ordinal),
+            StringComparison.Ordinal
+        );
+    }
+
+
     // ── MultiStream loader: dry-run counts / logs but never opens a stream ─────
 
     [Fact]
@@ -380,6 +449,26 @@ public sealed class XmlDiagnosticsMutationTests
         // declarations must not appear.
         Assert.DoesNotContain("xmlns:xsi", content, StringComparison.Ordinal);
         Assert.DoesNotContain("xmlns:xsd", content, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamLoader_when_writing_declares_no_namespace_prefix_at_all()
+    {
+        using var stream = new MemoryStream();
+        var loader = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        // The empty-namespace set must be exactly one empty prefix/namespace pair; any other
+        // entry would surface as an extra xmlns declaration.
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+        Assert.DoesNotContain("xmlns", content, StringComparison.Ordinal);
     }
 
 
