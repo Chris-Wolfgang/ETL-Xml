@@ -248,6 +248,66 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
+    public async Task MultiStreamExtractor_when_SkipItemCount_is_set_emits_items_skipped_counter_tagged_multistream()
+    {
+        var measurements = await CollectAsync(async () =>
+        {
+            var extractor = new XmlMultiStreamExtractor<MetricProbe>
+            (
+                SerializeEach(Sample),
+                new XmlMultiStreamExtractorOptions { SkipItemCount = 1 }
+            );
+            await DrainAsync(extractor);
+        });
+
+        var skipped = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.skipped")).ToList();
+        Assert.Equal(1, skipped.Sum(m => m.Value));
+        Assert.All(skipped, m => AssertTags(m, "extract", "XmlMultiStream"));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_SkipItemCount_is_set_emits_items_skipped_counter_tagged_multistream()
+    {
+        var measurements = await CollectAsync(async () =>
+        {
+            var loader = new XmlMultiStreamLoader<MetricProbe>
+            (
+                _ => new MemoryStream(),
+                new XmlMultiStreamLoaderOptions { SkipItemCount = 1 }
+            );
+            await loader.LoadAsync(Sample.ToAsyncEnumerable());
+        });
+
+        var skipped = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.skipped")).ToList();
+        Assert.Equal(1, skipped.Sum(m => m.Value));
+        Assert.All(skipped, m => AssertTags(m, "load", "XmlMultiStream"));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_IsDryRun_emits_items_loaded_counter()
+    {
+        var measurements = await CollectAsync(async () =>
+        {
+            var loader = new XmlMultiStreamLoader<MetricProbe>
+            (
+                _ => new MemoryStream(),
+                new XmlMultiStreamLoaderOptions { IsDryRun = true }
+            );
+            await loader.LoadAsync(Sample.ToAsyncEnumerable());
+        });
+
+        var loaded = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.loaded")).ToList();
+        Assert.Equal(2, loaded.Sum(m => m.Value));
+        Assert.All(loaded, m => AssertTags(m, "load", "XmlMultiStream"));
+    }
+
+
+
+    [Fact]
     public async Task OperationDuration_when_the_operation_takes_time_records_milliseconds()
     {
         var measurements = await CollectAsync(async () =>
