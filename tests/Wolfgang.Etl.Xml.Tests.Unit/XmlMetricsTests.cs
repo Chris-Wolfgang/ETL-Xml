@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Wolfgang.Etl.ErrorPolicies;
+using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
 using Xunit;
 using static Wolfgang.Etl.Xml.Tests.Unit.TestModels.XmlTestData;
 
@@ -290,11 +291,12 @@ public sealed class XmlMetricsTests
     [Fact]
     public async Task MultiStreamLoader_when_IsDryRun_emits_items_loaded_counter()
     {
+        var factory = new CountingStreamFactory();
         var measurements = await CollectAsync(async () =>
         {
             var loader = new XmlMultiStreamLoader<MetricProbe>
             (
-                _ => new MemoryStream(),
+                factory.Create<MetricProbe>,
                 new XmlMultiStreamLoaderOptions { IsDryRun = true }
             );
             await loader.LoadAsync(Sample.ToAsyncEnumerable());
@@ -303,6 +305,7 @@ public sealed class XmlMetricsTests
         var loaded = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.loaded")).ToList();
         Assert.Equal(2, loaded.Sum(m => m.Value));
         Assert.All(loaded, m => AssertTags(m, "load", "XmlMultiStream"));
+        Assert.Equal(0, factory.CallCount);
     }
 
 
