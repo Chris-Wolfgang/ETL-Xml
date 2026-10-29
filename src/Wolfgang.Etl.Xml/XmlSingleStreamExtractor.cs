@@ -354,6 +354,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
 
 
     // Counter + metric + log for one skipped item, kept together so the three can never drift.
+    // Only this stage uses helpers for the triple: inlined, ExtractWorkerAsync grows to 63 lines and
+    // trips MA0051 (60-line limit). The other three stages' loops fit, so they inline it.
     private void RecordSkipped()
     {
         IncrementCurrentSkippedItemCount();
