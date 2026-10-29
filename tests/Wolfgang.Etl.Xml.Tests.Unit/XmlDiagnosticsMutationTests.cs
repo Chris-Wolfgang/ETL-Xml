@@ -31,7 +31,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── SingleStream extractor: log sequence + running counts ─────────────────
 
     [Fact]
-    public async Task SingleStreamExtractor_logs_start_skip_extract_and_completion_with_counts()
+    public async Task SingleStreamExtractor_when_run_with_a_skip_logs_start_skip_extract_and_completion_with_counts()
     {
         using var source = await BuildXmlAsync(ThreePeople);
         var logger = new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>();
@@ -51,7 +51,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── SingleStream loader: log sequence + running counts ────────────────────
 
     [Fact]
-    public async Task SingleStreamLoader_logs_start_skip_load_and_completion_with_counts()
+    public async Task SingleStreamLoader_when_run_with_a_skip_logs_start_skip_load_and_completion_with_counts()
     {
         using var stream = new MemoryStream();
         var logger = new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>();
@@ -77,7 +77,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── MultiStream extractor: per-stream index in log messages ───────────────
 
     [Fact]
-    public async Task MultiStreamExtractor_logs_reading_and_extracted_with_stream_index()
+    public async Task MultiStreamExtractor_when_run_logs_reading_and_extracted_with_stream_index()
     {
         var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
         var extractor = new XmlMultiStreamExtractor<PersonRecord>(SerializeEach(TwoPeople), logger);
@@ -95,7 +95,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── MultiStream loader: per-stream index in log messages ──────────────────
 
     [Fact]
-    public async Task MultiStreamLoader_logs_loaded_with_stream_index_and_completion()
+    public async Task MultiStreamLoader_when_run_logs_loaded_with_stream_index_and_completion()
     {
         var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
         var loader = new XmlMultiStreamLoader<PersonRecord>(_ => new MemoryStream(), logger);
@@ -113,7 +113,7 @@ public sealed class XmlDiagnosticsMutationTests
     //    remove-left survivors on the settings, options and timer overloads) ──────────
 
     [Fact]
-    public async Task MultiStreamExtractor_settings_constructor_forwards_the_logger()
+    public async Task MultiStreamExtractor_ctor_when_given_readerSettings_forwards_the_logger()
     {
         var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
         var extractor = new XmlMultiStreamExtractor<PersonRecord>(SerializeEach(TwoPeople), new XmlReaderSettings(), logger);
@@ -126,7 +126,7 @@ public sealed class XmlDiagnosticsMutationTests
 
 
     [Fact]
-    public async Task MultiStreamExtractor_options_constructor_forwards_the_logger()
+    public async Task MultiStreamExtractor_ctor_when_given_options_forwards_the_logger()
     {
         var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
         var extractor = new XmlMultiStreamExtractor<PersonRecord>(SerializeEach(TwoPeople), new XmlMultiStreamExtractorOptions(), logger);
@@ -139,7 +139,7 @@ public sealed class XmlDiagnosticsMutationTests
 
 
     [Fact]
-    public async Task MultiStreamExtractor_timer_constructor_forwards_the_logger()
+    public async Task MultiStreamExtractor_ctor_when_given_a_timer_forwards_the_logger()
     {
         var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
         var extractor = new XmlMultiStreamExtractor<PersonRecord>
@@ -158,7 +158,7 @@ public sealed class XmlDiagnosticsMutationTests
 
 
     [Fact]
-    public async Task MultiStreamLoader_settings_constructor_forwards_the_logger()
+    public async Task MultiStreamLoader_ctor_when_given_writerSettings_forwards_the_logger()
     {
         var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
         var loader = new XmlMultiStreamLoader<PersonRecord>(_ => new MemoryStream(), new XmlWriterSettings(), logger);
@@ -171,7 +171,7 @@ public sealed class XmlDiagnosticsMutationTests
 
 
     [Fact]
-    public async Task MultiStreamLoader_timer_constructor_forwards_the_logger()
+    public async Task MultiStreamLoader_ctor_when_given_a_timer_forwards_the_logger()
     {
         var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
         var loader = new XmlMultiStreamLoader<PersonRecord>
@@ -270,7 +270,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── SingleStream extractor: skip non-element nodes before the root ─────────
 
     [Fact]
-    public async Task SingleStreamExtractor_advances_past_declaration_and_comment_before_root()
+    public async Task SingleStreamExtractor_when_declaration_and_comment_precede_the_root_advances_past_them()
     {
         // An XML declaration and a comment sit at depth 0 ahead of the real root element. The
         // extractor must keep advancing until the depth-0 *element* — a guard that mutates to
@@ -301,7 +301,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── SingleStream extractor: a child that deserializes to null is skipped ──
 
     [Fact]
-    public async Task SingleStreamExtractor_skips_child_that_deserializes_to_null()
+    public async Task SingleStreamExtractor_when_a_child_deserializes_to_null_skips_it()
     {
         // An xsi:nil child deserializes to a null record. The extractor must drop it — a mutated
         // "keep it" guard would yield a null into the sequence.
@@ -323,7 +323,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── MultiStream loader: dry-run counts / logs but never opens a stream ─────
 
     [Fact]
-    public async Task MultiStreamLoader_dry_run_logs_stream_index_and_never_invokes_factory()
+    public async Task MultiStreamLoader_when_IsDryRun_logs_stream_index_and_never_invokes_factory()
     {
         var factory = new CountingStreamFactory();
         var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
@@ -347,7 +347,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── SingleStream loader: default root name via the (stream, logger) ctor ──
 
     [Fact]
-    public async Task SingleStreamLoader_stream_logger_ctor_wraps_items_in_default_root_element()
+    public async Task SingleStreamLoader_ctor_when_given_stream_and_logger_wraps_items_in_default_root_element()
     {
         using var stream = new MemoryStream();
         var logger = new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>();
@@ -364,7 +364,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── SingleStream loader: no namespace declarations on the output ──────────
 
     [Fact]
-    public async Task SingleStreamLoader_output_has_no_namespace_declarations()
+    public async Task SingleStreamLoader_when_writing_emits_no_namespace_declarations()
     {
         using var stream = new MemoryStream();
         var loader = new XmlSingleStreamLoader<PersonRecord>
@@ -386,7 +386,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── LeaveOpen=false honoured through the settings constructors ────────────
 
     [Fact]
-    public async Task SingleStreamExtractor_settings_ctor_leaveOpen_false_closes_stream()
+    public async Task SingleStreamExtractor_settings_ctor_when_LeaveOpen_is_false_closes_stream()
     {
         using var source = await BuildXmlAsync(TwoPeople);
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
@@ -404,7 +404,7 @@ public sealed class XmlDiagnosticsMutationTests
 
 
     [Fact]
-    public async Task SingleStreamLoader_settings_ctor_leaveOpen_false_closes_stream()
+    public async Task SingleStreamLoader_settings_ctor_when_LeaveOpen_is_false_closes_stream()
     {
         var stream = new MemoryStream();
         var loader = new XmlSingleStreamLoader<PersonRecord>
@@ -424,7 +424,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── Test logger ───────────────────────────────────────────────────────────
 
     [Fact]
-    public void CapturingLogger_BeginScope_returns_no_scope()
+    public void CapturingLogger_BeginScope_when_called_returns_null()
     {
         var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
 

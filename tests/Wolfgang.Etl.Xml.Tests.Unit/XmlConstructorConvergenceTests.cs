@@ -34,7 +34,7 @@ public sealed class XmlConstructorConvergenceTests
     // ── Defect 1: LeaveOpen default must not depend on which ctor was used ────
 
     [Fact]
-    public async Task Loader_stream_logger_ctor_honours_documented_LeaveOpen_default()
+    public async Task SingleStreamLoader_ctor_when_given_only_stream_and_logger_honours_the_documented_LeaveOpen_default()
     {
         var stream = new MemoryStream();
         var loader = new XmlSingleStreamLoader<PersonRecord>
@@ -51,7 +51,7 @@ public sealed class XmlConstructorConvergenceTests
 
 
     [Fact]
-    public async Task Extractor_stream_logger_ctor_honours_documented_LeaveOpen_default()
+    public async Task SingleStreamExtractor_ctor_when_given_only_stream_and_logger_honours_the_documented_LeaveOpen_default()
     {
         using var source = await BuildXmlAsync(TwoPeople);
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
@@ -67,7 +67,7 @@ public sealed class XmlConstructorConvergenceTests
 
 
     [Fact]
-    public async Task Loader_all_ctors_agree_on_the_LeaveOpen_default()
+    public async Task SingleStreamLoader_ctor_when_LeaveOpen_is_not_set_every_overload_uses_the_same_default()
     {
         var viaOptions = new MemoryStream();
         var viaLogger = new MemoryStream();
@@ -89,7 +89,7 @@ public sealed class XmlConstructorConvergenceTests
     // ── The gap the convergence closes: options AND logger, no settings ───────
 
     [Fact]
-    public async Task Loader_canonical_ctor_accepts_options_and_logger_together()
+    public async Task SingleStreamLoader_canonical_ctor_when_given_options_and_logger_accepts_both()
     {
         var stream = new MemoryStream();
         var loader = new XmlSingleStreamLoader<PersonRecord>
@@ -107,7 +107,7 @@ public sealed class XmlConstructorConvergenceTests
 
 
     [Fact]
-    public async Task Extractor_canonical_ctor_accepts_options_and_logger_together()
+    public async Task SingleStreamExtractor_canonical_ctor_when_given_options_and_logger_accepts_both()
     {
         var source = await BuildXmlAsync(TwoPeople);
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
@@ -125,7 +125,7 @@ public sealed class XmlConstructorConvergenceTests
 
 
     [Fact]
-    public async Task Loader_bufferWriter_canonical_ctor_accepts_options_and_logger_together()
+    public async Task SingleStreamLoader_bufferWriter_canonical_ctor_when_given_options_and_logger_accepts_both()
     {
         var writer = new TestBufferWriter();
         var loader = new XmlSingleStreamLoader<PersonRecord>
@@ -145,7 +145,7 @@ public sealed class XmlConstructorConvergenceTests
     // ── Defect 2: a null-deserializing element must not swallow its sibling ───
 
     [Fact]
-    public async Task Extractor_when_element_deserializes_to_null_still_returns_following_siblings()
+    public async Task SingleStreamExtractor_when_element_deserializes_to_null_still_returns_following_siblings()
     {
         // The xsi:nil element deserializes to null. Deserialize has already advanced the reader
         // past it, so the loop must not read again — doing so used to consume "Bob"'s start tag
@@ -174,7 +174,7 @@ public sealed class XmlConstructorConvergenceTests
 
 
     [Fact]
-    public async Task Extractor_when_only_element_deserializes_to_null_returns_nothing()
+    public async Task SingleStreamExtractor_when_only_element_deserializes_to_null_returns_nothing()
     {
         const string xml =
             "<?xml version=\"1.0\"?>" +
@@ -192,7 +192,7 @@ public sealed class XmlConstructorConvergenceTests
 
 
     [Fact]
-    public async Task Extractor_counts_exclude_the_null_element_but_include_its_siblings()
+    public async Task SingleStreamExtractor_when_an_element_deserializes_to_null_counts_only_its_siblings()
     {
         const string xml =
             "<?xml version=\"1.0\"?>" +
