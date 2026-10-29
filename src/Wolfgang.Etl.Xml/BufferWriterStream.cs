@@ -18,20 +18,26 @@ internal sealed class BufferWriterStream : Stream
     private readonly IBufferWriter<byte> _writer;
 
 
+
     internal BufferWriterStream(IBufferWriter<byte> writer) =>
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+
 
 
     public override bool CanWrite => true;
 
 
+
     public override bool CanRead => false;
+
 
 
     public override bool CanSeek => false;
 
 
+
     public override long Length => throw new NotSupportedException();
+
 
 
     public override long Position
@@ -39,6 +45,7 @@ internal sealed class BufferWriterStream : Stream
         get => throw new NotSupportedException();
         set => throw new NotSupportedException();
     }
+
 
 
     // The XmlSerializer writes synchronously, so the synchronous Write override is the adapter's
@@ -57,10 +64,12 @@ internal sealed class BufferWriterStream : Stream
 #pragma warning restore RS0030
 
 
+
 #if NET5_0_OR_GREATER
     // Stream gained the span/memory overloads in netstandard2.1 / netcoreapp2.1; without these overrides
     // the base implementations rent an array and copy through Write(byte[], int, int).
     public override void Write(ReadOnlySpan<byte> buffer) => WriteBytes(buffer);
+
 
 
     public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
@@ -74,6 +83,7 @@ internal sealed class BufferWriterStream : Stream
         return default;
     }
 #endif
+
 
 
     public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
@@ -98,23 +108,29 @@ internal sealed class BufferWriterStream : Stream
     }
 
 
+
     public override void Flush()
     {
         // Nothing to flush — writes are committed to the buffer writer synchronously.
     }
 
 
+
     public override Task FlushAsync(CancellationToken cancellationToken) =>
         cancellationToken.IsCancellationRequested ? Task.FromCanceled(cancellationToken) : Task.CompletedTask;
+
 
 
     public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
 
 
+
     public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
 
+
     public override void SetLength(long value) => throw new NotSupportedException();
+
 
 
     private void WriteBytes(ReadOnlySpan<byte> bytes)
