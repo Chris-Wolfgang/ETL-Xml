@@ -25,6 +25,12 @@ namespace Wolfgang.Etl.Xml;
 /// serializes the item as a single XML document, and disposes the stream.
 /// The factory receives the item being written, allowing stream creation based on item properties
 /// (e.g., generating file names from record fields).
+/// <para>
+/// Each document is written by <see cref="XmlSerializer"/> with its default namespaces, so the
+/// element carries the <c>xmlns:xsi</c> and <c>xmlns:xsd</c> declarations. This differs from
+/// <see cref="XmlSingleStreamLoader{TRecord}"/>, which writes its records without them inside a
+/// shared root element. Both forms read back through the matching extractor.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>

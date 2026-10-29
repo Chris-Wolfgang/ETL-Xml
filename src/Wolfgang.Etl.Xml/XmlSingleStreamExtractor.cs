@@ -310,7 +310,9 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
             if (skipBudget > 0)
             {
                 skipBudget--;
-                RecordSkipped();
+                IncrementCurrentSkippedItemCount();
+                XmlMetrics.RecordSkipped(MetricTags);
+                XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
                 continue;
             }
 
@@ -320,7 +322,9 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
                 break;
             }
 
-            RecordExtracted();
+            IncrementCurrentItemCount();
+            XmlMetrics.RecordExtracted(MetricTags);
+            XmlLogMessages.ExtractedItem(_logger, CurrentItemCount, null);
 
             yield return item;
         }
@@ -349,26 +353,6 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
                 break;
             }
         }
-    }
-
-
-
-    // Counter + metric + log for one skipped item, kept together so the three can never drift.
-    private void RecordSkipped()
-    {
-        IncrementCurrentSkippedItemCount();
-        XmlMetrics.RecordSkipped(MetricTags);
-        XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
-    }
-
-
-
-    // Counter + metric + log for one extracted item.
-    private void RecordExtracted()
-    {
-        IncrementCurrentItemCount();
-        XmlMetrics.RecordExtracted(MetricTags);
-        XmlLogMessages.ExtractedItem(_logger, CurrentItemCount, null);
     }
 
 
