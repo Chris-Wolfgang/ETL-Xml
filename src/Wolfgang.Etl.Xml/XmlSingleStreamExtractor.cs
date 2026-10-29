@@ -310,9 +310,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
             if (skipBudget > 0)
             {
                 skipBudget--;
-                IncrementCurrentSkippedItemCount();
-                XmlMetrics.RecordSkipped(MetricTags);
-                XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
+                RecordSkipped();
                 continue;
             }
 
@@ -322,9 +320,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
                 break;
             }
 
-            IncrementCurrentItemCount();
-            XmlMetrics.RecordExtracted(MetricTags);
-            XmlLogMessages.ExtractedItem(_logger, CurrentItemCount, null);
+            RecordExtracted();
 
             yield return item;
         }
@@ -353,6 +349,28 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
                 break;
             }
         }
+    }
+
+
+
+    // Counter + metric + log for one skipped item, kept together so the three can never drift.
+    // Only this stage uses helpers for the triple: inlined, ExtractWorkerAsync grows to 63 lines and
+    // trips MA0051 (60-line limit). The other three stages' loops fit, so they inline it.
+    private void RecordSkipped()
+    {
+        IncrementCurrentSkippedItemCount();
+        XmlMetrics.RecordSkipped(MetricTags);
+        XmlLogMessages.SkippedItem(_logger, CurrentSkippedItemCount, SkipItemCount, null);
+    }
+
+
+
+    // Counter + metric + log for one extracted item.
+    private void RecordExtracted()
+    {
+        IncrementCurrentItemCount();
+        XmlMetrics.RecordExtracted(MetricTags);
+        XmlLogMessages.ExtractedItem(_logger, CurrentItemCount, null);
     }
 
 
