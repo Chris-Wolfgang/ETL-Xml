@@ -24,7 +24,7 @@ public sealed class XmlCoverageTests
 
 
     [Fact]
-    public async Task MultiStreamExtractor_streams_logger_ctor_extracts()
+    public async Task MultiStreamExtractor_ctor_when_given_streams_and_logger_extracts()
     {
         var extractor = new XmlMultiStreamExtractor<PersonRecord>
         (
@@ -37,7 +37,7 @@ public sealed class XmlCoverageTests
 
 
     [Fact]
-    public async Task MultiStreamExtractor_streams_readerSettings_logger_ctor_extracts()
+    public async Task MultiStreamExtractor_ctor_when_given_streams_readerSettings_and_logger_extracts()
     {
         var extractor = new XmlMultiStreamExtractor<PersonRecord>
         (
@@ -63,7 +63,7 @@ public sealed class XmlCoverageTests
 
 
     [Fact]
-    public async Task MultiStreamLoader_streamFactory_logger_ctor_loads()
+    public async Task MultiStreamLoader_ctor_when_given_streamFactory_and_logger_loads()
     {
         var buffers = new List<MemoryStream>();
         var loader = new XmlMultiStreamLoader<PersonRecord>
@@ -79,7 +79,7 @@ public sealed class XmlCoverageTests
 
 
     [Fact]
-    public async Task MultiStreamLoader_streamFactory_writerSettings_logger_ctor_serializes_with_settings()
+    public async Task MultiStreamLoader_ctor_when_given_streamFactory_writerSettings_and_logger_serializes_with_settings()
     {
         var buffers = new List<MemoryStream>();
         var loader = new XmlMultiStreamLoader<PersonRecord>
@@ -101,7 +101,7 @@ public sealed class XmlCoverageTests
 
 
     [Fact]
-    public async Task SingleStreamLoader_stream_logger_ctor_loads()
+    public async Task SingleStreamLoader_ctor_when_given_stream_and_logger_loads()
     {
         using var stream = new MemoryStream();
         var loader = new XmlSingleStreamLoader<PersonRecord>
