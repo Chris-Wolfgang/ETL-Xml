@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
+using static Wolfgang.Etl.Xml.Tests.Unit.TestModels.XmlTestData;
 using Xunit;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit;
@@ -19,10 +20,7 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// </summary>
 public sealed class XmlCoverageTests
 {
-    private static readonly PersonRecord[] Sample =
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
-    };
+    private static readonly PersonRecord[] Sample = XmlTestData.People.Take(1).ToArray();
 
 
     [Fact]
@@ -139,19 +137,6 @@ public sealed class XmlCoverageTests
         var ms = new MemoryStream();
         buffers.Add(ms);
         return ms;
-    }
-
-
-    private static IEnumerable<Stream> SerializeEach(IEnumerable<PersonRecord> items)
-    {
-        var serializer = new XmlSerializer(typeof(PersonRecord));
-        foreach (var item in items)
-        {
-            var ms = new MemoryStream();
-            serializer.Serialize(ms, item);
-            ms.Position = 0;
-            yield return ms;
-        }
     }
 
 

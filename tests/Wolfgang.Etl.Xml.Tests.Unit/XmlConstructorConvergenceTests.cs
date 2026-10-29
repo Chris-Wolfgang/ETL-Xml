@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
+using static Wolfgang.Etl.Xml.Tests.Unit.TestModels.XmlTestData;
 using Xunit;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit;
@@ -27,11 +28,7 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// </summary>
 public sealed class XmlConstructorConvergenceTests
 {
-    private static readonly PersonRecord[] TwoPeople =
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
-        new() { FirstName = "Bob", LastName = "Jones", Age = 25 },
-    };
+    private static readonly PersonRecord[] TwoPeople = XmlTestData.People.Take(2).ToArray();
 
 
     // ── Defect 1: LeaveOpen default must not depend on which ctor was used ────
@@ -56,7 +53,7 @@ public sealed class XmlConstructorConvergenceTests
     [Fact]
     public async Task Extractor_stream_logger_ctor_honours_documented_LeaveOpen_default()
     {
-        using var source = await BuildXmlAsync();
+        using var source = await BuildXmlAsync(TwoPeople);
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
         (
             source,
@@ -112,7 +109,7 @@ public sealed class XmlConstructorConvergenceTests
     [Fact]
     public async Task Extractor_canonical_ctor_accepts_options_and_logger_together()
     {
-        var source = await BuildXmlAsync();
+        var source = await BuildXmlAsync(TwoPeople);
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
         (
             source,
@@ -210,29 +207,5 @@ public sealed class XmlConstructorConvergenceTests
         await DrainAsync(extractor);
 
         Assert.Equal(1, extractor.CurrentItemCount);
-    }
-
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private static async Task DrainAsync(XmlSingleStreamExtractor<PersonRecord> extractor)
-    {
-        await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
-        {
-        }
-    }
-
-
-    private static async Task<MemoryStream> BuildXmlAsync()
-    {
-        var ms = new MemoryStream();
-        var loader = new XmlSingleStreamLoader<PersonRecord>
-        (
-            ms,
-            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
-        );
-        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable()).ConfigureAwait(false);
-        ms.Position = 0;
-        return ms;
     }
 }

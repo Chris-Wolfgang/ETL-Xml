@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Wolfgang.Etl.ErrorPolicies;
 using Xunit;
+using static Wolfgang.Etl.Xml.Tests.Unit.TestModels.XmlTestData;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit;
 
@@ -319,20 +320,6 @@ public sealed class XmlMetricsTests
         var serializer = new System.Xml.Serialization.XmlSerializer(typeof(MetricProbe));
         var ms = new MemoryStream();
         serializer.Serialize(ms, item);
-        ms.Position = 0;
-        return ms;
-    }
-
-
-    private static async Task<MemoryStream> BuildXmlAsync(MetricProbe[] items)
-    {
-        var ms = new MemoryStream();
-        var loader = new XmlSingleStreamLoader<MetricProbe>
-        (
-            ms,
-            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
-        );
-        await loader.LoadAsync(items.ToAsyncEnumerable()).ConfigureAwait(false);
         ms.Position = 0;
         return ms;
     }
