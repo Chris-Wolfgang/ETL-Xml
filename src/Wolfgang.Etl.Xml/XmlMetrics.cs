@@ -23,7 +23,9 @@ internal static class XmlMetrics
     internal const string MeterName = "Wolfgang.Etl.Xml";
 
 
+
     private static readonly Meter Meter = new(MeterName);
+
 
 
     /// <summary>Counts items successfully extracted.</summary>
@@ -31,9 +33,11 @@ internal static class XmlMetrics
         Meter.CreateCounter<long>("wolfgang.etl.xml.items.extracted");
 
 
+
     /// <summary>Counts items successfully loaded.</summary>
     internal static readonly Counter<long> ItemsLoaded =
         Meter.CreateCounter<long>("wolfgang.etl.xml.items.loaded");
+
 
 
     /// <summary>Counts items skipped by the skip budget.</summary>
@@ -41,14 +45,17 @@ internal static class XmlMetrics
         Meter.CreateCounter<long>("wolfgang.etl.xml.items.skipped");
 
 
+
     /// <summary>Counts items that failed and were skipped / dead-lettered by the error policy.</summary>
     internal static readonly Counter<long> ItemsErrored =
         Meter.CreateCounter<long>("wolfgang.etl.xml.items.errored");
 
 
+
     /// <summary>Records the duration, in milliseconds, of a completed extract / load operation.</summary>
     internal static readonly Histogram<double> OperationDuration =
         Meter.CreateHistogram<double>("wolfgang.etl.xml.operation.duration", "ms");
+
 
 
     // Each Record* helper guards on the instrument's Enabled flag so that, with no listener
@@ -57,13 +64,17 @@ internal static class XmlMetrics
     internal static void RecordExtracted(KeyValuePair<string, object?>[] tags) => Bump(ItemsExtracted, tags);
 
 
+
     internal static void RecordLoaded(KeyValuePair<string, object?>[] tags) => Bump(ItemsLoaded, tags);
+
 
 
     internal static void RecordSkipped(KeyValuePair<string, object?>[] tags) => Bump(ItemsSkipped, tags);
 
 
+
     internal static void RecordErrored(KeyValuePair<string, object?>[] tags) => Bump(ItemsErrored, tags);
+
 
 
     private static void Bump(Counter<long> counter, KeyValuePair<string, object?>[] tags)
@@ -75,12 +86,14 @@ internal static class XmlMetrics
     }
 
 
+
     /// <summary>
     /// Times an operation and records <see cref="OperationDuration"/> on dispose. Use with
     /// <c>using</c> at the top of a worker so the duration is captured when the operation completes
     /// (including for async iterators, whose <c>using</c> runs on enumeration completion / disposal).
     /// </summary>
     internal static OperationScope StartOperation(KeyValuePair<string, object?>[] tags) => new(tags);
+
 
 
     // A value type so a real run allocates nothing on the hot path; the only cost when no listener
@@ -94,11 +107,13 @@ internal static class XmlMetrics
         private readonly KeyValuePair<string, object?>[] _tags;
 
 
+
         internal OperationScope(KeyValuePair<string, object?>[] tags)
         {
             _tags = tags;
             _startTimestamp = Stopwatch.GetTimestamp();
         }
+
 
 
         public void Dispose()
