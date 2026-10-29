@@ -505,6 +505,118 @@ public sealed class XmlDiagnosticsMutationTests
     }
 
 
+    // ── Skip and MaximumItemCount log lines, per stage ────────────────────────
+
+    [Fact]
+    public async Task MultiStreamExtractor_when_SkipItemCount_is_set_logs_the_skip()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>
+        (
+            SerializeEach(TwoPeople),
+            new XmlMultiStreamExtractorOptions { SkipItemCount = 1 },
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Skipped item 1 of 1.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_SkipItemCount_is_set_logs_the_skip()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ => new MemoryStream(),
+            new XmlMultiStreamLoaderOptions { SkipItemCount = 1 },
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains("Skipped item 1 of 1.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamExtractor_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        using var source = await BuildXmlAsync(TwoPeople);
+        var logger = new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>();
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>
+        (
+            source,
+            new XmlSingleStreamExtractorOptions { MaximumItemCount = 1 },
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamLoader_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        using var stream = new MemoryStream();
+        var logger = new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>();
+        var loader = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlSingleStreamLoaderOptions { LeaveOpen = true, MaximumItemCount = 1 },
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>
+        (
+            SerializeEach(TwoPeople),
+            new XmlMultiStreamExtractorOptions { MaximumItemCount = 1 },
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ => new MemoryStream(),
+            new XmlMultiStreamLoaderOptions { MaximumItemCount = 1 },
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
     // ── Test logger ───────────────────────────────────────────────────────────
 
     [Fact]
