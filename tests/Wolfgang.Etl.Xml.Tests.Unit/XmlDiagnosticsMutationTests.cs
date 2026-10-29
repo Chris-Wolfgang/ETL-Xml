@@ -380,12 +380,7 @@ public sealed class XmlDiagnosticsMutationTests
 
         // Only the indented (settings-argument) output puts the records on their own lines.
         var content = Encoding.UTF8.GetString(stream.ToArray());
-        Assert.Contains
-        (
-            "\n  <PersonRecord>",
-            content.Replace("\r\n", "\n", StringComparison.Ordinal),
-            StringComparison.Ordinal
-        );
+        Assert.Matches("\r?\n  <PersonRecord>", content);
     }
 
 
