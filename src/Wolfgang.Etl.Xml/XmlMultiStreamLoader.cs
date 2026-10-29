@@ -332,6 +332,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
 
     private bool _isDryRun;
 
+
+
     /// <summary>
     /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode.
     /// When <see langword="true"/>, the load enumerates the source, honours
@@ -488,6 +490,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
             CurrentItemCount,
             CurrentSkippedItemCount
         );
+
 
 
     /// <inheritdoc />

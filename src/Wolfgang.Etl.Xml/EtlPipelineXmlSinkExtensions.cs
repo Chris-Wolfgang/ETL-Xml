@@ -60,6 +60,7 @@ public static class EtlPipelineXmlSinkExtensions
     }
 
 
+
     /// <summary>
     /// Terminates the pipeline, writing all records as a single-root XML document to a stream. The
     /// caller owns the stream.
@@ -90,6 +91,7 @@ public static class EtlPipelineXmlSinkExtensions
 
         return pipeline.To(new XmlSingleStreamLoader<T>(stream, options));
     }
+
 
 
     /// <summary>

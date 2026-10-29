@@ -57,6 +57,7 @@ public static class EtlPipelineXmlSourceExtensions
     }
 
 
+
     /// <summary>
     /// Starts a pipeline that reads records from a single-root XML stream. The caller owns the stream.
     /// </summary>
@@ -86,6 +87,7 @@ public static class EtlPipelineXmlSourceExtensions
 
         return pipeline.From(new XmlSingleStreamExtractor<T>(stream, options));
     }
+
 
 
     /// <summary>
