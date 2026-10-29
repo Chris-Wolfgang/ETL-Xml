@@ -8,6 +8,7 @@ using System.Xml;
 using Microsoft.Extensions.Logging;
 using Wolfgang.Etl.TestKit.Xunit;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
+using static Wolfgang.Etl.Xml.Tests.Unit.TestModels.XmlTestData;
 using Xunit;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit;
@@ -21,19 +22,10 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// </summary>
 public sealed class XmlDiagnosticsMutationTests
 {
-    private static readonly PersonRecord[] ThreePeople =
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
-        new() { FirstName = "Bob", LastName = "Jones", Age = 25 },
-        new() { FirstName = "Carol", LastName = "White", Age = 35 },
-    };
+    private static readonly PersonRecord[] ThreePeople = XmlTestData.People.Take(3).ToArray();
 
 
-    private static readonly PersonRecord[] TwoPeople =
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
-        new() { FirstName = "Bob", LastName = "Jones", Age = 25 },
-    };
+    private static readonly PersonRecord[] TwoPeople = XmlTestData.People.Take(2).ToArray();
 
 
     // ── SingleStream extractor: log sequence + running counts ─────────────────
@@ -429,50 +421,7 @@ public sealed class XmlDiagnosticsMutationTests
     }
 
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private static async Task DrainAsync(XmlSingleStreamExtractor<PersonRecord> extractor)
-    {
-        await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
-        {
-        }
-    }
-
-
-    private static async Task DrainAsync(XmlMultiStreamExtractor<PersonRecord> extractor)
-    {
-        await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
-        {
-        }
-    }
-
-
-    private static async Task<MemoryStream> BuildXmlAsync(PersonRecord[] items)
-    {
-        var ms = new MemoryStream();
-        var loader = new XmlSingleStreamLoader<PersonRecord>
-        (
-            ms,
-            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
-        );
-        await loader.LoadAsync(items.ToAsyncEnumerable()).ConfigureAwait(false);
-        ms.Position = 0;
-        return ms;
-    }
-
-
-    private static IEnumerable<Stream> SerializeEach(IEnumerable<PersonRecord> items)
-    {
-        var serializer = new System.Xml.Serialization.XmlSerializer(typeof(PersonRecord));
-        foreach (var item in items)
-        {
-            var ms = new MemoryStream();
-            serializer.Serialize(ms, item);
-            ms.Position = 0;
-            yield return ms;
-        }
-    }
-
+    // ── Test logger ───────────────────────────────────────────────────────────
 
     [Fact]
     public void CapturingLogger_BeginScope_returns_no_scope()
