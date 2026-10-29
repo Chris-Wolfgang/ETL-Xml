@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Wolfgang.Etl.ErrorPolicies;
+using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
 using Xunit;
 using static Wolfgang.Etl.Xml.Tests.Unit.TestModels.XmlTestData;
 
@@ -244,6 +245,121 @@ public sealed class XmlMetricsTests
         var errored = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.errored")).ToList();
         Assert.Equal(1, errored.Sum(m => m.Value));
         Assert.All(errored, m => Assert.Equal("XmlMultiStream", m.Tags["etl.component"]));
+    }
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_when_SkipItemCount_is_set_emits_items_skipped_counter_tagged_multistream()
+    {
+        var measurements = await CollectAsync(async () =>
+        {
+            var extractor = new XmlMultiStreamExtractor<MetricProbe>
+            (
+                SerializeEach(Sample),
+                new XmlMultiStreamExtractorOptions { SkipItemCount = 1 }
+            );
+            await DrainAsync(extractor);
+        });
+
+        var skipped = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.skipped")).ToList();
+        Assert.Equal(1, skipped.Sum(m => m.Value));
+        Assert.All(skipped, m => AssertTags(m, "extract", "XmlMultiStream"));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_SkipItemCount_is_set_emits_items_skipped_counter_tagged_multistream()
+    {
+        var measurements = await CollectAsync(async () =>
+        {
+            var loader = new XmlMultiStreamLoader<MetricProbe>
+            (
+                _ => new MemoryStream(),
+                new XmlMultiStreamLoaderOptions { SkipItemCount = 1 }
+            );
+            await loader.LoadAsync(Sample.ToAsyncEnumerable());
+        });
+
+        var skipped = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.skipped")).ToList();
+        Assert.Equal(1, skipped.Sum(m => m.Value));
+        Assert.All(skipped, m => AssertTags(m, "load", "XmlMultiStream"));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_IsDryRun_emits_items_loaded_counter()
+    {
+        var factory = new CountingStreamFactory();
+        var measurements = await CollectAsync(async () =>
+        {
+            var loader = new XmlMultiStreamLoader<MetricProbe>
+            (
+                factory.Create<MetricProbe>,
+                new XmlMultiStreamLoaderOptions { IsDryRun = true }
+            );
+            await loader.LoadAsync(Sample.ToAsyncEnumerable());
+        });
+
+        var loaded = measurements.Where(m => Is(m, "wolfgang.etl.xml.items.loaded")).ToList();
+        Assert.Equal(2, loaded.Sum(m => m.Value));
+        Assert.All(loaded, m => AssertTags(m, "load", "XmlMultiStream"));
+        Assert.Equal(0, factory.CallCount);
+    }
+
+
+
+    [Fact]
+    public async Task OperationDuration_when_the_operation_takes_time_records_milliseconds()
+    {
+        var measurements = await CollectAsync(async () =>
+        {
+            using var ms = new MemoryStream();
+            var loader = new XmlSingleStreamLoader<MetricProbe>
+            (
+                ms,
+                new XmlSingleStreamLoaderOptions { LeaveOpen = true }
+            );
+            await loader.LoadAsync(SlowAsync(Sample));
+        });
+
+        // The source waits 50 ms before its first item, so the load lasts at least that long.
+        var duration = Assert.Single(measurements, m => Is(m, "wolfgang.etl.xml.operation.duration"));
+        Assert.InRange(duration.Value, 40, double.MaxValue);
+    }
+
+
+
+    [Fact]
+    public void OperationDuration_instrument_when_published_has_unit_ms()
+    {
+        _ = XmlMetrics.OperationDuration;
+        string? unit = null;
+
+        using var listener = new MeterListener();
+        listener.InstrumentPublished = (instrument, _) =>
+        {
+            if (string.Equals(instrument.Meter.Name, XmlMetrics.MeterName, StringComparison.Ordinal)
+                && string.Equals(instrument.Name, "wolfgang.etl.xml.operation.duration", StringComparison.Ordinal))
+            {
+                unit = instrument.Unit;
+            }
+        };
+        listener.Start();
+
+        Assert.Equal("ms", unit);
+    }
+
+
+
+    private static async IAsyncEnumerable<MetricProbe> SlowAsync(IEnumerable<MetricProbe> items)
+    {
+        await Task.Delay(50).ConfigureAwait(false);
+        foreach (var item in items)
+        {
+            yield return item;
+        }
     }
 
 

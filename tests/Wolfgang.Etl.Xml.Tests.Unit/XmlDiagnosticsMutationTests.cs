@@ -84,6 +84,8 @@ public sealed class XmlDiagnosticsMutationTests
 
         await DrainAsync(extractor);
 
+        Assert.Contains(logger.Messages, m => m.Contains("Starting XML multi-stream extraction of PersonRecord.", StringComparison.Ordinal));
+
         Assert.Contains(logger.Messages, m => m.Contains("Reading stream 0.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Reading stream 1.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Extracted item 1 from stream 0.", StringComparison.Ordinal));
@@ -320,6 +322,68 @@ public sealed class XmlDiagnosticsMutationTests
     }
 
 
+
+    [Fact]
+    public async Task SingleStreamExtractor_when_a_child_deserializes_to_null_logs_the_skip()
+    {
+        const string xml =
+            "<ArrayOfPersonRecord xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+            "<PersonRecord xsi:nil=\"true\" />" +
+            "</ArrayOfPersonRecord>";
+        using var source = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+        var logger = new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>();
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>(source, logger);
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Skipping element that deserialized to null.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamExtractor_settings_ctor_when_options_also_carry_ReaderSettings_uses_the_settings_argument()
+    {
+        // The explicit settings argument wins over options.ReaderSettings. The argument's tiny
+        // document limit makes the read fail; the options' default settings would read it fine.
+        using var source = await BuildXmlAsync(TwoPeople);
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>
+        (
+            source,
+            new XmlReaderSettings { MaxCharactersInDocument = 10 },
+            new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>(),
+            new XmlSingleStreamExtractorOptions { ReaderSettings = new XmlReaderSettings() }
+        );
+
+        await Assert.ThrowsAsync<XmlException>(() => DrainAsync(extractor));
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamLoader_settings_ctor_when_options_also_carry_WriterSettings_uses_the_settings_argument()
+    {
+        using var stream = new MemoryStream();
+        var loader = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlWriterSettings { Indent = true },
+            new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>(),
+            new XmlSingleStreamLoaderOptions
+            {
+                LeaveOpen = true,
+                WriterSettings = new XmlWriterSettings { Indent = false },
+            }
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        // Only the indented (settings-argument) output puts the records on their own lines.
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+        Assert.Matches("\r?\n  <PersonRecord>", content);
+    }
+
+
     // ── MultiStream loader: dry-run counts / logs but never opens a stream ─────
 
     [Fact]
@@ -383,6 +447,26 @@ public sealed class XmlDiagnosticsMutationTests
     }
 
 
+
+    [Fact]
+    public async Task SingleStreamLoader_when_writing_declares_no_namespace_prefix_at_all()
+    {
+        using var stream = new MemoryStream();
+        var loader = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        // The empty-namespace set must be exactly one empty prefix/namespace pair; any other
+        // entry would surface as an extra xmlns declaration.
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+        Assert.DoesNotContain("xmlns", content, StringComparison.Ordinal);
+    }
+
+
     // ── LeaveOpen=false honoured through the settings constructors ────────────
 
     [Fact]
@@ -419,6 +503,118 @@ public sealed class XmlDiagnosticsMutationTests
 
         Assert.False(stream.CanWrite);
     }
+
+
+    // ── Skip and MaximumItemCount log lines, per stage ────────────────────────
+
+    [Fact]
+    public async Task MultiStreamExtractor_when_SkipItemCount_is_set_logs_the_skip()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>
+        (
+            SerializeEach(TwoPeople),
+            new XmlMultiStreamExtractorOptions { SkipItemCount = 1 },
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Skipped item 1 of 1.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_SkipItemCount_is_set_logs_the_skip()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ => new MemoryStream(),
+            new XmlMultiStreamLoaderOptions { SkipItemCount = 1 },
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains("Skipped item 1 of 1.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamExtractor_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        using var source = await BuildXmlAsync(TwoPeople);
+        var logger = new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>();
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>
+        (
+            source,
+            new XmlSingleStreamExtractorOptions { MaximumItemCount = 1 },
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamLoader_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        using var stream = new MemoryStream();
+        var logger = new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>();
+        var loader = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlSingleStreamLoaderOptions { LeaveOpen = true, MaximumItemCount = 1 },
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>
+        (
+            SerializeEach(TwoPeople),
+            new XmlMultiStreamExtractorOptions { MaximumItemCount = 1 },
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ => new MemoryStream(),
+            new XmlMultiStreamLoaderOptions { MaximumItemCount = 1 },
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
 
 
     // ── Test logger ───────────────────────────────────────────────────────────
