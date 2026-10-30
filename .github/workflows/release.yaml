@@ -346,6 +346,14 @@ jobs:
           name: release-coverage
           path: CoverageReport/
 
+  # Native AOT smoke: the same job as the PR check, run from the tagged commit
+  aot-smoke:
+    name: AOT smoke
+    needs: validate-release
+    permissions:
+      contents: read
+    uses: ./.github/workflows/aot-smoke.yaml
+
   # Pack and validate NuGet package
   pack-and-validate:
     name: Pack & Validate NuGet
@@ -773,7 +781,7 @@ jobs:
 
   publish-nuget:
     name: Publish to NuGet.org
-    needs: [pack-and-validate, verify-docs-build, sourcelink-snupkg]
+    needs: [pack-and-validate, verify-docs-build, sourcelink-snupkg, aot-smoke]
     if: needs.pack-and-validate.outputs.has-packages == 'true'
     runs-on: windows-latest
     permissions:
