@@ -41,7 +41,7 @@ namespace Wolfgang.Etl.Xml;
 /// await loader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
-public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
+public sealed class XmlMultiStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] TRecord> : LoaderBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML multi-stream loading of {typeof(TRecord).Name}";
@@ -53,7 +53,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     };
     private readonly Func<TRecord, Stream> _streamFactory;
     private readonly XmlWriterSettings? _writerSettings;
-    private static readonly XmlSerializer Serializer = new(typeof(TRecord));
+    private static readonly XmlSerializer Serializer = XmlSerialization.CreateSerializer(typeof(TRecord));
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
@@ -76,7 +76,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// with <see cref="MissingMethodException"/> with no compile-time signal. Hidden from IntelliSense; source code
     /// binds here too, so nothing changes for callers. New code has no reason to name this overload.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamLoader(Func<TRecord, Stream> streamFactory)
     {
@@ -102,7 +103,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streamFactory"/> is <c>null</c>.
     /// </exception>
-    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
@@ -138,7 +140,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamLoader
     (
@@ -170,7 +173,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// with <see cref="MissingMethodException"/> with no compile-time signal. Hidden from IntelliSense; source code
     /// binds here too, so nothing changes for callers. New code has no reason to name this overload.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamLoader(Func<TRecord, IBufferWriter<byte>> bufferWriterFactory)
         : this(ToStreamFactory(bufferWriterFactory))
@@ -194,7 +198,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="bufferWriterFactory"/> is <c>null</c>.
     /// </exception>
-    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlMultiStreamLoader
     (
         Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
@@ -228,7 +233,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamLoader
     (
@@ -249,7 +255,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="LoaderOptions"/>; <see langword="null"/> keeps every default.</param>
     /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
     /// <exception cref="ArgumentNullException"><paramref name="streamFactory"/> is <see langword="null"/>.</exception>
-    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlMultiStreamLoader
     (
         Func<TRecord, Stream> streamFactory,
@@ -273,7 +280,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="LoaderOptions"/>; <see langword="null"/> keeps every default.</param>
     /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
     /// <exception cref="ArgumentNullException"><paramref name="bufferWriterFactory"/> is <see langword="null"/>.</exception>
-    [RequiresUnreferencedCode("XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlMultiStreamLoader
     (
         Func<TRecord, IBufferWriter<byte>> bufferWriterFactory,
@@ -479,11 +487,11 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
             var settings = _writerSettings.Clone();
             settings.CloseOutput = false;
             using var writer = XmlWriter.Create(stream, settings);
-            Serializer.Serialize(writer, item);
+            XmlSerialization.Serialize(Serializer, writer, item);
         }
         else
         {
-            Serializer.Serialize(stream, item);
+            XmlSerialization.Serialize(Serializer, stream, item);
         }
     }
 

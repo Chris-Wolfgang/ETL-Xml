@@ -53,12 +53,12 @@ namespace Wolfgang.Etl.Xml;
 /// }
 /// </code>
 /// </example>
-public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlReport>
+public sealed class XmlSingleStreamExtractor<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] TRecord> : ExtractorBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private readonly Stream _stream;
     private readonly XmlReaderSettings? _readerSettings;
-    private static readonly XmlSerializer Serializer = new(typeof(TRecord));
+    private static readonly XmlSerializer Serializer = XmlSerialization.CreateSerializer(typeof(TRecord));
     private readonly ILogger _logger;
     private static readonly string OperationName = $"XML single-stream extraction of {typeof(TRecord).Name}";
     private static readonly KeyValuePair<string, object?>[] MetricTags =
@@ -89,7 +89,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// retained for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature.
     /// New code calls <c>(source, options, logger)</c>.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamExtractor(Stream stream, XmlSingleStreamExtractorOptions? options = null)
         : this(stream, options, logger: null)
@@ -113,7 +114,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamExtractor
     (
@@ -147,7 +149,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamExtractor
     (
@@ -196,7 +199,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// );
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlSingleStreamExtractor
     (
         Stream stream,
@@ -401,7 +405,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         }
 
         consumedElement = true;
-        var item = (TRecord?)Serializer.Deserialize(reader);
+        var item = (TRecord?)XmlSerialization.Deserialize(Serializer, reader);
         if (item is null)
         {
             XmlLogMessages.SkippingNullElement(_logger, null);
