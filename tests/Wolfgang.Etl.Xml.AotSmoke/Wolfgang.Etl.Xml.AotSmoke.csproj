@@ -14,12 +14,11 @@
     <PublishAot>true</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
 
-    <!-- The library is [RequiresUnreferencedCode] (XmlSerializer reflection), so
-         trim/AOT analysis warnings are EXPECTED. This smoke verifies runtime
-         behavior under AOT, not warning-freedom — don't fail the publish on the
-         warnings. The load-bearing per-call-site warning is suppressed with
-         justification in Program.cs. -->
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- The library propagates XmlSerializer's [RequiresUnreferencedCode] / [RequiresDynamicCode] to its
+         public entry points and keeps the record's public members with [DynamicallyAccessedMembers] (#293).
+         Program.cs suppresses the two warnings at its one call site with a justification, so the publish is
+         warning-free and Release's TreatWarningsAsErrors (Directory.Build.props) fails it on any new IL
+         warning. TrimmerSingleWarn=false reports each call site rather than one warning per assembly. -->
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
   </PropertyGroup>
 

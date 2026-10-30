@@ -47,7 +47,7 @@ namespace Wolfgang.Etl.Xml;
 /// }
 /// </code>
 /// </example>
-public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlReport>
+public sealed class XmlMultiStreamExtractor<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] TRecord> : ExtractorBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML multi-stream extraction of {typeof(TRecord).Name}";
@@ -59,7 +59,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     };
     private readonly IEnumerable<Stream> _streams;
     private readonly XmlReaderSettings? _readerSettings;
-    private static readonly XmlSerializer Serializer = new(typeof(TRecord));
+    private static readonly XmlSerializer Serializer = XmlSerialization.CreateSerializer(typeof(TRecord));
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
@@ -79,7 +79,8 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// with <see cref="MissingMethodException"/> with no compile-time signal. Hidden from IntelliSense; source code
     /// binds here too, so nothing changes for callers. New code has no reason to name this overload.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamExtractor(IEnumerable<Stream> streams)
     {
@@ -102,7 +103,8 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streams"/> is <c>null</c>.
     /// </exception>
-    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
@@ -135,7 +137,8 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamExtractor
     (
@@ -158,7 +161,8 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="ExtractorOptions"/>; <see langword="null"/> keeps every default.</param>
     /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
     /// <exception cref="ArgumentNullException"><paramref name="streams"/> is <see langword="null"/>.</exception>
-    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
@@ -312,10 +316,10 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
             var settings = _readerSettings.Clone();
             settings.CloseInput = false;
             using var reader = XmlReader.Create(stream, settings);
-            return (TRecord?)Serializer.Deserialize(reader);
+            return (TRecord?)XmlSerialization.Deserialize(Serializer, reader);
         }
 
-        return (TRecord?)Serializer.Deserialize(stream);
+        return (TRecord?)XmlSerialization.Deserialize(Serializer, stream);
     }
 
 
