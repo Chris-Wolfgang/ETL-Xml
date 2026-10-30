@@ -7,7 +7,8 @@ using Wolfgang.Etl.Xml;
 
 namespace Wolfgang.Etl.Xml.AotSmoke;
 
-// A public class with a parameterless ctor — what a consumer would round-trip.
+// A public class with a parameterless ctor — what a consumer would round-trip. Its getters are never
+// called from code, so only the library's [DynamicallyAccessedMembers] annotation keeps them.
 public sealed class Person
 {
     public string FirstName { get; set; } = string.Empty;
@@ -18,14 +19,15 @@ public sealed class Person
 }
 
 
-// Native-AOT smoke (#135). The library serializes via System.Xml.Serialization.XmlSerializer,
-// which uses runtime reflection / Reflection.Emit — so it is marked [RequiresUnreferencedCode]
-// and is NOT expected to work under Native AOT. This smoke asserts the BOUNDARY rather than
-// claiming safety:
+// Native-AOT smoke (#135, #293). The library serializes via System.Xml.Serialization.XmlSerializer,
+// which requires unreferenced and dynamic code, so every public entry point carries
+// [RequiresUnreferencedCode] and [RequiresDynamicCode]. Under Native AOT XmlSerializer falls back to its
+// reflection-based mode; the record type's public members survive trimming because the library annotates
+// TRecord with [DynamicallyAccessedMembers]. This smoke asserts that contract:
 //   phase 1 — the trim-safe options/report POCO surface must run clean under AOT;
-//   phase 2 — the extract/load reflection path is expected to fail under AOT; the expected
-//             failure is a success, an unexpected success prints a loud NOTE (the marker may be
-//             removable), and any other exception fails the job.
+//   phase 2 — an extract/load round trip must run AND return the same values. Before #293 the round trip
+//             "succeeded" with every property trimmed away (empty <Person /> elements), so counting records
+//             is not enough: the values are compared.
 internal static class Program
 {
     private static async Task<int> Main()
@@ -47,57 +49,58 @@ internal static class Program
             return 1;
         }
 
-        // --- Phase 2: the reflection-based extract/load path ---
-        try
-        {
-            var count = await RoundTripAsync().ConfigureAwait(false);
-            Console.WriteLine(
-                $"NOTE: extract/load round trip SUCCEEDED under Native AOT ({count} records) — the " +
-                "[RequiresUnreferencedCode] marker may now be removable; review whether the library " +
-                "gained AOT support (e.g. source-generated serialization) and update this smoke.");
-            return 0;
-        }
-        catch (Exception ex) when (IsExpectedAotFailure(ex))
-        {
-            var reported = Unwrap(ex);
-            Console.WriteLine(
-                "OK: extract/load is unavailable under Native AOT exactly as documented " +
-                $"([RequiresUnreferencedCode]) — {reported.GetType().Name}: {reported.Message}");
-            return 0;
-        }
-    }
-
-
-    // XmlSerializer's runtime code generation is disabled under Native AOT. Depending on where it
-    // trips (constructing the serializer in a static initializer, or the first Serialize/Deserialize
-    // call) the surfaced exception varies, so accept the family of "no dynamic code / not supported"
-    // failures — including a TypeInitializationException wrapping one.
-    private static bool IsExpectedAotFailure(Exception ex)
-    {
-        var inner = Unwrap(ex);
-        return inner is NotSupportedException
-            or PlatformNotSupportedException
-            or InvalidOperationException
-            or MissingMethodException;
-    }
-
-
-    private static Exception Unwrap(Exception ex) =>
-        ex is TypeInitializationException && ex.InnerException is not null ? ex.InnerException : ex;
-
-
-    [UnconditionalSuppressMessage(
-        "Trimming",
-        "IL2026",
-        Justification = "Smoke test: intentionally exercises the [RequiresUnreferencedCode] extract/load path to verify AOT runtime behavior.")]
-    private static async Task<int> RoundTripAsync()
-    {
-        var people = new[]
+        // --- Phase 2: the XmlSerializer extract/load path ---
+        var expected = new[]
         {
             new Person { FirstName = "Alice", LastName = "Smith", Age = 30 },
             new Person { FirstName = "Bob", LastName = "Jones", Age = 25 },
         };
 
+        List<Person> actual;
+        try
+        {
+            actual = await RoundTripAsync(expected).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"AOT smoke FAILED: the extract/load round trip threw {ex.GetType().Name}: {ex.Message}");
+            return 1;
+        }
+
+        if (actual.Count != expected.Length)
+        {
+            Console.Error.WriteLine($"AOT smoke FAILED: expected {expected.Length} records, extracted {actual.Count}.");
+            return 1;
+        }
+
+        for (var i = 0; i < expected.Length; i++)
+        {
+            if (!string.Equals(actual[i].FirstName, expected[i].FirstName, StringComparison.Ordinal)
+                || !string.Equals(actual[i].LastName, expected[i].LastName, StringComparison.Ordinal)
+                || actual[i].Age != expected[i].Age)
+            {
+                Console.Error.WriteLine(
+                    $"AOT smoke FAILED: record {i} came back as '{actual[i].FirstName}|{actual[i].LastName}|{actual[i].Age}', " +
+                    $"expected '{expected[i].FirstName}|{expected[i].LastName}|{expected[i].Age}' (members trimmed?).");
+                return 1;
+            }
+        }
+
+        Console.WriteLine($"OK: extract/load round trip under Native AOT returned all {actual.Count} records with their values.");
+        return 0;
+    }
+
+
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026",
+        Justification = "Smoke test: exercises the [RequiresUnreferencedCode] extract/load path to verify AOT runtime behavior. Person has only primitive members, which the library's [DynamicallyAccessedMembers] keeps.")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050",
+        Justification = "Smoke test: exercises the [RequiresDynamicCode] extract/load path to verify XmlSerializer's reflection fallback under Native AOT.")]
+    private static async Task<List<Person>> RoundTripAsync(IEnumerable<Person> people)
+    {
         using var buffer = new MemoryStream();
         var loader = new XmlSingleStreamLoader<Person>(buffer, new XmlSingleStreamLoaderOptions { LeaveOpen = true });
         await loader.LoadAsync(ToAsync(people)).ConfigureAwait(false);
@@ -105,13 +108,13 @@ internal static class Program
         buffer.Position = 0;
         var extractor = new XmlSingleStreamExtractor<Person>(buffer);
 
-        var count = 0;
-        await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
+        var result = new List<Person>();
+        await foreach (var person in extractor.ExtractAsync().ConfigureAwait(false))
         {
-            count++;
+            result.Add(person);
         }
 
-        return count;
+        return result;
     }
 
 

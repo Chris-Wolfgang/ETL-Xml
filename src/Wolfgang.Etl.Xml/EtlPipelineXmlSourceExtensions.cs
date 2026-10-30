@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Wolfgang.Etl.Abstractions;
 
@@ -26,7 +27,9 @@ public static class EtlPipelineXmlSourceExtensions
     /// <param name="path">The path of the XML file to read.</param>
     /// <returns>An <see cref="IEtlPipeline{T}"/> for chaining.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="path"/> is <see langword="null"/>.</exception>
-    public static IEtlPipeline<T> XmlSingleStreamExtractor<T>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipeline<T> XmlSingleStreamExtractor<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
     (
         this EtlPipeline pipeline,
         string path
@@ -67,7 +70,9 @@ public static class EtlPipelineXmlSourceExtensions
     /// <param name="options">Optional extractor options. When <see langword="null"/>, defaults are used.</param>
     /// <returns>An <see cref="IEtlPipeline{T}"/> for chaining.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="stream"/> is <see langword="null"/>.</exception>
-    public static IEtlPipeline<T> XmlSingleStreamExtractor<T>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipeline<T> XmlSingleStreamExtractor<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
     (
         this EtlPipeline pipeline,
         Stream stream,
@@ -99,7 +104,9 @@ public static class EtlPipelineXmlSourceExtensions
     /// <param name="streams">The streams to read, one XML document each.</param>
     /// <returns>An <see cref="IEtlPipeline{T}"/> for chaining.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="streams"/> is <see langword="null"/>.</exception>
-    public static IEtlPipeline<T> XmlMultiStreamExtractor<T>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipeline<T> XmlMultiStreamExtractor<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
     (
         this EtlPipeline pipeline,
         IEnumerable<Stream> streams

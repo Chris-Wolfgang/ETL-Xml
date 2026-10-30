@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Wolfgang.Etl.Abstractions;
 
@@ -26,7 +27,9 @@ public static class EtlPipelineXmlSinkExtensions
     /// <param name="options">Optional loader options. When <see langword="null"/>, defaults are used.</param>
     /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="path"/> is <see langword="null"/>.</exception>
-    public static IEtlPipelineSink XmlSingleStreamLoader<T>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipelineSink XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
     (
         this IEtlPipeline<T> pipeline,
         string path,
@@ -71,7 +74,9 @@ public static class EtlPipelineXmlSinkExtensions
     /// <param name="options">Optional loader options. When <see langword="null"/>, defaults are used.</param>
     /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="stream"/> is <see langword="null"/>.</exception>
-    public static IEtlPipelineSink XmlSingleStreamLoader<T>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipelineSink XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
     (
         this IEtlPipeline<T> pipeline,
         Stream stream,
@@ -106,7 +111,9 @@ public static class EtlPipelineXmlSinkExtensions
     /// </param>
     /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="streamFactory"/> is <see langword="null"/>.</exception>
-    public static IEtlPipelineSink XmlMultiStreamLoader<T>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipelineSink XmlMultiStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
     (
         this IEtlPipeline<T> pipeline,
         Func<T, Stream> streamFactory
