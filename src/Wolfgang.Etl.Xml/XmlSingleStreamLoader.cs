@@ -125,9 +125,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
         Stream stream,
         ILogger<XmlSingleStreamLoader<TRecord>> logger
     )
-        // Delegates to the canonical constructor rather than assigning fields directly. The
-        // hand-rolled version omitted _leaveOpen, so this overload silently defaulted it to
-        // false and closed the caller's stream, contradicting the documented LeaveOpen = true.
+        // Delegates to the canonical constructor rather than assigning fields directly, so
+        // LeaveOpen resolves in one place.
         : this(stream, options: null, logger: logger ?? throw new ArgumentNullException(nameof(logger)))
     {
     }
@@ -224,9 +223,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
 
     // The single initialization path. Every public and internal constructor delegates here, so
-    // there is exactly one place that resolves options -> _leaveOpen / _rootElementName. The
-    // previous shape let each overload initialize fields itself, which is how the (stream, logger)
-    // overload came to omit _leaveOpen entirely and silently close the caller's stream.
+    // there is exactly one place that resolves options -> _leaveOpen / _rootElementName.
     private XmlSingleStreamLoader
     (
         Stream stream,
