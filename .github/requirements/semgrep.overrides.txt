@@ -1,0 +1,4 @@
+# semgrep pins mcp==1.29.0, which carries GHSA for unbounded StreamableHTTP session
+# accumulation (Dependabot alert 35, fixed in 1.30.0). semgrep.yaml installs with
+# --no-deps, so this override lifts mcp past the pin. Drop it once semgrep allows >=1.30.0.
+mcp>=1.30.0,<2
