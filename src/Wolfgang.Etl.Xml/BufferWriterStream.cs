@@ -57,8 +57,22 @@ internal sealed class BufferWriterStream : Stream
 #pragma warning restore RS0030
 
 
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
+    // Stream gained the span/memory overloads in netstandard2.1 / netcoreapp2.1; without these overrides
+    // the base implementations rent an array and copy through Write(byte[], int, int).
     public override void Write(ReadOnlySpan<byte> buffer) => WriteBytes(buffer);
+
+
+    public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return ValueTask.FromCanceled(cancellationToken);
+        }
+
+        WriteBytes(buffer.Span);
+        return default;
+    }
 #endif
 
 

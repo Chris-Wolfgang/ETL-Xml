@@ -189,4 +189,26 @@ public sealed class XmlLoaderBufferWriterTests
             () => stream.WriteAsync(new byte[] { 4 }, 0, 1, new CancellationToken(canceled: true))
         );
     }
+
+#if NET5_0_OR_GREATER
+
+
+    [Fact]
+    public async Task BufferWriterStream_span_and_memory_writes_append_bytes_and_honour_cancellation()
+    {
+        var bufferWriter = new TestBufferWriter();
+        var stream = new BufferWriterStream(bufferWriter);
+
+        stream.Write(new ReadOnlySpan<byte>(new byte[] { 1, 2 }));
+        await stream.WriteAsync(new ReadOnlyMemory<byte>(new byte[] { 3, 4, 5 }), CancellationToken.None);
+
+        Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }, bufferWriter.WrittenSpan.ToArray());
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>
+        (
+            async () => await stream.WriteAsync(new ReadOnlyMemory<byte>(new byte[] { 6 }), new CancellationToken(canceled: true))
+        );
+        Assert.Equal(5, bufferWriter.WrittenCount);
+    }
+#endif
 }

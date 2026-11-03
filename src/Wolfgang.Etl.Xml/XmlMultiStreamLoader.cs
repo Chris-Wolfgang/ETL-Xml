@@ -296,6 +296,8 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         return item =>
         {
             var bufferWriter = bufferWriterFactory(item);
+            // null! is deliberate: the public constructors take Func<TRecord, Stream>, and the
+            // null check in SerializeItemOrHandleErrorAsync is what handles a null result.
             return bufferWriter is null ? null! : new BufferWriterStream(bufferWriter);
         };
     }
