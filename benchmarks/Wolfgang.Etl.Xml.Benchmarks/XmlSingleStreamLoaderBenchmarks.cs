@@ -50,11 +50,11 @@ public class XmlSingleStreamLoaderBenchmarks
     public Task LoadNoIndentAsync()
     {
         var stream = new MemoryStream();
-        var settings = new XmlWriterSettings { Indent = false };
+        var options = new XmlSingleStreamLoaderOptions { WriterSettings = new XmlWriterSettings { Indent = false } };
         var loader = new XmlSingleStreamLoader<BenchmarkPerson>
         (
             stream,
-            settings,
+            options,
             NullLogger<XmlSingleStreamLoader<BenchmarkPerson>>.Instance
         );
         return loader.LoadAsync(_items.ToAsyncEnumerable());

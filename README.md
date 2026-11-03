@@ -85,7 +85,10 @@ await EtlPipeline
     .RunAsync();
 ```
 
-Insert a `Through` stage to transform or filter records mid-stream:
+Insert a `Through` stage to transform or filter records mid-stream. The stage receives an
+`IAsyncEnumerable<Person>`, so LINQ operators such as `Where` need an async LINQ provider
+(the `System.Linq.Async` package, or `System.Linq.AsyncEnumerable` on .NET 10); without one,
+write the filter as an `async` iterator:
 
 ```csharp
 await EtlPipeline
@@ -174,7 +177,12 @@ var settings = new XmlReaderSettings
     Schemas = schemas,
 };
 
-var extractor = new XmlSingleStreamExtractor<Person>(stream, settings, logger);
+var extractor = new XmlSingleStreamExtractor<Person>
+(
+    stream,
+    new XmlSingleStreamExtractorOptions { ReaderSettings = settings },
+    logger
+);
 await foreach (var person in extractor.ExtractAsync())
 {
     // only schema-valid records reach here
@@ -311,7 +319,10 @@ Every measurement is tagged with `etl.operation` (`extract` / `load`),
 
 - **`XmlSingleStreamLoader<T>`** — Loads items into a single XML stream wrapped in a root element.
 - **`XmlMultiStreamLoader<T>`** — Loads items into multiple XML streams via a factory function, one document per stream.
-- **`XmlReport`** — Progress report returned via `IProgress<XmlReport>`. Properties: `CurrentItemCount`, `CurrentSkippedItemCount`.
+
+### Progress
+
+- **`XmlReport`** — Progress report for all four stages, returned via `IProgress<XmlReport>`. Properties: `CurrentItemCount`, `CurrentSkippedItemCount`.
 
 ### `EtlPipeline` factories
 
@@ -447,7 +458,7 @@ dotnet build --configuration Release
 dotnet test --configuration Release
 
 # Run code formatting (PowerShell Core)
-pwsh ./format.ps1
+pwsh ./scripts/format.ps1
 ```
 
 ### Code Formatting
@@ -477,7 +488,7 @@ cd docfx_project
 docfx metadata  # Extract API metadata from source code
 docfx build     # Build HTML documentation
 
-# Documentation is generated in the docs/ folder at the repository root
+# Documentation is generated in docfx_project/_site
 ```
 
 The documentation is automatically built and deployed to GitHub Pages when changes are pushed to the `main` branch.
@@ -493,7 +504,8 @@ docfx build --serve
 
 **Documentation Structure:**
 - `docfx_project/` - DocFX configuration and source files
-- `docs/` - Generated HTML documentation (published to GitHub Pages)
+- `docfx_project/_site/` - Generated HTML documentation (deployed to GitHub Pages by `docfx.yaml`)
+- `docs/` - ADRs, migration guides and CI/release notes (not generated)
 - `docfx_project/index.md` - Main landing page content
 - `docfx_project/docs/` - Additional documentation articles
 - `docfx_project/api/` - Auto-generated API reference YAML files
