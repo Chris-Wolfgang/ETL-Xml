@@ -282,6 +282,8 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
                 ExceptionDispatchInfo.Capture(error).Throw();
             }
 
+            // The policy skipped / dead-lettered a failed stream.
+            XmlMetrics.RecordErrored(MetricTags);
             return default;
         }
 
