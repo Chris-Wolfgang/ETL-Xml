@@ -12,8 +12,7 @@ using Xunit;
 namespace Wolfgang.Etl.Xml.Tests.Unit;
 
 /// <summary>
-/// Restores per-class coverage for paths the TestKit contract base stopped exercising after the
-/// 0.14 bump — the typed-<c>ILogger&lt;T&gt;</c> constructors on the multi-stream extractor / both
+/// Restores per-class coverage for paths the TestKit contract base does not exercise — the typed-<c>ILogger&lt;T&gt;</c> constructors on the multi-stream extractor / both
 /// loaders, the custom-<see cref="XmlWriterSettings"/> serialize branch, the invalid-NCName root
 /// throw, and the deserialize-to-null skip.
 /// </summary>

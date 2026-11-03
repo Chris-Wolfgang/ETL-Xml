@@ -9,7 +9,7 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 
 /// <summary>
 /// Verifies <see cref="XmlSingleStreamLoader{TRecord}"/> honours the
-/// <c>ISupportDryRun</c> contract (#176): in dry-run mode it writes nothing to the
+/// dry-run contract (<c>SupportsDryRunContractTests</c>): in dry-run mode it writes nothing to the
 /// output stream, and in a real run it does.
 /// </summary>
 public sealed class XmlSingleStreamLoaderDryRunContractTests
@@ -58,7 +58,7 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
 
 /// <summary>
 /// Verifies <see cref="XmlMultiStreamLoader{TRecord}"/> honours the
-/// <c>ISupportDryRun</c> contract (#176): in dry-run mode it never invokes the
+/// dry-run contract (<c>SupportsDryRunContractTests</c>): in dry-run mode it never invokes the
 /// destination-stream factory or writes, and in a real run it does.
 /// </summary>
 public sealed class XmlMultiStreamLoaderDryRunContractTests

@@ -151,7 +151,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class whose
     /// factory returns an <see cref="IBufferWriter{T}"/> of bytes per item instead of a
-    /// <see cref="Stream"/> (#8) — serialized bytes flow straight into each buffer writer.
+    /// <see cref="Stream"/> — serialized bytes flow straight into each buffer writer.
     /// </summary>
     /// <param name="bufferWriterFactory">
     /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
@@ -175,7 +175,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class with an
-    /// <see cref="IBufferWriter{T}"/>-of-bytes factory (#8) and a logger.
+    /// <see cref="IBufferWriter{T}"/>-of-bytes factory and a logger.
     /// </summary>
     /// <param name="bufferWriterFactory">
     /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
@@ -202,7 +202,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlMultiStreamLoader{TRecord}"/> class with an
-    /// <see cref="IBufferWriter{T}"/>-of-bytes factory (#8) and custom writer settings.
+    /// <see cref="IBufferWriter{T}"/>-of-bytes factory and custom writer settings.
     /// </summary>
     /// <param name="bufferWriterFactory">
     /// A factory that receives the item to be written and returns an <see cref="IBufferWriter{T}"/>
@@ -331,7 +331,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
     private bool _isDryRun;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
+    /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode.
     /// When <see langword="true"/>, the load enumerates the source, honours
     /// <see cref="LoaderBase{TRecord, TProgress}.SkipItemCount"/> /
     /// <see cref="LoaderBase{TRecord, TProgress}.MaximumItemCount"/>, advances the progress

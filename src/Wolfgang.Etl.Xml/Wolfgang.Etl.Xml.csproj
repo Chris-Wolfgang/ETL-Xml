@@ -11,7 +11,8 @@
          flips, binary-layout shifts). When an intentional break needs to ship,
          waive it by generating a CompatibilitySuppressions.xml
          (`dotnet pack /p:GenerateCompatibilitySuppressionFile=true`) and checking
-         it in — there is none yet, so none is required today. -->
+         it in. The checked-in CompatibilitySuppressions.xml is currently empty
+         (no suppressions). -->
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageValidationBaselineVersion>0.10.0</PackageValidationBaselineVersion>
     <!-- Pin AssemblyVersion to a fixed binding-stability baseline so consumers

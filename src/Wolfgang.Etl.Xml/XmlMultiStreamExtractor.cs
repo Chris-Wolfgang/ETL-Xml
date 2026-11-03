@@ -22,7 +22,10 @@ namespace Wolfgang.Etl.Xml;
 /// <remarks>
 /// Iterates over an <see cref="IEnumerable{T}"/> of <see cref="Stream"/> instances,
 /// deserializing a single <typeparamref name="TRecord"/> from each stream.
-/// Each stream is disposed after the item is read.
+/// Each stream the enumeration reaches is disposed after its item is read. Streams it never reaches
+/// (it stopped at <see cref="ExtractorBase{TSource, TProgress}.MaximumItemCount"/>, was cancelled, or the
+/// error policy aborted) are not opened or disposed by the extractor; the caller still owns them, which is
+/// why a lazy sequence such as <c>Select(File.OpenRead)</c> is the intended shape.
 /// Extraction stops when the enumerable is exhausted or <see cref="ExtractorBase{TSource, TProgress}.MaximumItemCount"/> is reached.
 /// </remarks>
 /// <example>
@@ -31,7 +34,10 @@ namespace Wolfgang.Etl.Xml;
 /// var extractor = new XmlMultiStreamExtractor&lt;Person&gt;
 /// (
 ///     streams,
-///     new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit },
+///     new XmlMultiStreamExtractorOptions
+///     {
+///         ReaderSettings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit },
+///     },
 ///     logger
 /// );
 /// await foreach (var person in extractor.ExtractAsync(cancellationToken))
@@ -192,12 +198,10 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
 
 
     /// <inheritdoc />
-#pragma warning disable CS1998 // Async method lacks 'await' operators — XmlSerializer is synchronous
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync
     (
         [EnumeratorCancellation] CancellationToken token
     )
-#pragma warning restore CS1998
     {
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
         using var operationScope = XmlMetrics.StartOperation(MetricTags);

@@ -89,10 +89,10 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// or whitespace string.
     /// </exception>
     /// <remarks>
-    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
-    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
-    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
-    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// Hidden from IntelliSense because its optional <c>options</c> parameter overlaps the canonical
+    /// <c>(source, options, logger)</c> constructor (S3427, see <c>src/Wolfgang.Etl.Xml/.editorconfig</c>); it is
+    /// retained for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature.
+    /// New code calls <c>(source, options, logger)</c>.
     /// </remarks>
     [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -251,7 +251,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class that
-    /// writes to an <see cref="IBufferWriter{T}"/> of bytes instead of a <see cref="Stream"/> (#8) —
+    /// writes to an <see cref="IBufferWriter{T}"/> of bytes instead of a <see cref="Stream"/> —
     /// serialized bytes flow straight into the buffer writer with no intermediate stream buffering.
     /// </summary>
     /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
@@ -260,10 +260,10 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="bufferWriter"/> is <c>null</c>.</exception>
     /// <remarks>
-    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
-    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
-    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
-    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// Hidden from IntelliSense because its optional <c>options</c> parameter overlaps the canonical
+    /// <c>(source, options, logger)</c> constructor (S3427, see <c>src/Wolfgang.Etl.Xml/.editorconfig</c>); it is
+    /// retained for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature.
+    /// New code calls <c>(source, options, logger)</c>.
     /// </remarks>
     [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -276,7 +276,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class writing
-    /// to an <see cref="IBufferWriter{T}"/> of bytes (#8) with a logger.
+    /// to an <see cref="IBufferWriter{T}"/> of bytes with a logger.
     /// </summary>
     /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
     /// <param name="logger">The logger instance for diagnostic output.</param>
@@ -300,7 +300,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class writing
-    /// to an <see cref="IBufferWriter{T}"/> of bytes (#8) with custom writer settings.
+    /// to an <see cref="IBufferWriter{T}"/> of bytes with custom writer settings.
     /// </summary>
     /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
@@ -334,7 +334,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class writing
-    /// to an <see cref="IBufferWriter{T}"/> of bytes (#8). This is the canonical buffer-writer
+    /// to an <see cref="IBufferWriter{T}"/> of bytes. This is the canonical buffer-writer
     /// overload — it is the only one that lets <paramref name="options"/> and
     /// <paramref name="logger"/> be supplied together without also supplying
     /// <see cref="XmlWriterSettings"/>.
@@ -397,7 +397,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     private bool _isDryRun;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
+    /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode.
     /// When <see langword="true"/>, the load enumerates the source, honours
     /// <see cref="LoaderBase{TRecord, TProgress}.SkipItemCount"/> /
     /// <see cref="LoaderBase{TRecord, TProgress}.MaximumItemCount"/>, advances the progress
