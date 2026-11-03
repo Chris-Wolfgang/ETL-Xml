@@ -22,6 +22,8 @@ Path-based factories own the file stream they open and close it when the run fin
 
 Mechanically: the source path factory constructs the extractor with `LeaveOpen = false` (so `XmlReader.CloseInput` disposes the stream when the reader is disposed); the sink path factory wraps the terminator with the Abstractions `DisposingOwned` helper so the owned stream is disposed after `RunAsync` completes or throws.
 
+A third case is construction failure: if the extractor or loader constructor rejects its arguments (for example an empty or invalid `RootElementName`) after the path factory has opened the file, the factory disposes the stream before rethrowing, so no handle is left open.
+
 ---
 
 ## Considered Options

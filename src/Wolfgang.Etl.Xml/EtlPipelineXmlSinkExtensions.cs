@@ -45,8 +45,18 @@ public static class EtlPipelineXmlSinkExtensions
         }
 
         var stream = File.Create(path);
-        var loader = new XmlSingleStreamLoader<T>(stream, options);
-        return pipeline.To(loader).DisposingOwned(stream);
+        try
+        {
+            var loader = new XmlSingleStreamLoader<T>(stream, options);
+            return pipeline.To(loader).DisposingOwned(stream);
+        }
+        catch
+        {
+            // Nothing owns the stream until DisposingOwned returns, so a constructor that rejects
+            // the options (e.g. an invalid RootElementName) must not leak the open file handle.
+            stream.Dispose();
+            throw;
+        }
     }
 
 

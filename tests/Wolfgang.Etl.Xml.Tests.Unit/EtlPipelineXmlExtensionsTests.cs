@@ -83,6 +83,35 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
+    public void XmlSingleStreamLoader_path_when_options_are_invalid_throws_and_releases_the_file()
+    {
+        var outPath = Path.GetTempFileName();
+        try
+        {
+            var options = new XmlSingleStreamLoaderOptions { RootElementName = "" };
+
+            Assert.Throws<ArgumentException>
+            (
+                () => EtlPipeline
+                    .Create()
+                    .From(ToAsync(new List<PersonRecord>()))
+                    .XmlSingleStreamLoader(outPath, options)
+            );
+
+            // An undisposed FileStream would hold the handle and make this exclusive open throw IOException.
+            using (File.Open(outPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+            }
+        }
+        finally
+        {
+            File.Delete(outPath);
+        }
+    }
+
+
+
+    [Fact]
     public async Task MultiStream_source_to_single_stream_sink_via_pipeline()
     {
         // One single-document XML stream per record feeding a single-root XML sink.
