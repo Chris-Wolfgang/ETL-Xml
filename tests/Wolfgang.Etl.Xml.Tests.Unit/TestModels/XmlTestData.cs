@@ -53,6 +53,7 @@ internal static class XmlTestData
     /// <see cref="XmlMultiStreamExtractor{TRecord}"/> reads.
     /// </summary>
     internal static IEnumerable<Stream> SerializeEach<T>(IEnumerable<T> items)
+        where T : notnull
     {
         var serializer = new XmlSerializer(typeof(T));
         foreach (var item in items)
