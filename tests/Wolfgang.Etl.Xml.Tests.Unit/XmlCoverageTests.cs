@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Serialization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
 using static Wolfgang.Etl.Xml.Tests.Unit.TestModels.XmlTestData;
