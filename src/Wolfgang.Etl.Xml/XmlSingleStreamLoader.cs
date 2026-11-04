@@ -396,6 +396,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     private bool _isDryRun;
 
+
+
     /// <summary>
     /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode.
     /// When <see langword="true"/>, the load enumerates the source, honours

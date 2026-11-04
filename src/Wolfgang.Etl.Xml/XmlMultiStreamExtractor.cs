@@ -329,6 +329,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
         );
 
 
+
     /// <inheritdoc />
     protected override IProgressTimer CreateProgressTimer(IProgress<XmlReport> progress)
     {
