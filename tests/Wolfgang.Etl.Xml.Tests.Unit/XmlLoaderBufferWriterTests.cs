@@ -105,7 +105,7 @@ public sealed class XmlLoaderBufferWriterTests
         await loader.LoadAsync(Sample.ToAsyncEnumerable());
 
         Assert.Equal(2, buffers.Count);
-        Assert.All(buffers, b => Assert.True(b.WrittenCount > 0));
+        Assert.All(buffers, b => Assert.InRange(b.WrittenCount, 1, int.MaxValue));
     }
 
 

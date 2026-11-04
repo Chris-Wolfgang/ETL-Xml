@@ -238,7 +238,7 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
-    public void Constructor_StreamFactory_Logger_when_logger_is_null_uses_NullLogger()
+    public async Task Constructor_StreamFactory_Logger_when_logger_is_null_uses_NullLogger()
     {
         // logger is now an optional trailing parameter: null means "no logging"
         // (NullLogger.Instance) rather than an argument error.
@@ -248,7 +248,9 @@ public class XmlMultiStreamLoaderTests
             logger: null
         );
 
-        Assert.NotNull(sut);
+        await sut.LoadAsync(SourceItems.ToAsyncEnumerable());
+
+        Assert.Equal(SourceItems.Count, sut.CurrentItemCount);
     }
 
 
@@ -297,9 +299,10 @@ public class XmlMultiStreamLoaderTests
             logger: null
         );
 
-        await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
+        await sut.LoadAsync(SourceItems.ToAsyncEnumerable());
 
-        Assert.NotNull(sut);
+        // A full run with the NullLogger fallback loads and counts every item.
+        Assert.Equal(SourceItems.Count, sut.CurrentItemCount);
     }
 
 
