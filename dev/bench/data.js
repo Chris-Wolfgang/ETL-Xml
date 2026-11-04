@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793734528629,
+  "lastUpdate": 1793816162916,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "BenchmarkDotNet": [
@@ -3990,6 +3990,120 @@ window.BENCHMARK_DATA = {
             "value": 1055981.0423177083,
             "unit": "ns",
             "range": "± 12271.64856427025"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "90e91625f416672074b691d2f90fac3471c9144f",
+          "message": "chore(src): three blank lines between members throughout src/ (#507)\n\nThe blank-line nits #488 left from #464: XmlSingleStreamLoaderOptions had\nfour blank lines, the two multi-stream stages had two before\nCreateProgressTimer, and _isDryRun sat one blank line above IsDryRun.\nBufferWriterStream, XmlMetrics and the two pipeline-extension files used two\nthroughout. Whitespace only.\n\nRefs #464\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-04T13:13:14-05:00",
+          "tree_id": "274e676f42a87983e3a45a8c5c53b102b7fe2e24",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/90e91625f416672074b691d2f90fac3471c9144f"
+        },
+        "date": 1793816158788,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 41433.63755289713,
+            "unit": "ns",
+            "range": "± 439.0046021885832"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 400536.5774739583,
+            "unit": "ns",
+            "range": "± 1206.3195380077098"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 4080276.4140625,
+            "unit": "ns",
+            "range": "± 20183.650349609772"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 22171.57044474284,
+            "unit": "ns",
+            "range": "± 235.8791385035319"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 217397.39811197916,
+            "unit": "ns",
+            "range": "± 673.7729314160938"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 2179333.8294270835,
+            "unit": "ns",
+            "range": "± 15057.229599995972"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 28675.59992472331,
+            "unit": "ns",
+            "range": "± 117.23359439702482"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 182120.84611002603,
+            "unit": "ns",
+            "range": "± 246.99639126741025"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 1724004.2766927083,
+            "unit": "ns",
+            "range": "± 13497.637482736063"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 15424.861002604166,
+            "unit": "ns",
+            "range": "± 8.084851722411209"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 10)",
+            "value": 14291.712910970053,
+            "unit": "ns",
+            "range": "± 105.68046512889946"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 92754.57381184895,
+            "unit": "ns",
+            "range": "± 250.61079321215462"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 100)",
+            "value": 76173.67338053386,
+            "unit": "ns",
+            "range": "± 148.15638637668874"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 953090.4537760416,
+            "unit": "ns",
+            "range": "± 17671.2292596287"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 1000)",
+            "value": 870669.9651692709,
+            "unit": "ns",
+            "range": "± 8492.53109187988"
           }
         ]
       }
