@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793706469365,
+  "lastUpdate": 1793793582678,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -2030,6 +2030,76 @@ window.BENCHMARK_DATA = {
             "value": 2350680789.6666665,
             "unit": "ns",
             "range": "± 38255519.41740368"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "43913d1341ec9a34e83f4c2b763f2ab3fcb87661",
+          "message": "ci: release.yaml enforces the same two coverage gates as pr.yaml (#490)\n\n* ci(pr): hold every test assembly to 100% line coverage (#489)\n\nThe repository floor of 97 was a stop-gap while a test assembly sat below\n100. All three (Unit, DocExamples, SourceLink) and all 33 test classes now\nreport 100% locally, so CODECOV_TEST_MINIMUM returns to the template's 100\nand the floor comment goes.\n\nRefs #375\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>\n\n* docs(changelog): move the assembler change to its own PR\n\nscripts/changelog.ps1 is a protected file (protected-files.yaml), so it\ncannot share a PR with CHANGELOG.md. This PR keeps the CHANGELOG.md fixes;\nthe assembler fix moves to a protected-only PR stacked on it.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* ci(changelog): assemble keeps the footer in step and does not double PR refs\n\nscripts/changelog.ps1 assemble now skips the (#N) suffix when the fragment\nalready cites that PR (the source of CHANGELOG's doubled (#283)/(#347)),\nrewrites the [Unreleased] compare link to diff from the new tag, and adds\nthe new version's vPREV...vNEW link.\n\nRefs #457\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* ci: release.yaml enforces the same two coverage gates as pr.yaml\n\nrelease.yaml applied a flat CODECOV_MINIMUM (90) to every module, so a test\nassembly could pass the release gate at a level the PR gate rejects. It\nnow carries CODECOV_TEST_MINIMUM (100) and the pr.yaml Stage 2 parser:\ntest assemblies identified by location under tests/, top-level rows only,\nthe non-greedy final-percent match, floored percent. pr.yaml's three\n'Enforce 90% coverage threshold' steps are renamed 'Enforce coverage\nthresholds'; build-pr.ps1's help names release.yaml too.\n\nRefs #468\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* ci(pr): coverage step names carry no percentage\n\nThe coverage steps are now just 'Enforce coverage thresholds' and the\nStage 1 summary line says 'coverage gate'; the values live only in the\nenv block (CODECOV_MINIMUM / CODECOV_TEST_MINIMUM), so changing a\nthreshold never means renaming a step. Step names are not required-check\ncontexts (job names are), so the ruleset is unaffected. Same change as\nChris-Wolfgang/repo-template#795.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-04T03:24:01Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/43913d1341ec9a34e83f4c2b763f2ab3fcb87661"
+        },
+        "date": 1793793580518,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1813558.9208984375,
+            "unit": "ns",
+            "range": "± 8697.875896035353"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 903118.84375,
+            "unit": "ns",
+            "range": "± 12808.459842046028"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 2869015.03125,
+            "unit": "ns",
+            "range": "± 57034.50433130053"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 28471924.322916668,
+            "unit": "ns",
+            "range": "± 187253.4964267146"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 183526597.7777778,
+            "unit": "ns",
+            "range": "± 58820.307968262234"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 91347567.66666667,
+            "unit": "ns",
+            "range": "± 1596543.2667354597"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 272819777.6666667,
+            "unit": "ns",
+            "range": "± 3093700.086934791"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 2992217586.6666665,
+            "unit": "ns",
+            "range": "± 12146034.90490828"
           }
         ]
       }
