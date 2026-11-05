@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793793582678,
+  "lastUpdate": 1793880218258,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -2100,6 +2100,76 @@ window.BENCHMARK_DATA = {
             "value": 2992217586.6666665,
             "unit": "ns",
             "range": "± 12146034.90490828"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "14a71d97e390d2587a73ba9122c32e55689c194a",
+          "message": "ci(aot): adopt the canonical AOT smoke workflow (aot.yaml -> aot-smoke.yaml) (#513)\n\n* ci(aot): rename aot.yaml to aot-smoke.yaml (content unchanged)\n\nA pure rename, committed on its own so `git log --follow` keeps the\nworkflow's history across the canonical rewrite in the next commit.\n\nRefs #401\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* ci(aot): adopt the canonical AOT smoke workflow\n\nReplace the repo-specific smoke with the fleet-canonical aot-smoke.yaml.\nOnly the three env values are repo-specific:\n\n- SMOKE_PROJECT: tests/Wolfgang.Etl.Xml.AotSmoke/Wolfgang.Etl.Xml.AotSmoke.csproj\n- LIBRARY_NAMESPACE: Wolfgang.Etl.Xml\n- ALLOWED_WARNING_REGEX: '' (no known accepted upstream warning)\n\nThe job name becomes \"AOT smoke (linux-x64)\" (was\n\"PublishAot + run (linux-x64)\"), the same string in every repo so a\nsingle required-check entry matches fleet-wide. Adds workflow_call so\nrelease.yaml can gate publishing on the same job; the pull_request\ntrigger targets main and has no paths filter.\n\nRefs #401\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* ci(aot): sync the header comment with the current canonical file\n\nThe canonical aot-smoke.yaml now documents that there is no push\ntrigger and that the check is run once on main with workflow_dispatch\nbefore it is made required. Comment-only change.\n\nRefs #401\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* ci(aot): strip the MSBuild project suffix before the namespace match\n\nMSBuild appends \" [<path>.csproj]\" to every warning line, and the smoke\nproject's path contains the library namespace, so the grep -F match hit\nevery IL warning (third-party ones included). Sync with the canonical\nfile, which now strips that suffix with sed first.\n\nRefs #401\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* ci(release): gate NuGet publish on the AOT smoke job (#514)\n\n* ci(release): gate NuGet publish on the AOT smoke job\n\nAdd an `aot-smoke` job (needs validate-release, contents: read) that\ncalls ./.github/workflows/aot-smoke.yaml from the tagged commit, and add\nit to publish-nuget's needs, so a release whose Native AOT smoke fails\ndoes not publish. No other job changes.\n\nRefs #401\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* ci(release): keep ./ on the AOT smoke call, as the docfx call does\n\nThe $/ form zizmor asks for is rejected by actionlint 1.7.12, which the\nactions audit pins and which is still the latest release.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-05T02:52:03Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/14a71d97e390d2587a73ba9122c32e55689c194a"
+        },
+        "date": 1793880215799,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1143768.6526692708,
+            "unit": "ns",
+            "range": "± 1781.6631559918426"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 546941.5921223959,
+            "unit": "ns",
+            "range": "± 12582.850414510302"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 1780408.53125,
+            "unit": "ns",
+            "range": "± 11071.666642253906"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 18475616.947916668,
+            "unit": "ns",
+            "range": "± 63711.3740079646"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 119095030.40000002,
+            "unit": "ns",
+            "range": "± 718272.3111300871"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 59195555.888888896,
+            "unit": "ns",
+            "range": "± 1081631.6266189052"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 176510503,
+            "unit": "ns",
+            "range": "± 838312.866028549"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 1900226800.6666667,
+            "unit": "ns",
+            "range": "± 17679661.63478137"
           }
         ]
       }
