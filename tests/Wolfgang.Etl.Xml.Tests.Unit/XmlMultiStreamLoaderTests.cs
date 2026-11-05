@@ -21,14 +21,7 @@ public class XmlMultiStreamLoaderTests
         XmlReport
     >
 {
-    private static readonly IReadOnlyList<PersonRecord> SourceItems = new List<PersonRecord>
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
-        new() { FirstName = "Bob", LastName = "Jones", Age = 25 },
-        new() { FirstName = "Carol", LastName = "White", Age = 35 },
-        new() { FirstName = "Dave", LastName = "Brown", Age = 40 },
-        new() { FirstName = "Eve", LastName = "Davis", Age = 28 },
-    };
+    private static readonly IReadOnlyList<PersonRecord> SourceItems = XmlTestData.People;
 
 
 

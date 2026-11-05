@@ -24,7 +24,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public async Task SingleStream_stream_round_trip_via_pipeline()
+    public async Task RunAsync_when_single_stream_source_and_sink_round_trips_the_records()
     {
         // Arrange: a single-root XML source stream and an in-memory destination.
         var source = await CreateSingleStreamXmlAsync(People);
@@ -46,7 +46,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public async Task SingleStream_file_round_trip_via_pipeline_disposes_streams()
+    public async Task RunAsync_when_single_stream_file_paths_round_trips_and_disposes_the_files()
     {
         var inPath = Path.GetTempFileName();
         var outPath = Path.GetTempFileName();
@@ -112,7 +112,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public async Task MultiStream_source_to_single_stream_sink_via_pipeline()
+    public async Task RunAsync_when_multi_stream_source_feeds_single_stream_sink_round_trips_the_records()
     {
         // One single-document XML stream per record feeding a single-root XML sink.
         var sources = People.Select(CreateSingleRecordXml).Cast<Stream>().ToList();
@@ -132,7 +132,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public async Task SingleStream_source_to_multi_stream_sink_via_pipeline()
+    public async Task RunAsync_when_single_stream_source_feeds_multi_stream_sink_writes_one_document_per_record()
     {
         // A single-root XML source fanned out to one document per record.
         var source = await CreateSingleStreamXmlAsync(People);
@@ -157,7 +157,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public async Task Through_operator_applies_between_xml_source_and_sink()
+    public async Task RunAsync_when_Through_filters_between_xml_source_and_sink_loads_only_the_kept_records()
     {
         var source = await CreateSingleStreamXmlAsync(People);
         var destination = new MemoryStream();
@@ -182,7 +182,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlSingleStreamExtractor_null_pipeline_throws()
+    public void XmlSingleStreamExtractor_when_pipeline_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>
         (
@@ -193,7 +193,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlSingleStreamExtractor_null_path_throws()
+    public void XmlSingleStreamExtractor_when_path_is_null_throws_ArgumentNullException()
     {
         string path = null!;
 
@@ -206,7 +206,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlMultiStreamExtractor_null_streams_throws()
+    public void XmlMultiStreamExtractor_when_streams_is_null_throws_ArgumentNullException()
     {
         IEnumerable<Stream> streams = null!;
 
@@ -219,7 +219,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlSingleStreamLoader_null_path_throws()
+    public void XmlSingleStreamLoader_when_path_is_null_throws_ArgumentNullException()
     {
         var pipeline = EtlPipeline.Create().XmlSingleStreamExtractor<PersonRecord>(new MemoryStream());
 
@@ -232,7 +232,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlMultiStreamLoader_null_factory_throws()
+    public void XmlMultiStreamLoader_when_streamFactory_is_null_throws_ArgumentNullException()
     {
         var pipeline = EtlPipeline.Create().XmlSingleStreamExtractor<PersonRecord>(new MemoryStream());
         Func<PersonRecord, Stream> streamFactory = null!;
@@ -246,7 +246,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlSingleStreamExtractor_path_null_pipeline_throws()
+    public void XmlSingleStreamExtractor_path_overload_when_pipeline_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>
         (
@@ -257,7 +257,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlSingleStreamExtractor_null_stream_throws()
+    public void XmlSingleStreamExtractor_when_stream_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>
         (
@@ -268,7 +268,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlMultiStreamExtractor_null_pipeline_throws()
+    public void XmlMultiStreamExtractor_when_pipeline_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>
         (
@@ -279,7 +279,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlSingleStreamLoader_path_null_pipeline_throws()
+    public void XmlSingleStreamLoader_path_overload_when_pipeline_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>
         (
@@ -290,7 +290,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlSingleStreamLoader_stream_null_pipeline_throws()
+    public void XmlSingleStreamLoader_stream_overload_when_pipeline_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>
         (
@@ -301,7 +301,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlSingleStreamLoader_null_stream_throws()
+    public void XmlSingleStreamLoader_when_stream_is_null_throws_ArgumentNullException()
     {
         var pipeline = EtlPipeline.Create().XmlSingleStreamExtractor<PersonRecord>(new MemoryStream());
 
@@ -314,7 +314,7 @@ public sealed class EtlPipelineXmlExtensionsTests
 
 
     [Fact]
-    public void XmlMultiStreamLoader_null_pipeline_throws()
+    public void XmlMultiStreamLoader_when_pipeline_is_null_throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>
         (
