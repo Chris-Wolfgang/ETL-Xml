@@ -190,6 +190,25 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
+    public async Task LoadAsync_when_writing_a_document_emits_the_default_xsi_and_xsd_declarations()
+    {
+        var buffers = new List<byte[]>();
+        var sut = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ => new CapturingMemoryStream(buffers)
+        );
+
+        await sut.LoadAsync(SourceItems.Take(1).ToAsyncEnumerable());
+
+        var content = Encoding.UTF8.GetString(Assert.Single(buffers));
+        // Pins the documented difference from XmlSingleStreamLoader, which omits both.
+        Assert.Contains("xmlns:xsi=", content, StringComparison.Ordinal);
+        Assert.Contains("xmlns:xsd=", content, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
     public async Task LoadAsync_round_trips_correctly()
     {
         var buffers = new List<byte[]>();
