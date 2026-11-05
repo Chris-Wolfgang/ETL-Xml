@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793816162916,
+  "lastUpdate": 1793845183378,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "BenchmarkDotNet": [
@@ -4104,6 +4104,120 @@ window.BENCHMARK_DATA = {
             "value": 870669.9651692709,
             "unit": "ns",
             "range": "± 8492.53109187988"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7bdaaac6ab3f9a057ff91be3e76a0c5cb083cb36",
+          "message": "feat(aot): annotate the XmlSerializer boundary and keep the record's members (#293) (#512)\n\nXmlSerializer requires unreferenced and dynamic code. Every public\nconstructor of the four stage types and every EtlPipeline XML factory now\ncarries [RequiresDynamicCode] next to [RequiresUnreferencedCode] (shared\nmessages), the record type parameter carries\n[DynamicallyAccessedMembers(PublicParameterlessConstructor | PublicFields |\nPublicProperties)], and all XmlSerializer calls go through the internal\nXmlSerialization class, whose suppressions are justified by that invariant\nand guarded by XmlTrimAnnotationTests. IsAotCompatible is declared for\nnet8.0+.\n\nMeasured before: 16 IL2026 (net8.0) and 16 IL2026 + 10 IL3050 (net10.0)\nwith the trim/AOT analyzer categories at warning; 0 after. A Native AOT\npublish of the smoke used to \"succeed\" while every record came back empty\n(the trimmer removed the record's accessors); it now round-trips the values,\nand the smoke compares them and publishes warnings-as-errors.\n\nDesign: docs/adr/ADR-004-trim-and-native-aot.md.\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-04T21:16:52-05:00",
+          "tree_id": "0bd9583fbc05989f0b4bd3bb1aadff215a32457f",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/7bdaaac6ab3f9a057ff91be3e76a0c5cb083cb36"
+        },
+        "date": 1793845181354,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 42471.72322591146,
+            "unit": "ns",
+            "range": "± 277.20422314713676"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 425139.91796875,
+            "unit": "ns",
+            "range": "± 2416.39367381008"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 4281180.546875,
+            "unit": "ns",
+            "range": "± 54608.163857228996"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 18091.84971110026,
+            "unit": "ns",
+            "range": "± 363.278707566889"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 190653.11059570312,
+            "unit": "ns",
+            "range": "± 2981.313713701366"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 1999215.30078125,
+            "unit": "ns",
+            "range": "± 22132.550485006795"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 26244.74378458659,
+            "unit": "ns",
+            "range": "± 197.42121965223586"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 194367.73787434897,
+            "unit": "ns",
+            "range": "± 1025.2574709268094"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 1923619.8815104167,
+            "unit": "ns",
+            "range": "± 44404.07147239298"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 13017.357050577799,
+            "unit": "ns",
+            "range": "± 74.87727433157337"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 10)",
+            "value": 11535.449783325195,
+            "unit": "ns",
+            "range": "± 138.18887064905115"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 102112.623046875,
+            "unit": "ns",
+            "range": "± 344.16861338753506"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 100)",
+            "value": 85077.32914225261,
+            "unit": "ns",
+            "range": "± 987.5372366410974"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 1210867.4889322917,
+            "unit": "ns",
+            "range": "± 3765.541555668133"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 1000)",
+            "value": 995802.3697916666,
+            "unit": "ns",
+            "range": "± 6088.8423709981735"
           }
         ]
       }
