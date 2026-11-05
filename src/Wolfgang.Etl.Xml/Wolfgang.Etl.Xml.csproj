@@ -38,6 +38,15 @@
     <PackageIcon>xml_icon_256.png</PackageIcon>
   </PropertyGroup>
 
+  <!-- Trim / Native AOT (#293). XmlSerializer requires unreferenced and dynamic code; the library propagates
+       that to its consumers with [RequiresUnreferencedCode] / [RequiresDynamicCode] on every public entry point
+       and keeps the record type's public members with [DynamicallyAccessedMembers] (see XmlSerialization.cs).
+       IsAotCompatible turns on the trim, AOT and single-file analyzers so a new unannotated reflection path is
+       reported. The analyzers only run for net8.0+, so the declaration is scoped to those TFMs. -->
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\..\assets\xml_icon_256.png">
       <Pack>True</Pack>
