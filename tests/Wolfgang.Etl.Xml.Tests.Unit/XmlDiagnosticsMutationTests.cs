@@ -238,6 +238,43 @@ public sealed class XmlDiagnosticsMutationTests
     }
 
 
+
+    [Fact]
+    public async Task MultiStreamLoader_when_factory_returns_null_logs_the_same_item_number_as_the_exception()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>((Func<PersonRecord, Stream>)(_ => null!), logger);
+
+        await Assert.ThrowsAsync<InvalidOperationException>
+        (
+            () => loader.LoadAsync(TwoPeople.ToAsyncEnumerable())
+        );
+
+        Assert.Contains("Stream factory returned null for item number 1.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_when_a_stream_deserializes_to_null_logs_the_skip_at_Debug()
+    {
+        const string nilXml =
+            "<PersonRecord xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:nil=\"true\" />";
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>
+        (
+            new[] { new MemoryStream(Encoding.UTF8.GetBytes(nilXml)) },
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        var index = logger.Messages.ToList().IndexOf("Skipping stream 0: it deserialized to null.");
+        Assert.NotEqual(-1, index);
+        Assert.Equal(LogLevel.Debug, logger.Levels[index]);
+    }
+
+
     // ── SingleStream extractor: skip non-element nodes before the root ─────────
 
     [Fact]
@@ -449,9 +486,14 @@ public sealed class XmlDiagnosticsMutationTests
     private sealed class CapturingLogger<T> : ILogger<T>
     {
         private readonly List<string> _messages = new();
+        private readonly List<LogLevel> _levels = new();
 
 
         public IReadOnlyList<string> Messages => _messages;
+
+
+        // Parallel to Messages: the level each message was logged at.
+        public IReadOnlyList<LogLevel> Levels => _levels;
 
 
         // Scopes are never inspected by these tests; MEL allows a null scope (IDisposable?).
@@ -472,6 +514,7 @@ public sealed class XmlDiagnosticsMutationTests
         )
         {
             _messages.Add(formatter(state, exception));
+            _levels.Add(logLevel);
         }
 
     }

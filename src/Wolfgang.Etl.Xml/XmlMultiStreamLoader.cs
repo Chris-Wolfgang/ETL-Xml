@@ -415,7 +415,7 @@ public sealed class XmlMultiStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepor
         var stream = _streamFactory(item);
         if (stream is null)
         {
-            XmlLogMessages.StreamFactoryReturnedNull(_logger, streamIndex, null);
+            XmlLogMessages.StreamFactoryReturnedNull(_logger, oneBasedItemNumber, null);
             throw new InvalidOperationException($"Stream factory returned null for item number {oneBasedItemNumber}.");
         }
 

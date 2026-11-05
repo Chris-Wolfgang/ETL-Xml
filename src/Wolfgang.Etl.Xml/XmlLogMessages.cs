@@ -51,7 +51,7 @@ internal static class XmlLogMessages
         LoggerMessage.Define<int>(LogLevel.Debug, new EventId(200, nameof(ReadingStream)), "Reading stream {StreamIndex}.");
 
     internal static readonly Action<ILogger, int, Exception?> StreamDeserializedToNull =
-        LoggerMessage.Define<int>(LogLevel.Warning, new EventId(201, nameof(StreamDeserializedToNull)), "Stream {StreamIndex} deserialized to null.");
+        LoggerMessage.Define<int>(LogLevel.Debug, new EventId(201, nameof(StreamDeserializedToNull)), "Skipping stream {StreamIndex}: it deserialized to null.");
 
     internal static readonly Action<ILogger, int, int, Exception?> ExtractedItemFromStream =
         LoggerMessage.Define<int, int>(LogLevel.Debug, new EventId(202, nameof(ExtractedItemFromStream)), "Extracted item {CurrentItemCount} from stream {StreamIndex}.");
@@ -64,7 +64,7 @@ internal static class XmlLogMessages
     // ── MultiStream Loader ───────────────────────────────────────────
 
     internal static readonly Action<ILogger, int, Exception?> StreamFactoryReturnedNull =
-        LoggerMessage.Define<int>(LogLevel.Error, new EventId(210, nameof(StreamFactoryReturnedNull)), "Stream factory returned null for item at index {StreamIndex}.");
+        LoggerMessage.Define<int>(LogLevel.Error, new EventId(210, nameof(StreamFactoryReturnedNull)), "Stream factory returned null for item number {ItemNumber}.");
 
     internal static readonly Action<ILogger, int, int, Exception?> LoadedItemToStream =
         LoggerMessage.Define<int, int>(LogLevel.Debug, new EventId(211, nameof(LoadedItemToStream)), "Loaded item {CurrentItemCount} to stream {StreamIndex}.");
