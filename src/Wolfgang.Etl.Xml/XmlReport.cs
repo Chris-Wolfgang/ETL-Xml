@@ -9,6 +9,8 @@ namespace Wolfgang.Etl.Xml;
 /// Extends <see cref="Report"/> with XML-specific progress information,
 /// including the count of skipped items.
 /// </remarks>
+// Deliberately not sealed, unlike the options records: sealing would break any consumer that
+// derives from it, so it is only worth doing as part of a planned breaking release.
 public record XmlReport : Report
 {
     /// <summary>

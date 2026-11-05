@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -109,7 +110,7 @@ public sealed class GlobalizationTests
                 new XmlSingleStreamLoaderOptions { LeaveOpen = true }
             );
 
-            await loader.LoadAsync(ToAsync(Sample)).ConfigureAwait(false);
+            await loader.LoadAsync(Sample.ToAsyncEnumerable()).ConfigureAwait(false);
 
             return System.Text.Encoding.UTF8.GetString(destination.ToArray());
         });
@@ -133,17 +134,5 @@ public sealed class GlobalizationTests
             CultureInfo.CurrentCulture = originalCulture;
             CultureInfo.CurrentUICulture = originalUiCulture;
         }
-    }
-
-
-
-    private static async IAsyncEnumerable<T> ToAsync<T>(IEnumerable<T> items)
-    {
-        foreach (var item in items)
-        {
-            yield return item;
-        }
-
-        await Task.CompletedTask.ConfigureAwait(false);
     }
 }

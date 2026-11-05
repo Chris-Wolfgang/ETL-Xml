@@ -52,7 +52,7 @@ namespace Wolfgang.Etl.Xml;
 /// await owningLoader.LoadAsync(items, cancellationToken);
 /// </code>
 /// </example>
-public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlReport>
+public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] TRecord> : LoaderBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML single-stream loading of {typeof(TRecord).Name}";
@@ -65,7 +65,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     private readonly Stream _stream;
     private readonly XmlWriterSettings? _writerSettings;
-    private static readonly XmlSerializer Serializer = new(typeof(TRecord));
+    private static readonly XmlSerializer Serializer = XmlSerialization.CreateSerializer(typeof(TRecord));
     private readonly string _rootElementName;
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
@@ -89,12 +89,13 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// or whitespace string.
     /// </exception>
     /// <remarks>
-    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
-    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
-    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
-    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// Hidden from IntelliSense because its optional <c>options</c> parameter overlaps the canonical
+    /// <c>(source, options, logger)</c> constructor (S3427, see <c>src/Wolfgang.Etl.Xml/.editorconfig</c>); it is
+    /// retained for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature.
+    /// New code calls <c>(source, options, logger)</c>.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamLoader(Stream stream, XmlSingleStreamLoaderOptions? options = null)
         : this(stream, options, logger: null)
@@ -118,16 +119,16 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamLoader
     (
         Stream stream,
         ILogger<XmlSingleStreamLoader<TRecord>> logger
     )
-        // Delegates to the canonical constructor rather than assigning fields directly. The
-        // hand-rolled version omitted _leaveOpen, so this overload silently defaulted it to
-        // false and closed the caller's stream, contradicting the documented LeaveOpen = true.
+        // Delegates to the canonical constructor rather than assigning fields directly, so
+        // LeaveOpen resolves in one place.
         : this(stream, options: null, logger: logger ?? throw new ArgumentNullException(nameof(logger)))
     {
     }
@@ -157,7 +158,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamLoader
     (
@@ -210,7 +212,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// );
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlSingleStreamLoader
     (
         Stream stream,
@@ -224,9 +227,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
 
     // The single initialization path. Every public and internal constructor delegates here, so
-    // there is exactly one place that resolves options -> _leaveOpen / _rootElementName. The
-    // previous shape let each overload initialize fields itself, which is how the (stream, logger)
-    // overload came to omit _leaveOpen entirely and silently close the caller's stream.
+    // there is exactly one place that resolves options -> _leaveOpen / _rootElementName.
     private XmlSingleStreamLoader
     (
         Stream stream,
@@ -251,7 +252,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class that
-    /// writes to an <see cref="IBufferWriter{T}"/> of bytes instead of a <see cref="Stream"/> (#8) —
+    /// writes to an <see cref="IBufferWriter{T}"/> of bytes instead of a <see cref="Stream"/> —
     /// serialized bytes flow straight into the buffer writer with no intermediate stream buffering.
     /// </summary>
     /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
@@ -260,12 +261,13 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="bufferWriter"/> is <c>null</c>.</exception>
     /// <remarks>
-    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
-    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
-    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
-    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// Hidden from IntelliSense because its optional <c>options</c> parameter overlaps the canonical
+    /// <c>(source, options, logger)</c> constructor (S3427, see <c>src/Wolfgang.Etl.Xml/.editorconfig</c>); it is
+    /// retained for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature.
+    /// New code calls <c>(source, options, logger)</c>.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamLoader(IBufferWriter<byte> bufferWriter, XmlSingleStreamLoaderOptions? options = null)
         : this(new BufferWriterStream(bufferWriter ?? throw new ArgumentNullException(nameof(bufferWriter))), options)
@@ -276,7 +278,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class writing
-    /// to an <see cref="IBufferWriter{T}"/> of bytes (#8) with a logger.
+    /// to an <see cref="IBufferWriter{T}"/> of bytes with a logger.
     /// </summary>
     /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
     /// <param name="logger">The logger instance for diagnostic output.</param>
@@ -289,7 +291,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamLoader(IBufferWriter<byte> bufferWriter, ILogger<XmlSingleStreamLoader<TRecord>> logger)
         : this(new BufferWriterStream(bufferWriter ?? throw new ArgumentNullException(nameof(bufferWriter))), logger)
@@ -300,7 +303,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class writing
-    /// to an <see cref="IBufferWriter{T}"/> of bytes (#8) with custom writer settings.
+    /// to an <see cref="IBufferWriter{T}"/> of bytes with custom writer settings.
     /// </summary>
     /// <param name="bufferWriter">The buffer writer to write XML data to.</param>
     /// <param name="writerSettings">The XML writer settings to use for serialization.</param>
@@ -317,7 +320,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamLoader
     (
@@ -334,7 +338,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlSingleStreamLoader{TRecord}"/> class writing
-    /// to an <see cref="IBufferWriter{T}"/> of bytes (#8). This is the canonical buffer-writer
+    /// to an <see cref="IBufferWriter{T}"/> of bytes. This is the canonical buffer-writer
     /// overload — it is the only one that lets <paramref name="options"/> and
     /// <paramref name="logger"/> be supplied together without also supplying
     /// <see cref="XmlWriterSettings"/>.
@@ -349,7 +353,8 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="bufferWriter"/> is <c>null</c>.
     /// </exception>
-    [RequiresUnreferencedCode("XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlSingleStreamLoader
     (
         IBufferWriter<byte> bufferWriter,
@@ -396,8 +401,10 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
     private bool _isDryRun;
 
+
+
     /// <summary>
-    /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
+    /// Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode.
     /// When <see langword="true"/>, the load enumerates the source, honours
     /// <see cref="LoaderBase{TRecord, TProgress}.SkipItemCount"/> /
     /// <see cref="LoaderBase{TRecord, TProgress}.MaximumItemCount"/>, advances the progress
@@ -448,7 +455,7 @@ public sealed class XmlSingleStreamLoader<TRecord> : LoaderBase<TRecord, XmlRepo
 
                 if (writer is not null)
                 {
-                    Serializer.Serialize(writer, item, XmlSerializerNamespacesCache.Empty);
+                    XmlSerialization.Serialize(Serializer, writer, item, XmlSerializerNamespacesCache.Empty);
                 }
 
                 IncrementCurrentItemCount();

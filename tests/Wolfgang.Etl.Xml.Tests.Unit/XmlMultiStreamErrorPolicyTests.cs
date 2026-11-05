@@ -107,7 +107,7 @@ public sealed class XmlMultiStreamErrorPolicyTests
         var loader = new XmlMultiStreamLoader<ConditionalRecord>(_ => new MemoryStream());
 
         await Assert.ThrowsAnyAsync<Exception>(async () =>
-            await loader.LoadAsync(ToAsync(new[] { new ConditionalRecord { Explode = true } })))
+            await loader.LoadAsync(new[] { new ConditionalRecord { Explode = true } }.ToAsyncEnumerable()))
             ;
     }
 
@@ -127,7 +127,7 @@ public sealed class XmlMultiStreamErrorPolicyTests
             new ConditionalRecord { Explode = false },
         };
 
-        await loader.LoadAsync(ToAsync(items));
+        await loader.LoadAsync(items.ToAsyncEnumerable());
 
         Assert.Equal(2, loader.CurrentItemCount);
         Assert.Equal(1, loader.CurrentErrorItemCount);
@@ -147,15 +147,4 @@ public sealed class XmlMultiStreamErrorPolicyTests
 
     private static Stream BadStream() =>
         new MemoryStream(System.Text.Encoding.UTF8.GetBytes("<NotAPersonRecord><garbage/></NotAPersonRecord>"));
-
-
-    private static async IAsyncEnumerable<T> ToAsync<T>(IEnumerable<T> items)
-    {
-        foreach (var item in items)
-        {
-            yield return item;
-        }
-
-        await Task.CompletedTask.ConfigureAwait(false);
-    }
 }

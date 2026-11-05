@@ -21,14 +21,7 @@ public class XmlMultiStreamLoaderTests
         XmlReport
     >
 {
-    private static readonly IReadOnlyList<PersonRecord> SourceItems = new List<PersonRecord>
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
-        new() { FirstName = "Bob", LastName = "Jones", Age = 25 },
-        new() { FirstName = "Carol", LastName = "White", Age = 35 },
-        new() { FirstName = "Dave", LastName = "Brown", Age = 40 },
-        new() { FirstName = "Eve", LastName = "Davis", Age = 28 },
-    };
+    private static readonly IReadOnlyList<PersonRecord> SourceItems = XmlTestData.People;
 
 
 
@@ -190,6 +183,25 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
+    public async Task LoadAsync_when_writing_a_document_emits_the_default_xsi_and_xsd_declarations()
+    {
+        var buffers = new List<byte[]>();
+        var sut = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ => new CapturingMemoryStream(buffers)
+        );
+
+        await sut.LoadAsync(SourceItems.Take(1).ToAsyncEnumerable());
+
+        var content = Encoding.UTF8.GetString(Assert.Single(buffers));
+        // Pins the documented difference from XmlSingleStreamLoader, which omits both.
+        Assert.Contains("xmlns:xsi=", content, StringComparison.Ordinal);
+        Assert.Contains("xmlns:xsd=", content, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
     public async Task LoadAsync_round_trips_correctly()
     {
         var buffers = new List<byte[]>();
@@ -238,7 +250,7 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
-    public void Constructor_StreamFactory_Logger_when_logger_is_null_uses_NullLogger()
+    public async Task Constructor_StreamFactory_Logger_when_logger_is_null_uses_NullLogger()
     {
         // logger is now an optional trailing parameter: null means "no logging"
         // (NullLogger.Instance) rather than an argument error.
@@ -248,7 +260,9 @@ public class XmlMultiStreamLoaderTests
             logger: null
         );
 
-        Assert.NotNull(sut);
+        await sut.LoadAsync(SourceItems.ToAsyncEnumerable());
+
+        Assert.Equal(SourceItems.Count, sut.CurrentItemCount);
     }
 
 
@@ -297,9 +311,10 @@ public class XmlMultiStreamLoaderTests
             logger: null
         );
 
-        await sut.LoadAsync(AsyncEnumerable.Empty<PersonRecord>());
+        await sut.LoadAsync(SourceItems.ToAsyncEnumerable());
 
-        Assert.NotNull(sut);
+        // A full run with the NullLogger fallback loads and counts every item.
+        Assert.Equal(SourceItems.Count, sut.CurrentItemCount);
     }
 
 

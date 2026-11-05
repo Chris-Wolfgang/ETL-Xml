@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Wolfgang.Etl.Abstractions;
 
@@ -26,7 +27,9 @@ public static class EtlPipelineXmlSinkExtensions
     /// <param name="options">Optional loader options. When <see langword="null"/>, defaults are used.</param>
     /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="path"/> is <see langword="null"/>.</exception>
-    public static IEtlPipelineSink XmlSingleStreamLoader<T>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipelineSink XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
     (
         this IEtlPipeline<T> pipeline,
         string path,
@@ -45,9 +48,20 @@ public static class EtlPipelineXmlSinkExtensions
         }
 
         var stream = File.Create(path);
-        var loader = new XmlSingleStreamLoader<T>(stream, options);
-        return pipeline.To(loader).DisposingOwned(stream);
+        try
+        {
+            var loader = new XmlSingleStreamLoader<T>(stream, options);
+            return pipeline.To(loader).DisposingOwned(stream);
+        }
+        catch
+        {
+            // Nothing owns the stream until DisposingOwned returns, so a constructor that rejects
+            // the options (e.g. an invalid RootElementName) must not leak the open file handle.
+            stream.Dispose();
+            throw;
+        }
     }
+
 
 
     /// <summary>
@@ -60,7 +74,9 @@ public static class EtlPipelineXmlSinkExtensions
     /// <param name="options">Optional loader options. When <see langword="null"/>, defaults are used.</param>
     /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="stream"/> is <see langword="null"/>.</exception>
-    public static IEtlPipelineSink XmlSingleStreamLoader<T>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipelineSink XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
     (
         this IEtlPipeline<T> pipeline,
         Stream stream,
@@ -82,6 +98,7 @@ public static class EtlPipelineXmlSinkExtensions
     }
 
 
+
     /// <summary>
     /// Terminates the pipeline, writing one XML document per record to a stream chosen per record.
     /// The loader closes each stream after writing its record.
@@ -94,7 +111,9 @@ public static class EtlPipelineXmlSinkExtensions
     /// </param>
     /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="streamFactory"/> is <see langword="null"/>.</exception>
-    public static IEtlPipelineSink XmlMultiStreamLoader<T>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipelineSink XmlMultiStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
     (
         this IEtlPipeline<T> pipeline,
         Func<T, Stream> streamFactory

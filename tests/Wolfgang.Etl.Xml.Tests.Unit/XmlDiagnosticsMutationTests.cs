@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+using Wolfgang.Etl.TestKit.Xunit;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
+using static Wolfgang.Etl.Xml.Tests.Unit.TestModels.XmlTestData;
 using Xunit;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit;
@@ -20,25 +22,16 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// </summary>
 public sealed class XmlDiagnosticsMutationTests
 {
-    private static readonly PersonRecord[] ThreePeople =
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
-        new() { FirstName = "Bob", LastName = "Jones", Age = 25 },
-        new() { FirstName = "Carol", LastName = "White", Age = 35 },
-    };
+    private static readonly PersonRecord[] ThreePeople = XmlTestData.People.Take(3).ToArray();
 
 
-    private static readonly PersonRecord[] TwoPeople =
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
-        new() { FirstName = "Bob", LastName = "Jones", Age = 25 },
-    };
+    private static readonly PersonRecord[] TwoPeople = XmlTestData.People.Take(2).ToArray();
 
 
     // ── SingleStream extractor: log sequence + running counts ─────────────────
 
     [Fact]
-    public async Task SingleStreamExtractor_logs_start_skip_extract_and_completion_with_counts()
+    public async Task SingleStreamExtractor_when_run_with_a_skip_logs_start_skip_extract_and_completion_with_counts()
     {
         using var source = await BuildXmlAsync(ThreePeople);
         var logger = new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>();
@@ -58,7 +51,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── SingleStream loader: log sequence + running counts ────────────────────
 
     [Fact]
-    public async Task SingleStreamLoader_logs_start_skip_load_and_completion_with_counts()
+    public async Task SingleStreamLoader_when_run_with_a_skip_logs_start_skip_load_and_completion_with_counts()
     {
         using var stream = new MemoryStream();
         var logger = new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>();
@@ -84,12 +77,14 @@ public sealed class XmlDiagnosticsMutationTests
     // ── MultiStream extractor: per-stream index in log messages ───────────────
 
     [Fact]
-    public async Task MultiStreamExtractor_logs_reading_and_extracted_with_stream_index()
+    public async Task MultiStreamExtractor_when_run_logs_reading_and_extracted_with_stream_index()
     {
         var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
         var extractor = new XmlMultiStreamExtractor<PersonRecord>(SerializeEach(TwoPeople), logger);
 
         await DrainAsync(extractor);
+
+        Assert.Contains(logger.Messages, m => m.Contains("Starting XML multi-stream extraction of PersonRecord.", StringComparison.Ordinal));
 
         Assert.Contains(logger.Messages, m => m.Contains("Reading stream 0.", StringComparison.Ordinal));
         Assert.Contains(logger.Messages, m => m.Contains("Reading stream 1.", StringComparison.Ordinal));
@@ -102,7 +97,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── MultiStream loader: per-stream index in log messages ──────────────────
 
     [Fact]
-    public async Task MultiStreamLoader_logs_loaded_with_stream_index_and_completion()
+    public async Task MultiStreamLoader_when_run_logs_loaded_with_stream_index_and_completion()
     {
         var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
         var loader = new XmlMultiStreamLoader<PersonRecord>(_ => new MemoryStream(), logger);
@@ -116,10 +111,168 @@ public sealed class XmlDiagnosticsMutationTests
     }
 
 
+    // ── Every logger-taking constructor forwards the logger (Stryker: `logger ?? NullLogger`
+    //    remove-left survivors on the settings, options and timer overloads) ──────────
+
+    [Fact]
+    public async Task MultiStreamExtractor_ctor_when_given_readerSettings_forwards_the_logger()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>(SerializeEach(TwoPeople), new XmlReaderSettings(), logger);
+
+        await DrainAsync(extractor);
+
+        Assert.Contains(logger.Messages, m => m.Contains("Reading stream 0.", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_ctor_when_given_options_forwards_the_logger()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>(SerializeEach(TwoPeople), new XmlMultiStreamExtractorOptions(), logger);
+
+        await DrainAsync(extractor);
+
+        Assert.Contains(logger.Messages, m => m.Contains("Reading stream 0.", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_ctor_when_given_a_timer_forwards_the_logger()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>
+        (
+            SerializeEach(TwoPeople),
+            new XmlReaderSettings(),
+            new ManualProgressTimer(),
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        Assert.Contains(logger.Messages, m => m.Contains("Reading stream 0.", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_ctor_when_given_writerSettings_forwards_the_logger()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>(_ => new MemoryStream(), new XmlWriterSettings(), logger);
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains(logger.Messages, m => m.Contains("Loaded item 1 to stream 0.", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_ctor_when_given_a_timer_forwards_the_logger()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ => new MemoryStream(),
+            new XmlWriterSettings(),
+            new ManualProgressTimer(),
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains(logger.Messages, m => m.Contains("Loaded item 1 to stream 0.", StringComparison.Ordinal));
+    }
+
+
+    // ── Exception messages (Stryker string-mutation survivors) ───────────────
+
+    [Fact]
+    public void SingleStreamLoader_when_RootElementName_is_whitespace_message_names_the_problem()
+    {
+        var ex = Assert.Throws<ArgumentException>
+        (
+            () => new XmlSingleStreamLoader<PersonRecord>(new MemoryStream(), new XmlSingleStreamLoaderOptions { RootElementName = " " })
+        );
+
+        Assert.StartsWith("Root element name cannot be empty or whitespace.", ex.Message, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public void SingleStreamLoader_when_RootElementName_is_not_an_NCName_message_quotes_the_name()
+    {
+        var ex = Assert.Throws<ArgumentException>
+        (
+            () => new XmlSingleStreamLoader<PersonRecord>(new MemoryStream(), new XmlSingleStreamLoaderOptions { RootElementName = "1bad" })
+        );
+
+        Assert.StartsWith("Root element name '1bad' is not a valid XML local name.", ex.Message, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_factory_returns_null_message_names_the_item_number()
+    {
+        var loader = new XmlMultiStreamLoader<PersonRecord>((Func<PersonRecord, Stream>)(_ => null!));
+
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>
+        (
+            () => loader.LoadAsync(TwoPeople.ToAsyncEnumerable())
+        );
+
+        Assert.Equal("Stream factory returned null for item number 1.", ex.Message);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_factory_returns_null_logs_the_same_item_number_as_the_exception()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>((Func<PersonRecord, Stream>)(_ => null!), logger);
+
+        await Assert.ThrowsAsync<InvalidOperationException>
+        (
+            () => loader.LoadAsync(TwoPeople.ToAsyncEnumerable())
+        );
+
+        Assert.Contains("Stream factory returned null for item number 1.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_when_a_stream_deserializes_to_null_logs_the_skip_at_Debug()
+    {
+        const string nilXml =
+            "<PersonRecord xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:nil=\"true\" />";
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>
+        (
+            new[] { new MemoryStream(Encoding.UTF8.GetBytes(nilXml)) },
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        var index = logger.Messages.ToList().IndexOf("Skipping stream 0: it deserialized to null.");
+        Assert.NotEqual(-1, index);
+        Assert.Equal(LogLevel.Debug, logger.Levels[index]);
+    }
+
+
     // ── SingleStream extractor: skip non-element nodes before the root ─────────
 
     [Fact]
-    public async Task SingleStreamExtractor_advances_past_declaration_and_comment_before_root()
+    public async Task SingleStreamExtractor_when_declaration_and_comment_precede_the_root_advances_past_them()
     {
         // An XML declaration and a comment sit at depth 0 ahead of the real root element. The
         // extractor must keep advancing until the depth-0 *element* — a guard that mutates to
@@ -150,7 +303,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── SingleStream extractor: a child that deserializes to null is skipped ──
 
     [Fact]
-    public async Task SingleStreamExtractor_skips_child_that_deserializes_to_null()
+    public async Task SingleStreamExtractor_when_a_child_deserializes_to_null_skips_it()
     {
         // An xsi:nil child deserializes to a null record. The extractor must drop it — a mutated
         // "keep it" guard would yield a null into the sequence.
@@ -169,10 +322,72 @@ public sealed class XmlDiagnosticsMutationTests
     }
 
 
+
+    [Fact]
+    public async Task SingleStreamExtractor_when_a_child_deserializes_to_null_logs_the_skip()
+    {
+        const string xml =
+            "<ArrayOfPersonRecord xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+            "<PersonRecord xsi:nil=\"true\" />" +
+            "</ArrayOfPersonRecord>";
+        using var source = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+        var logger = new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>();
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>(source, logger);
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Skipping element that deserialized to null.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamExtractor_settings_ctor_when_options_also_carry_ReaderSettings_uses_the_settings_argument()
+    {
+        // The explicit settings argument wins over options.ReaderSettings. The argument's tiny
+        // document limit makes the read fail; the options' default settings would read it fine.
+        using var source = await BuildXmlAsync(TwoPeople);
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>
+        (
+            source,
+            new XmlReaderSettings { MaxCharactersInDocument = 10 },
+            new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>(),
+            new XmlSingleStreamExtractorOptions { ReaderSettings = new XmlReaderSettings() }
+        );
+
+        await Assert.ThrowsAsync<XmlException>(() => DrainAsync(extractor));
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamLoader_settings_ctor_when_options_also_carry_WriterSettings_uses_the_settings_argument()
+    {
+        using var stream = new MemoryStream();
+        var loader = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlWriterSettings { Indent = true },
+            new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>(),
+            new XmlSingleStreamLoaderOptions
+            {
+                LeaveOpen = true,
+                WriterSettings = new XmlWriterSettings { Indent = false },
+            }
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        // Only the indented (settings-argument) output puts the records on their own lines.
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+        Assert.Matches("\r?\n  <PersonRecord>", content);
+    }
+
+
     // ── MultiStream loader: dry-run counts / logs but never opens a stream ─────
 
     [Fact]
-    public async Task MultiStreamLoader_dry_run_logs_stream_index_and_never_invokes_factory()
+    public async Task MultiStreamLoader_when_IsDryRun_logs_stream_index_and_never_invokes_factory()
     {
         var factory = new CountingStreamFactory();
         var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
@@ -196,7 +411,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── SingleStream loader: default root name via the (stream, logger) ctor ──
 
     [Fact]
-    public async Task SingleStreamLoader_stream_logger_ctor_wraps_items_in_default_root_element()
+    public async Task SingleStreamLoader_ctor_when_given_stream_and_logger_wraps_items_in_default_root_element()
     {
         using var stream = new MemoryStream();
         var logger = new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>();
@@ -213,7 +428,7 @@ public sealed class XmlDiagnosticsMutationTests
     // ── SingleStream loader: no namespace declarations on the output ──────────
 
     [Fact]
-    public async Task SingleStreamLoader_output_has_no_namespace_declarations()
+    public async Task SingleStreamLoader_when_writing_emits_no_namespace_declarations()
     {
         using var stream = new MemoryStream();
         var loader = new XmlSingleStreamLoader<PersonRecord>
@@ -232,10 +447,30 @@ public sealed class XmlDiagnosticsMutationTests
     }
 
 
+
+    [Fact]
+    public async Task SingleStreamLoader_when_writing_declares_no_namespace_prefix_at_all()
+    {
+        using var stream = new MemoryStream();
+        var loader = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        // The empty-namespace set must be exactly one empty prefix/namespace pair; any other
+        // entry would surface as an extra xmlns declaration.
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+        Assert.DoesNotContain("xmlns", content, StringComparison.Ordinal);
+    }
+
+
     // ── LeaveOpen=false honoured through the settings constructors ────────────
 
     [Fact]
-    public async Task SingleStreamExtractor_settings_ctor_leaveOpen_false_closes_stream()
+    public async Task SingleStreamExtractor_settings_ctor_when_LeaveOpen_is_false_closes_stream()
     {
         using var source = await BuildXmlAsync(TwoPeople);
         var extractor = new XmlSingleStreamExtractor<PersonRecord>
@@ -253,7 +488,7 @@ public sealed class XmlDiagnosticsMutationTests
 
 
     [Fact]
-    public async Task SingleStreamLoader_settings_ctor_leaveOpen_false_closes_stream()
+    public async Task SingleStreamLoader_settings_ctor_when_LeaveOpen_is_false_closes_stream()
     {
         var stream = new MemoryStream();
         var loader = new XmlSingleStreamLoader<PersonRecord>
@@ -270,53 +505,122 @@ public sealed class XmlDiagnosticsMutationTests
     }
 
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // ── Skip and MaximumItemCount log lines, per stage ────────────────────────
 
-    private static async Task DrainAsync(XmlSingleStreamExtractor<PersonRecord> extractor)
+    [Fact]
+    public async Task MultiStreamExtractor_when_SkipItemCount_is_set_logs_the_skip()
     {
-        await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
-        {
-        }
-    }
-
-
-    private static async Task DrainAsync(XmlMultiStreamExtractor<PersonRecord> extractor)
-    {
-        await foreach (var _ in extractor.ExtractAsync().ConfigureAwait(false))
-        {
-        }
-    }
-
-
-    private static async Task<MemoryStream> BuildXmlAsync(PersonRecord[] items)
-    {
-        var ms = new MemoryStream();
-        var loader = new XmlSingleStreamLoader<PersonRecord>
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>
         (
-            ms,
-            new XmlSingleStreamLoaderOptions { LeaveOpen = true }
+            SerializeEach(TwoPeople),
+            new XmlMultiStreamExtractorOptions { SkipItemCount = 1 },
+            logger
         );
-        await loader.LoadAsync(items.ToAsyncEnumerable()).ConfigureAwait(false);
-        ms.Position = 0;
-        return ms;
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Skipped item 1 of 1.", logger.Messages);
     }
 
-
-    private static IEnumerable<Stream> SerializeEach(IEnumerable<PersonRecord> items)
-    {
-        var serializer = new System.Xml.Serialization.XmlSerializer(typeof(PersonRecord));
-        foreach (var item in items)
-        {
-            var ms = new MemoryStream();
-            serializer.Serialize(ms, item);
-            ms.Position = 0;
-            yield return ms;
-        }
-    }
 
 
     [Fact]
-    public void CapturingLogger_BeginScope_returns_no_scope()
+    public async Task MultiStreamLoader_when_SkipItemCount_is_set_logs_the_skip()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ => new MemoryStream(),
+            new XmlMultiStreamLoaderOptions { SkipItemCount = 1 },
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains("Skipped item 1 of 1.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamExtractor_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        using var source = await BuildXmlAsync(TwoPeople);
+        var logger = new CapturingLogger<XmlSingleStreamExtractor<PersonRecord>>();
+        var extractor = new XmlSingleStreamExtractor<PersonRecord>
+        (
+            source,
+            new XmlSingleStreamExtractorOptions { MaximumItemCount = 1 },
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task SingleStreamLoader_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        using var stream = new MemoryStream();
+        var logger = new CapturingLogger<XmlSingleStreamLoader<PersonRecord>>();
+        var loader = new XmlSingleStreamLoader<PersonRecord>
+        (
+            stream,
+            new XmlSingleStreamLoaderOptions { LeaveOpen = true, MaximumItemCount = 1 },
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamExtractor_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamExtractor<PersonRecord>>();
+        var extractor = new XmlMultiStreamExtractor<PersonRecord>
+        (
+            SerializeEach(TwoPeople),
+            new XmlMultiStreamExtractorOptions { MaximumItemCount = 1 },
+            logger
+        );
+
+        await DrainAsync(extractor);
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
+    [Fact]
+    public async Task MultiStreamLoader_when_MaximumItemCount_is_reached_logs_the_stop()
+    {
+        var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
+        var loader = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ => new MemoryStream(),
+            new XmlMultiStreamLoaderOptions { MaximumItemCount = 1 },
+            logger
+        );
+
+        await loader.LoadAsync(TwoPeople.ToAsyncEnumerable());
+
+        Assert.Contains("Reached MaximumItemCount of 1. Stopping.", logger.Messages);
+    }
+
+
+
+    // ── Test logger ───────────────────────────────────────────────────────────
+
+    [Fact]
+    public void CapturingLogger_BeginScope_when_called_returns_null()
     {
         var logger = new CapturingLogger<XmlMultiStreamLoader<PersonRecord>>();
 
@@ -327,9 +631,14 @@ public sealed class XmlDiagnosticsMutationTests
     private sealed class CapturingLogger<T> : ILogger<T>
     {
         private readonly List<string> _messages = new();
+        private readonly List<LogLevel> _levels = new();
 
 
         public IReadOnlyList<string> Messages => _messages;
+
+
+        // Parallel to Messages: the level each message was logged at.
+        public IReadOnlyList<LogLevel> Levels => _levels;
 
 
         // Scopes are never inspected by these tests; MEL allows a null scope (IDisposable?).
@@ -350,6 +659,7 @@ public sealed class XmlDiagnosticsMutationTests
         )
         {
             _messages.Add(formatter(state, exception));
+            _levels.Add(logLevel);
         }
 
     }
