@@ -4,7 +4,7 @@ namespace Wolfgang.Etl.Xml.Tests.Unit.TestModels;
 
 /// <summary>
 /// A multi-stream loader stream factory that counts its calls, so a test can assert how many
-/// streams the loader opened (including none).
+/// streams the loader opened (including none). Generic so any record type can use it.
 /// </summary>
 internal sealed class CountingStreamFactory
 {
@@ -12,7 +12,7 @@ internal sealed class CountingStreamFactory
 
 
 
-    public Stream Create(PersonRecord _)
+    public Stream Create<TRecord>(TRecord _)
     {
         CallCount++;
         return new MemoryStream();

@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Built against `Wolfgang.Etl.Abstractions` 0.25.0 (and TestKit / TestKit.Xunit 0.25.0): the base-stage `ReportingInterval` / `MaximumItemCount` / `SkipItemCount` setters are deprecated fleet-wide in favour of the options record, and `IncrementCurrentItemCount(int)` / `IncrementCurrentSkippedItemCount(int)` are available to derived stages. (#350)
+- Built against `Wolfgang.Etl.Abstractions` 0.25.0 (and TestKit / TestKit.Xunit 0.25.0; the release itself ships against 0.26.0, see Internal): the base-stage `ReportingInterval` / `MaximumItemCount` / `SkipItemCount` setters are deprecated fleet-wide in favour of the options record, and `IncrementCurrentItemCount(int)` / `IncrementCurrentSkippedItemCount(int)` are available to derived stages. (#350)
 
 ### Fixed
 
@@ -33,14 +33,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- `THIRD-PARTY-NOTICES.md` added at the repo root (shipped runtime dependencies with version and licence) and packed into the NuGet package. (#283) (#283)
+- `THIRD-PARTY-NOTICES.md` added at the repo root (shipped runtime dependencies with version and licence) and packed into the NuGet package. (#283)
 
 ### Internal
 
 - Built against Wolfgang.Etl.Abstractions / ErrorPolicies / TestKit / TestKit.Xunit 0.26.0 (trim- and native-AOT-compatible on net8.0+; no API change from 0.25.0), so the package now requires Abstractions 0.26.0 or later. (#380)
 - New `src/.editorconfig`: S1133 (scheduled `[Obsolete]` setters, #311) and S3427 (optional-parameter overlaps with the single-argument constructors that #253 / #281 retire) are off for the src project until the 2026-12-15 removal wave, with dated notes. (#364)
 - Redundant `using`s removed from five unit-test files. (#365)
-- The options constructor assigns the stage's backing fields directly instead of going through the deprecated setters, so the `CS0618` suppressions that covered those writes are gone. Neither loader's deprecated setter validates, so no record-side guard was needed. (#347) (#347)
+- The options constructor assigns the stage's backing fields directly instead of going through the deprecated setters, so the `CS0618` suppressions that covered those writes are gone. Neither loader's deprecated setter validates, so no record-side guard was needed. (#347)
 - Record the compiler-synthesized members of the shipped records in `PublicAPI.Shipped.txt` (per-TFM files for the covariant `<Clone>$` lines); they were public all along, no surface change. (#315)
 
 ## [0.9.0] - 2026-09-16
@@ -162,7 +162,7 @@ Scorecard (all under the < 25 floor), landed via #273 and #276.
 - Per-item error handling / dead-lettering on the multi-stream extractor and loader (#11). `XmlMultiStreamExtractor<T>` and `XmlMultiStreamLoader<T>` now honour the assignable `ErrorPolicy` inherited from the Abstractions base stages (0.21+): assign one of `Wolfgang.Etl.ErrorPolicies.ItemErrorPolicy`'s ready-made policies (`Skip`, `SkipAndLog`, `SkipAndDeadLetter`, `SkipDeadLetterAndLog`) to skip or dead-letter a stream/record that fails to deserialize/serialize and keep going, with the count surfaced via `CurrentErrorItemCount`. The default remains fail-fast. The single-stream classes keep fail-fast semantics (a shared streaming document cannot resume mid-record) — use the multi-stream variants for per-record error capture.
 - Dry-run support on the loaders (#176). `XmlSingleStreamLoader<T>` and `XmlMultiStreamLoader<T>` implement `ISupportDryRun`: set `IsDryRun = true` to enumerate the source, honour `SkipItemCount` / `MaximumItemCount`, advance progress counters, and log exactly as a real load, but write nothing to the output stream(s) (the single-stream loader emits no document at all; the multi-stream loader never invokes the destination-stream factory). Defaults to `false` (fail-safe: real writes).
 
-## [0.4.0] - 2026-08-07
+## [0.4.0] - 2026-08-08
 
 ### Changed
 
@@ -192,7 +192,8 @@ Scorecard (all under the < 25 floor), landed via #273 and #276.
 ### Changed
 
 - Dependabot bump: dotnet-dependencies group (8 packages).
-## [0.2.1] - Unreleased
+
+## [0.2.1] - 2026-06-26
 
 Canonical maintenance round + binding-stability fix. Public API and runtime behavior unchanged from 0.2.0.
 
@@ -265,8 +266,16 @@ Initial public release.
 ### Fixed
 - Dropped `netcoreapp3.1` from the test TFM matrix where the CI image does not provide the SDK ([#16](https://github.com/Chris-Wolfgang/ETL-Xml/pull/16)).
 
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.8.1...v0.9.0
+[0.8.1]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v.0.1.0...v0.2.0

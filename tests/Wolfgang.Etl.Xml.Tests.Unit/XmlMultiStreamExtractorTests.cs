@@ -22,14 +22,7 @@ public class XmlMultiStreamExtractorTests
 {
     private static readonly XmlSerializer Serializer = new(typeof(PersonRecord));
 
-    private static readonly IReadOnlyList<PersonRecord> ExpectedItems = new List<PersonRecord>
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
-        new() { FirstName = "Bob", LastName = "Jones", Age = 25 },
-        new() { FirstName = "Carol", LastName = "White", Age = 35 },
-        new() { FirstName = "Dave", LastName = "Brown", Age = 40 },
-        new() { FirstName = "Eve", LastName = "Davis", Age = 28 },
-    };
+    private static readonly IReadOnlyList<PersonRecord> ExpectedItems = XmlTestData.People;
 
 
 
@@ -94,6 +87,36 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
+    public async Task ExtractAsync_when_MaximumItemCount_stops_early_leaves_unreached_streams_open()
+    {
+        var streams = ExpectedItems.Take(3).Select(item =>
+        {
+            var stream = new MemoryStream();
+            Serializer.Serialize(stream, item);
+            stream.Position = 0;
+            return stream;
+        }).ToList();
+
+        var sut = new XmlMultiStreamExtractor<PersonRecord>(streams, new XmlMultiStreamExtractorOptions { MaximumItemCount = 1 });
+
+        var results = new List<PersonRecord>();
+        await foreach (var item in sut.ExtractAsync())
+        {
+            results.Add(item);
+        }
+
+        Assert.Single(results);
+
+        // The stream that was read is disposed; the ones the enumeration never reached stay
+        // caller-owned and open, as the class remarks document.
+        Assert.Throws<ObjectDisposedException>(() => streams[0].ReadByte());
+        Assert.True(streams[1].CanRead);
+        Assert.True(streams[2].CanRead);
+    }
+
+
+
+    [Fact]
     public async Task ExtractAsync_when_XmlElement_attributes_maps_correctly()
     {
         var serializer = new XmlSerializer(typeof(XmlAttributePersonRecord));
@@ -132,17 +155,19 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
-    public void Constructor_Streams_Logger_when_logger_is_null_uses_NullLogger()
+    public async Task Constructor_Streams_Logger_when_logger_is_null_uses_NullLogger()
     {
         // logger is now an optional trailing parameter: null means "no logging"
         // (NullLogger.Instance) rather than an argument error.
         var sut = new XmlMultiStreamExtractor<PersonRecord>
         (
-            Array.Empty<Stream>(),
+            CreateXmlStreams(1),
             logger: null
         );
 
-        Assert.NotNull(sut);
+        var extracted = await sut.ExtractAsync().ToListAsync();
+
+        Assert.Single(extracted);
     }
 
 
@@ -180,18 +205,20 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
-    public void Constructor_with_settings_when_logger_is_null_uses_NullLogger()
+    public async Task Constructor_with_settings_when_logger_is_null_uses_NullLogger()
     {
         // logger is now an optional trailing parameter: null means "no logging"
         // (NullLogger.Instance) rather than an argument error.
         var sut = new XmlMultiStreamExtractor<PersonRecord>
         (
-            Array.Empty<Stream>(),
+            CreateXmlStreams(1),
             new XmlReaderSettings(),
             logger: null
         );
 
-        Assert.NotNull(sut);
+        var extracted = await sut.ExtractAsync().ToListAsync();
+
+        Assert.Single(extracted);
     }
 
 
@@ -241,12 +268,15 @@ public class XmlMultiStreamExtractorTests
             logger: null
         );
 
-        await foreach (var item in sut.ExtractAsync())
+        var extracted = 0;
+        await foreach (var _ in sut.ExtractAsync())
         {
-            _ = item;
+            extracted++;
         }
 
-        Assert.NotNull(sut);
+        // A full run with the NullLogger fallback extracts the item and counts it.
+        Assert.Equal(1, extracted);
+        Assert.Equal(1, sut.CurrentItemCount);
     }
 
 

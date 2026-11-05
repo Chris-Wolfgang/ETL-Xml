@@ -23,14 +23,7 @@ public class XmlSingleStreamExtractorTests
 {
     private static readonly XmlSerializer Serializer = new(typeof(PersonRecord));
 
-    private static readonly IReadOnlyList<PersonRecord> ExpectedItems = new List<PersonRecord>
-    {
-        new() { FirstName = "Alice", LastName = "Smith", Age = 30 },
-        new() { FirstName = "Bob", LastName = "Jones", Age = 25 },
-        new() { FirstName = "Carol", LastName = "White", Age = 35 },
-        new() { FirstName = "Dave", LastName = "Brown", Age = 40 },
-        new() { FirstName = "Eve", LastName = "Davis", Age = 28 },
-    };
+    private static readonly IReadOnlyList<PersonRecord> ExpectedItems = XmlTestData.People;
 
 
 
@@ -282,12 +275,15 @@ public class XmlSingleStreamExtractorTests
             logger: null
         );
 
-        await foreach (var item in sut.ExtractAsync())
+        var extracted = 0;
+        await foreach (var _ in sut.ExtractAsync())
         {
-            _ = item;
+            extracted++;
         }
 
-        Assert.NotNull(sut);
+        // A full run with the NullLogger fallback extracts the item and counts it.
+        Assert.Equal(1, extracted);
+        Assert.Equal(1, sut.CurrentItemCount);
     }
 
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Wolfgang.Etl.Xml;
 
 /// <summary>
-/// A write-only <see cref="Stream"/> adapter over an <see cref="IBufferWriter{T}"/> of bytes (#8).
+/// A write-only <see cref="Stream"/> adapter over an <see cref="IBufferWriter{T}"/> of bytes.
 /// The XML writer streams its serialized bytes straight into the caller's buffer writer (for
 /// example a <c>System.IO.Pipelines.PipeWriter</c> or an <c>ArrayBufferWriter&lt;byte&gt;</c>) with no
 /// intermediate <see cref="MemoryStream"/>. Reads and seeks are not supported; the underlying
@@ -18,20 +18,26 @@ internal sealed class BufferWriterStream : Stream
     private readonly IBufferWriter<byte> _writer;
 
 
+
     internal BufferWriterStream(IBufferWriter<byte> writer) =>
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+
 
 
     public override bool CanWrite => true;
 
 
+
     public override bool CanRead => false;
+
 
 
     public override bool CanSeek => false;
 
 
+
     public override long Length => throw new NotSupportedException();
+
 
 
     public override long Position
@@ -39,6 +45,7 @@ internal sealed class BufferWriterStream : Stream
         get => throw new NotSupportedException();
         set => throw new NotSupportedException();
     }
+
 
 
     // The XmlSerializer writes synchronously, so the synchronous Write override is the adapter's
@@ -57,9 +64,26 @@ internal sealed class BufferWriterStream : Stream
 #pragma warning restore RS0030
 
 
-#if NET8_0_OR_GREATER
+
+#if NET5_0_OR_GREATER
+    // Stream gained the span/memory overloads in netstandard2.1 / netcoreapp2.1; without these overrides
+    // the base implementations rent an array and copy through Write(byte[], int, int).
     public override void Write(ReadOnlySpan<byte> buffer) => WriteBytes(buffer);
+
+
+
+    public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return ValueTask.FromCanceled(cancellationToken);
+        }
+
+        WriteBytes(buffer.Span);
+        return default;
+    }
 #endif
+
 
 
     public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
@@ -84,23 +108,29 @@ internal sealed class BufferWriterStream : Stream
     }
 
 
+
     public override void Flush()
     {
         // Nothing to flush — writes are committed to the buffer writer synchronously.
     }
 
 
+
     public override Task FlushAsync(CancellationToken cancellationToken) =>
         cancellationToken.IsCancellationRequested ? Task.FromCanceled(cancellationToken) : Task.CompletedTask;
+
 
 
     public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
 
 
+
     public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
 
+
     public override void SetLength(long value) => throw new NotSupportedException();
+
 
 
     private void WriteBytes(ReadOnlySpan<byte> bytes)

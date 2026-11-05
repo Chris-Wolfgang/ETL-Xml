@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;net481;netstandard2.0;net5.0;net6.0;net7.0;net8.0;net10.0</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <Version>0.10.0</Version>
     <!-- ABI / binary-compatibility gate (#128). Every pack validates the built
@@ -11,7 +10,8 @@
          flips, binary-layout shifts). When an intentional break needs to ship,
          waive it by generating a CompatibilitySuppressions.xml
          (`dotnet pack /p:GenerateCompatibilitySuppressionFile=true`) and checking
-         it in — there is none yet, so none is required today. -->
+         it in. The checked-in CompatibilitySuppressions.xml is currently empty
+         (no suppressions). -->
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageValidationBaselineVersion>0.10.0</PackageValidationBaselineVersion>
     <!-- Pin AssemblyVersion to a fixed binding-stability baseline so consumers
@@ -36,6 +36,15 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <ApplicationIcon>..\..\assets\xml_icon.ico</ApplicationIcon>
     <PackageIcon>xml_icon_256.png</PackageIcon>
+  </PropertyGroup>
+
+  <!-- Trim / Native AOT (#293). XmlSerializer requires unreferenced and dynamic code; the library propagates
+       that to its consumers with [RequiresUnreferencedCode] / [RequiresDynamicCode] on every public entry point
+       and keeps the record type's public members with [DynamicallyAccessedMembers] (see XmlSerialization.cs).
+       IsAotCompatible turns on the trim, AOT and single-file analyzers so a new unannotated reflection path is
+       reported. The analyzers only run for net8.0+, so the declaration is scoped to those TFMs. -->
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>

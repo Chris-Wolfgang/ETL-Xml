@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,10 @@ namespace Wolfgang.Etl.Xml;
 /// <remarks>
 /// Iterates over an <see cref="IEnumerable{T}"/> of <see cref="Stream"/> instances,
 /// deserializing a single <typeparamref name="TRecord"/> from each stream.
-/// Each stream is disposed after the item is read.
+/// Each stream the enumeration reaches is disposed after its item is read. Streams it never reaches
+/// (it stopped at <see cref="ExtractorBase{TSource, TProgress}.MaximumItemCount"/>, was cancelled, or the
+/// error policy aborted) are not opened or disposed by the extractor; the caller still owns them, which is
+/// why a lazy sequence such as <c>Select(File.OpenRead)</c> is the intended shape.
 /// Extraction stops when the enumerable is exhausted or <see cref="ExtractorBase{TSource, TProgress}.MaximumItemCount"/> is reached.
 /// </remarks>
 /// <example>
@@ -31,7 +35,10 @@ namespace Wolfgang.Etl.Xml;
 /// var extractor = new XmlMultiStreamExtractor&lt;Person&gt;
 /// (
 ///     streams,
-///     new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit },
+///     new XmlMultiStreamExtractorOptions
+///     {
+///         ReaderSettings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit },
+///     },
 ///     logger
 /// );
 /// await foreach (var person in extractor.ExtractAsync(cancellationToken))
@@ -40,7 +47,7 @@ namespace Wolfgang.Etl.Xml;
 /// }
 /// </code>
 /// </example>
-public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlReport>
+public sealed class XmlMultiStreamExtractor<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] TRecord> : ExtractorBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private static readonly string OperationName = $"XML multi-stream extraction of {typeof(TRecord).Name}";
@@ -52,7 +59,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     };
     private readonly IEnumerable<Stream> _streams;
     private readonly XmlReaderSettings? _readerSettings;
-    private static readonly XmlSerializer Serializer = new(typeof(TRecord));
+    private static readonly XmlSerializer Serializer = XmlSerialization.CreateSerializer(typeof(TRecord));
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
@@ -72,7 +79,8 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// with <see cref="MissingMethodException"/> with no compile-time signal. Hidden from IntelliSense; source code
     /// binds here too, so nothing changes for callers. New code has no reason to name this overload.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamExtractor(IEnumerable<Stream> streams)
     {
@@ -95,7 +103,8 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="streams"/> is <c>null</c>.
     /// </exception>
-    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
@@ -128,7 +137,8 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlMultiStreamExtractor
     (
@@ -151,7 +161,8 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// <param name="options">The construction-time configuration, including the settings inherited from <see cref="ExtractorOptions"/>; <see langword="null"/> keeps every default.</param>
     /// <param name="logger">An optional logger; <see langword="null"/> disables logging.</param>
     /// <exception cref="ArgumentNullException"><paramref name="streams"/> is <see langword="null"/>.</exception>
-    [RequiresUnreferencedCode("XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlMultiStreamExtractor
     (
         IEnumerable<Stream> streams,
@@ -192,12 +203,10 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
 
 
     /// <inheritdoc />
-#pragma warning disable CS1998 // Async method lacks 'await' operators — XmlSerializer is synchronous
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync
     (
         [EnumeratorCancellation] CancellationToken token
     )
-#pragma warning restore CS1998
     {
         XmlLogMessages.StartingOperation(_logger, OperationName, null);
         using var operationScope = XmlMetrics.StartOperation(MetricTags);
@@ -208,6 +217,15 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
         foreach (var stream in _streams)
         {
             token.ThrowIfCancellationRequested();
+
+            // Stop BEFORE opening the next stream once the maximum is reached (and nothing is left
+            // to skip): reading it first would consume, dispose and discard one stream past the limit.
+            if (skipBudget == 0 && CurrentItemCount >= MaximumItemCount)
+            {
+                XmlLogMessages.ReachedMaximumItemCount(_logger, MaximumItemCount, null);
+                break;
+            }
+
             XmlLogMessages.ReadingStream(_logger, streamIndex, null);
 
             streamIndex++;
@@ -228,12 +246,6 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
                 continue;
             }
 
-            if (CurrentItemCount >= MaximumItemCount)
-            {
-                XmlLogMessages.ReachedMaximumItemCount(_logger, MaximumItemCount, null);
-                break;
-            }
-
             IncrementCurrentItemCount();
             XmlMetrics.RecordExtracted(MetricTags);
             XmlLogMessages.ExtractedItemFromStream(_logger, CurrentItemCount, streamIndex - 1, null);
@@ -252,7 +264,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
     /// a failed stream — each stream is one independent record, so Skip genuinely skips and
     /// continues. Rethrows the original exception when the policy aborts.
     /// </summary>
-    private async System.Threading.Tasks.Task<TRecord?> DeserializeStreamOrHandleErrorAsync(Stream stream, int oneBasedStreamNumber)
+    private async Task<TRecord?> DeserializeStreamOrHandleErrorAsync(Stream stream, int oneBasedStreamNumber)
     {
         TRecord? item = default;
         Exception? error = null;
@@ -282,6 +294,8 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
                 ExceptionDispatchInfo.Capture(error).Throw();
             }
 
+            // The policy skipped / dead-lettered a failed stream.
+            XmlMetrics.RecordErrored(MetricTags);
             return default;
         }
 
@@ -302,10 +316,10 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
             var settings = _readerSettings.Clone();
             settings.CloseInput = false;
             using var reader = XmlReader.Create(stream, settings);
-            return (TRecord?)Serializer.Deserialize(reader);
+            return (TRecord?)XmlSerialization.Deserialize(Serializer, reader);
         }
 
-        return (TRecord?)Serializer.Deserialize(stream);
+        return (TRecord?)XmlSerialization.Deserialize(Serializer, stream);
     }
 
 
@@ -317,6 +331,7 @@ public sealed class XmlMultiStreamExtractor<TRecord> : ExtractorBase<TRecord, Xm
             CurrentItemCount,
             CurrentSkippedItemCount
         );
+
 
 
     /// <inheritdoc />

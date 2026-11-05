@@ -227,7 +227,13 @@ function Invoke-Assemble
         [void]$sb.AppendLine()
         [void]$sb.AppendLine("### $($kinds[$kind])")
         [void]$sb.AppendLine()
-        foreach ($g in $group) { [void]$sb.AppendLine("- $($g.Description)$(Get-PrSuffix $g.RelPath)") }
+        foreach ($g in $group)
+        {
+            # A fragment that already cites its PR must not get the same "(#N)" appended again.
+            $suffix = Get-PrSuffix $g.RelPath
+            if ($suffix -and $g.Description.Contains($suffix.Trim())) { $suffix = '' }
+            [void]$sb.AppendLine("- $($g.Description)$suffix")
+        }
     }
     $section = $sb.ToString().TrimEnd()
 
@@ -240,6 +246,24 @@ function Invoke-Assemble
 
     $block = @($section -split "`n") + @('')
     $lines.InsertRange($insertAt, [string[]]$block)
+
+    # Keep the footer's compare links in step: [Unreleased] now diffs from the new tag, and the new
+    # version gets its own vPREV...vNEW line so its heading renders as a link.
+    for ($i = 0; $i -lt $lines.Count; $i++)
+    {
+        if ($lines[$i] -match '^\[Unreleased\]:\s*(?<base>\S+/compare/)(?<prev>\S+)\.\.\.HEAD\s*$')
+        {
+            $compareBase = $Matches['base']
+            $previousTag = $Matches['prev']
+            $lines[$i] = "[Unreleased]: ${compareBase}v$Version...HEAD"
+            if (-not ($lines | Where-Object { $_ -match "^\[$([regex]::Escape($Version))\]:" }))
+            {
+                $lines.Insert($i + 1, "[$Version]: $compareBase$previousTag...v$Version")
+            }
+            break
+        }
+    }
+
     Set-Content -Path $ChangelogPath -Value ($lines -join "`n") -NoNewline
     Add-Content -Path $ChangelogPath -Value ''
 

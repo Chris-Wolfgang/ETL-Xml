@@ -53,12 +53,12 @@ namespace Wolfgang.Etl.Xml;
 /// }
 /// </code>
 /// </example>
-public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, XmlReport>
+public sealed class XmlSingleStreamExtractor<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] TRecord> : ExtractorBase<TRecord, XmlReport>
     where TRecord : notnull, new()
 {
     private readonly Stream _stream;
     private readonly XmlReaderSettings? _readerSettings;
-    private static readonly XmlSerializer Serializer = new(typeof(TRecord));
+    private static readonly XmlSerializer Serializer = XmlSerialization.CreateSerializer(typeof(TRecord));
     private readonly ILogger _logger;
     private static readonly string OperationName = $"XML single-stream extraction of {typeof(TRecord).Name}";
     private static readonly KeyValuePair<string, object?>[] MetricTags =
@@ -84,12 +84,13 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// Thrown when <paramref name="stream"/> is <c>null</c>.
     /// </exception>
     /// <remarks>
-    /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
-    /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
-    /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
-    /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
+    /// Hidden from IntelliSense because its optional <c>options</c> parameter overlaps the canonical
+    /// <c>(source, options, logger)</c> constructor (S3427, see <c>src/Wolfgang.Etl.Xml/.editorconfig</c>); it is
+    /// retained for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature.
+    /// New code calls <c>(source, options, logger)</c>.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamExtractor(Stream stream, XmlSingleStreamExtractorOptions? options = null)
         : this(stream, options, logger: null)
@@ -113,16 +114,16 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamExtractor
     (
         Stream stream,
         ILogger<XmlSingleStreamExtractor<TRecord>> logger
     )
-        // Delegates to the canonical constructor rather than assigning fields directly. The
-        // hand-rolled version omitted _leaveOpen, so this overload silently defaulted it to
-        // false and closed the caller's stream, contradicting the documented LeaveOpen = true.
+        // Delegates to the canonical constructor rather than assigning fields directly, so
+        // LeaveOpen resolves in one place.
         : this(stream, options: null, logger: logger ?? throw new ArgumentNullException(nameof(logger)))
     {
     }
@@ -148,7 +149,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// removing it would fail them at runtime with <see cref="MissingMethodException"/> with no compile-time signal.
     /// Hidden from IntelliSense; source code binds here too, so nothing changes for callers. New code passes the record.
     /// </remarks>
-    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public XmlSingleStreamExtractor
     (
@@ -197,7 +199,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
     /// );
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("XmlSingleStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.")]
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
     public XmlSingleStreamExtractor
     (
         Stream stream,
@@ -211,9 +214,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
 
 
     // The single initialization path. Every public and internal constructor delegates here, so
-    // there is exactly one place that resolves options -> _leaveOpen. The previous shape let each
-    // overload initialize fields itself, which is how the (stream, logger) overload came to omit
-    // _leaveOpen entirely and silently close the caller's stream.
+    // there is exactly one place that resolves options -> _leaveOpen.
     private XmlSingleStreamExtractor
     (
         Stream stream,
@@ -357,6 +358,8 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
 
 
     // Counter + metric + log for one skipped item, kept together so the three can never drift.
+    // Only this stage uses helpers for the triple: inlined, ExtractWorkerAsync grows to 63 lines and
+    // trips MA0051 (60-line limit). The other three stages' loops fit, so they inline it.
     private void RecordSkipped()
     {
         IncrementCurrentSkippedItemCount();
@@ -402,7 +405,7 @@ public sealed class XmlSingleStreamExtractor<TRecord> : ExtractorBase<TRecord, X
         }
 
         consumedElement = true;
-        var item = (TRecord?)Serializer.Deserialize(reader);
+        var item = (TRecord?)XmlSerialization.Deserialize(Serializer, reader);
         if (item is null)
         {
             XmlLogMessages.SkippingNullElement(_logger, null);

@@ -1,15 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Wolfgang.Etl.TestKit.Xunit;
 using Wolfgang.Etl.Xml.Tests.Unit.TestModels;
+using Xunit;
 
 namespace Wolfgang.Etl.Xml.Tests.Unit;
 
 /// <summary>
 /// Verifies <see cref="XmlSingleStreamLoader{TRecord}"/> honours the
-/// <c>ISupportDryRun</c> contract (#176): in dry-run mode it writes nothing to the
+/// dry-run contract (<c>SupportsDryRunContractTests</c>): in dry-run mode it writes nothing to the
 /// output stream, and in a real run it does.
 /// </summary>
 public sealed class XmlSingleStreamLoaderDryRunContractTests
@@ -38,7 +40,7 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
     }
 
 
-    [Xunit.Fact]
+    [Fact]
     public async Task DryRun_with_LeaveOpen_false_still_closes_the_destination_stream()
     {
         var stream = new MemoryStream();
@@ -51,14 +53,14 @@ public sealed class XmlSingleStreamLoaderDryRunContractTests
         await loader.LoadAsync(Sample.ToAsyncEnumerable());
 
         // Nothing was written, but LeaveOpen = false must still close the stream on completion.
-        Xunit.Assert.Throws<System.ObjectDisposedException>(() => stream.Position);
+        Assert.Throws<ObjectDisposedException>(() => stream.Position);
     }
 }
 
 
 /// <summary>
 /// Verifies <see cref="XmlMultiStreamLoader{TRecord}"/> honours the
-/// <c>ISupportDryRun</c> contract (#176): in dry-run mode it never invokes the
+/// dry-run contract (<c>SupportsDryRunContractTests</c>): in dry-run mode it never invokes the
 /// destination-stream factory or writes, and in a real run it does.
 /// </summary>
 public sealed class XmlMultiStreamLoaderDryRunContractTests
