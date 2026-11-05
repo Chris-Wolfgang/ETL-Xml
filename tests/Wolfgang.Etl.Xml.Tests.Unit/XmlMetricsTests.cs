@@ -296,7 +296,7 @@ public sealed class XmlMetricsTests
         {
             var loader = new XmlMultiStreamLoader<MetricProbe>
             (
-                factory.Create<MetricProbe>,
+                factory.Create,
                 new XmlMultiStreamLoaderOptions { IsDryRun = true }
             );
             await loader.LoadAsync(Sample.ToAsyncEnumerable());
