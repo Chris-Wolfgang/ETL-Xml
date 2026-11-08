@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792304095679,
+  "lastUpdate": 1794140866578,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Stryker mutation score": [
@@ -244,6 +244,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "Mutation score",
             "value": 71.51,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "f30df2333e2ae7ae36f81c3a5324c365fe88ec64",
+          "message": "Bump the dotnet-dependencies group with 2 updates (#539)\n\nBumps jetbrains.resharper.globaltools from 2026.2.3.1 to 2026.2.4.1\nBumps Meziantou.Analyzer from 3.0.317 to 3.0.320\n\n---\nupdated-dependencies:\n- dependency-name: jetbrains.resharper.globaltools\n  dependency-version: 2026.2.4.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.320\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\nCo-authored-by: Chris Wolfgang <210299580+Chris-Wolfgang@users.noreply.github.com>",
+          "timestamp": "2026-11-05T18:58:25Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/f30df2333e2ae7ae36f81c3a5324c365fe88ec64"
+        },
+        "date": 1794140860856,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score",
+            "value": 81.55,
             "unit": "%"
           }
         ]
