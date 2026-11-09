@@ -1509,6 +1509,13 @@ jobs:
             echo "::notice::Excluded ${#excluded_integration[@]} integration test project(s) from the coverage gate (expected to run in a separate workflow): ${excluded_integration[*]}"
           fi
 
+          # Assemblies that actually ran tests in this job. The coverage gate below
+          # requires a coverage row for each one, so a test project whose coverage is
+          # never collected (e.g. no coverlet.collector) fails the gate instead of
+          # silently dropping out of it. Mirrors Stage 1.
+          ran_assemblies_file="$RUNNER_TEMP/stage3-ran-test-assemblies.txt"
+          : > "$ran_assemblies_file"
+
           if [ ${#test_projects[@]} -eq 0 ]; then
             if find ./src -type f \( -name "*.csproj" -o -name "*.vbproj" -o -name "*.fsproj" \) -print -quit 2>/dev/null | grep -q .; then
               echo "❌ No test projects under ./tests but ./src contains projects — refusing to silently skip the coverage gate."
@@ -1602,6 +1609,14 @@ jobs:
               fi
               rm -f "$test_log"
             done <<< "$frameworks"
+
+            # Record the assembly so the coverage gate can require a row for it
+            # (same derivation as the gate's TEST_ASSEMBLIES list).
+            asm=$(grep -oE '<AssemblyName>[^<]+' "$test_proj" 2>/dev/null | head -1 | cut -d'>' -f2 || true)
+            if [ -z "$asm" ]; then
+              asm=$(basename "$test_proj"); asm="${asm%.*}"
+            fi
+            echo "$asm" >> "$ran_assemblies_file"
             echo ""
           done
 
@@ -1622,13 +1637,19 @@ jobs:
 
       - name: Enforce coverage thresholds
         run: |
-          # If no cobertura files were produced (no tests, all test projects
-          # skipped, etc.), the preceding step explicitly skipped report
-          # generation. Mirror that here — gating only when coverage was
-          # actually collected — instead of failing with "Coverage report
-          # not generated!" on jobs that legitimately had nothing to cover.
+          # No cobertura files is legitimate only when nothing ran (no tests, every
+          # test project skipped): the preceding step then skipped report generation
+          # and this gate has nothing to cover. When the test step recorded assemblies
+          # that DID run, the gate cannot be evaluated and must fail, as Stages 1 and 2
+          # do, instead of passing on missing coverage.
+          ran_assemblies_file="$RUNNER_TEMP/stage3-ran-test-assemblies.txt"
           if ! find ./TestResults -name "coverage.cobertura.xml" -print -quit 2>/dev/null | grep -q .; then
-            echo "ℹ️  No coverage files produced — skipping coverage gate (consistent with the prior 'skipping report generation' notice)."
+            if [ -s "$ran_assemblies_file" ]; then
+              echo "❌ Tests ran but produced no coverage files - the coverage gate cannot be evaluated. Test assemblies that ran:"
+              cat "$ran_assemblies_file"
+              exit 1
+            fi
+            echo "ℹ️  No coverage files produced and no test assembly ran — skipping coverage gate (consistent with the prior 'skipping report generation' notice)."
             exit 0
           fi
           if [ ! -f "CoverageReport/Summary.txt" ]; then
@@ -1687,6 +1708,19 @@ jobs:
           if [ "$MATCHED" -eq 0 ]; then
             echo "❌ Coverage parser matched 0 modules in Summary.txt — regex or report format is out of sync. Refusing to silently pass the gate."
             exit 1
+          fi
+
+          # Every test assembly that ran must appear in the report. A missing row means
+          # its coverage was never collected, and an unmeasured assembly must not pass.
+          if [ -f "$ran_assemblies_file" ]; then
+            while IFS= read -r asm; do
+              [ -z "$asm" ] && continue
+              if ! awk -v asm="$asm" '/^[^ ]/ && $1 == asm { found = 1 } END { exit !found }' CoverageReport/Summary.txt; then
+                echo "Checking test module: '$asm' - Coverage: none collected"
+                echo "  ❌ FAIL: tests ran but no coverage was recorded (is coverlet.collector referenced?)"
+                FAILED=1
+              fi
+            done < <(sort -u "$ran_assemblies_file")
           fi
 
           if [ "$FAILED" -ne 0 ]; then
