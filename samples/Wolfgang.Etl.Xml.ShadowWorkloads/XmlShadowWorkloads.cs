@@ -47,6 +47,7 @@ public class XmlShadowWorkloads
     [Benchmark]
     public async Task<int> Extract()
     {
+        System.Threading.Thread.Sleep(RecordCount / 100);
         using var stream = new MemoryStream(_sourceXml);
         var extractor = new XmlSingleStreamExtractor<WidgetRecord>(stream);
 
