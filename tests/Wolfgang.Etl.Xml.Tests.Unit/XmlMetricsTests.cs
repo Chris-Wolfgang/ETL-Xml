@@ -332,6 +332,28 @@ public sealed class XmlMetricsTests
 
 
     [Fact]
+    public async Task OperationDuration_when_the_operation_is_short_records_a_bounded_number_of_milliseconds()
+    {
+        var measurements = await CollectAsync(async () =>
+        {
+            using var ms = new MemoryStream();
+            var loader = new XmlSingleStreamLoader<MetricProbe>
+            (
+                ms,
+                new XmlSingleStreamLoaderOptions { LeaveOpen = true }
+            );
+            await loader.LoadAsync(SlowAsync(Sample));
+        });
+
+        // A ~50 ms load must not record more than 30 s: the value is elapsed ticks scaled to
+        // milliseconds, not a raw timestamp sum or a tick count multiplied by the frequency.
+        var duration = Assert.Single(measurements, m => Is(m, "wolfgang.etl.xml.operation.duration"));
+        Assert.InRange(duration.Value, 0, 30_000);
+    }
+
+
+
+    [Fact]
     public void OperationDuration_instrument_when_published_has_unit_ms()
     {
         _ = XmlMetrics.OperationDuration;
