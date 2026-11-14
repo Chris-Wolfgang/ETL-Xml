@@ -201,7 +201,7 @@ jobs:
           auto-push: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # >20% slower than the baseline best fails the run (AC: >20% latency).
-          alert-threshold: '120%'
+          alert-threshold: '1%'
           comment-on-alert: false
           fail-on-alert: true
 
