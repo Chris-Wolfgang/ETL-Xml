@@ -119,6 +119,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0 # the same-runner re-measure checks out the last-measured commit
           persist-credentials: false
 
       - name: Setup .NET
@@ -160,7 +161,115 @@ jobs:
           }' "${reports[@]}" > shadow-result.json
           echo "report=$SAMPLE_DIR/shadow-result.json" >> "$GITHUB_OUTPUT"
 
-      - name: Publish chart & gate on latency regression
+      # The stored baseline point comes from a different night, so a slow runner
+      # (not a slow build) can trip the gate: the 2026-11-13 failures had all 8
+      # benchmarks 1.25-1.9x slower, yet a same-runner A/B of the measured commits
+      # showed no difference. So the stored-point comparison is only a first pass.
+      # On an alert, the last-measured commit is built and re-run in THIS job and
+      # the run fails only if current is still >20% slower than that same-runner
+      # baseline. Nothing is pushed to gh-pages until the gate has passed.
+      - name: Find last-measured commit
+        id: last
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh api -H "Accept: application/vnd.github.raw" \
+               "repos/$GITHUB_REPOSITORY/contents/dev/shadow/data.js?ref=gh-pages" > "$RUNNER_TEMP/shadow-data.js"; then
+            sha=$(sed 's/^window.BENCHMARK_DATA = //' "$RUNNER_TEMP/shadow-data.js" \
+                    | jq -r '.entries["Xml shadow workloads"][-1].commit.id // ""')
+          else
+            sha=""
+          fi
+          echo "Last measured commit: ${sha:-<none>}"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      # First pass: compare with the stored point. Does not push (auto-push off)
+      # and does not comment; an alert fails this step, which is tolerated so the
+      # same-runner re-measure below can decide.
+      - name: Compare with stored baseline (first pass)
+        id: stored
+        continue-on-error: true
+        uses: benchmark-action/github-action-benchmark@4322e5726e6334590d251fc4f92bec0efafc45dc # v1.22.2
+        with:
+          name: Xml shadow workloads
+          tool: 'benchmarkdotnet'
+          output-file-path: ${{ steps.locate.outputs.report }}
+          gh-pages-branch: gh-pages
+          benchmark-data-dir-path: dev/shadow
+          auto-push: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # >20% slower than the baseline best fails the run (AC: >20% latency).
+          alert-threshold: '120%'
+          comment-on-alert: false
+          fail-on-alert: true
+
+      # The step above commits the new point to a local gh-pages branch even when
+      # it does not push. Drop it and return to the checked-out commit, so a point
+      # that alerted can never be pushed and later steps see the original tree.
+      - name: Discard locally committed point
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset --hard
+          git checkout --detach "$GITHUB_SHA"
+          git branch -D gh-pages || true
+          git status --short | head
+
+      - name: Re-measure last-measured commit on this runner
+        if: steps.stored.outcome == 'failure'
+        env:
+          LAST_SHA: ${{ steps.last.outputs.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          threshold=120
+          proj=Wolfgang.Etl.Xml.ShadowWorkloads.csproj
+
+          echo "::warning::Stored-baseline comparison alerted; re-measuring ${LAST_SHA:-<none>} and current on this runner"
+          if [ -z "$LAST_SHA" ]; then
+            echo "::error::Alerted and no last-measured commit is available to re-measure against"
+            exit 1
+          fi
+
+          git worktree add "$RUNNER_TEMP/baseline" "$LAST_SHA"
+          dotnet build -c Release "$RUNNER_TEMP/baseline/$SAMPLE_DIR/$proj"
+
+          run_bdn() { # dir artifacts-dir
+            (cd "$1/$SAMPLE_DIR" && dotnet run -c Release --no-build -- \
+              --filter "*" --job short --memory --exporters json --artifacts "$2")
+          }
+          report() { # artifacts-dir -> merged {FullName: MeanNs} object
+            jq -s 'map(.Benchmarks[]) | map({key: .FullName, value: .Statistics.Mean}) | from_entries' \
+              "$1"/results/*-report-full-compressed.json
+          }
+
+          # Baseline first, then current, back to back on this runner.
+          run_bdn "$RUNNER_TEMP/baseline" "$RUNNER_TEMP/ab-baseline"
+          run_bdn "$GITHUB_WORKSPACE" "$RUNNER_TEMP/ab-current"
+
+          result="$(jq -n --argjson b "$(report "$RUNNER_TEMP/ab-baseline")" \
+                          --argjson c "$(report "$RUNNER_TEMP/ab-current")" '
+            [$c | to_entries[] | . as $e | ($b[$e.key]) as $bm |
+             {benchmark: $e.key, baselineNs: $bm, currentNs: $e.value,
+              ratioPct: (if $bm then ($e.value / $bm * 100 | round) else null end)}]')"
+          echo "$result" | jq .
+
+          bad="$(echo "$result" | jq --argjson t "$threshold" '[.[] | select(.ratioPct == null or .ratioPct > $t)]')"
+          if [ "$(echo "$bad" | jq length)" -gt 0 ]; then
+            echo "::error::Still >$((threshold - 100))% slower than $LAST_SHA on the same runner (or missing from the baseline); this is a real regression"
+            echo "$bad" | jq .
+            exit 1
+          fi
+          echo "::notice::Alert cleared: current is within $((threshold - 100))% of $LAST_SHA measured on this runner (slow-runner night). The point is not published."
+
+      # Only a point that passed the stored-baseline gate outright is published,
+      # and only from main, so a branch dispatch can never write to gh-pages. A
+      # cleared alert is not published: a slow-runner reading must not become
+      # the baseline the next night is compared with.
+      - name: Publish chart
+        if: github.ref == 'refs/heads/main' && steps.stored.outcome == 'success'
         uses: benchmark-action/github-action-benchmark@4322e5726e6334590d251fc4f92bec0efafc45dc # v1.22.2
         with:
           name: Xml shadow workloads
@@ -170,13 +279,12 @@ jobs:
           benchmark-data-dir-path: dev/shadow
           auto-push: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          # >20% slower than the baseline best fails the run (AC: >20% latency).
           alert-threshold: '120%'
-          comment-on-alert: true
-          fail-on-alert: true
+          comment-on-alert: false
+          fail-on-alert: false
 
       - name: Open regression issue
-        if: failure()
+        if: failure() && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
