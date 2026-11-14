@@ -14,15 +14,32 @@ namespace System.Diagnostics.CodeAnalysis;
 [EditorBrowsable(EditorBrowsableState.Never)]
 [ExcludeFromCodeCoverage]
 [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method, Inherited = false)]
-[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Message.get and Url are part of the framework's public shape for this attribute; the polyfill must mirror it so trimmer / analyzer tooling that reads these properties via reflection sees the same surface as the real BCL type.")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Url is part of the framework's public shape for this attribute; the polyfill must mirror it so trimmer / analyzer tooling that reads these properties via reflection sees the same surface as the real BCL type.")]
 internal sealed class RequiresUnreferencedCodeAttribute : Attribute
 {
+    private readonly string _message;
+
+
+
     public RequiresUnreferencedCodeAttribute(string message)
     {
-        Message = message;
+        _message = message;
     }
 
-    public string Message { get; }
+
+
+    /// <summary>
+    /// Gets the message that explains why the annotated member is not compatible.
+    /// </summary>
+    /// <remarks>
+    /// A get-only property over a field rather than an auto-property: nothing in this
+    /// assembly reads <c>Message</c> (tooling reads the constructor argument from
+    /// metadata), and ReSharper reports an unread auto-property getter as
+    /// UnusedAutoPropertyAccessor.Global.
+    /// </remarks>
+    public string Message => _message;
+
+
 
     public string? Url { get; set; }
 }
