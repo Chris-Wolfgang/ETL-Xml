@@ -1,0 +1,23 @@
+name: ab-shadow-scratch
+on:
+  push:
+    branches: [scratch/shadow-ab]
+permissions:
+  contents: read
+jobs:
+  ab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { ref: f30df2333e2ae7ae36f81c3a5324c365fe88ec64, path: A, persist-credentials: false }
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { ref: 211dea8182034a3c33cb872d09390caf65af2e1e, path: B, persist-credentials: false }
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73
+        with: { dotnet-version: '10.0.x' }
+      - run: |
+          dotnet --info | head -12
+          for v in A B; do dotnet build -c Release $v/samples/Wolfgang.Etl.Xml.ShadowWorkloads/Wolfgang.Etl.Xml.ShadowWorkloads.csproj | tail -2; done
+      - run: |
+          for i in 1 2 3; do for v in A B; do
+            (cd $v/samples/Wolfgang.Etl.Xml.ShadowWorkloads && dotnet run -c Release --no-build -- --filter "*" --job short --memory 2>&1 | grep -E "^\| (Extract|Load|RoundTrip|Concurrent)" | sed "s/^/$v run$i /")
+          done; done
