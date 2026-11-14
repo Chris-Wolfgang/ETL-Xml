@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794494637872,
+  "lastUpdate": 1794679506578,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "BenchmarkDotNet": [
@@ -4446,6 +4446,120 @@ window.BENCHMARK_DATA = {
             "value": 776326.3509114584,
             "unit": "ns",
             "range": "± 556.4093009690114"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7c43e62aa8d4aab0763b1a0d2a9672ae36c251d4",
+          "message": "fix(inspectcode): back the polyfill Message with a field, not an auto-property (#557)\n\nReSharper 2026.3.0 (bumped in #551) reported Message.get on the\nRequiresDynamicCodeAttribute polyfill as UnusedAutoPropertyAccessor.Global\n(code-scanning alert 856) on main 211dea8, despite the class-level\nSuppressMessage. The finding is not reproducible run to run (0 results on\n#556, 2 on #552 for the same file), so make it structurally impossible:\nMessage becomes a get-only property over a readonly field. Same change on\nthe RequiresUnreferencedCodeAttribute twin, which has the same shape.\n\nCloses #553\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-14T13:01:27-05:00",
+          "tree_id": "42bcf08e2b06442e8bd94e35b0750f4e75159de8",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/7c43e62aa8d4aab0763b1a0d2a9672ae36c251d4"
+        },
+        "date": 1794679503604,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 45540.000813802086,
+            "unit": "ns",
+            "range": "± 872.1491437981599"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 446707.1168619792,
+            "unit": "ns",
+            "range": "± 5691.587987980661"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 4496059.583333333,
+            "unit": "ns",
+            "range": "± 58535.90172485778"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 20526.279418945312,
+            "unit": "ns",
+            "range": "± 862.713577557033"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 192944.77449544272,
+            "unit": "ns",
+            "range": "± 4735.742184806093"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 2052129.3424479167,
+            "unit": "ns",
+            "range": "± 19951.988166659245"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 25964.23173014323,
+            "unit": "ns",
+            "range": "± 660.1105455997889"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 201919.19173177084,
+            "unit": "ns",
+            "range": "± 1931.1219272189733"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 1942683.59375,
+            "unit": "ns",
+            "range": "± 13579.199618604971"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 13171.610539754232,
+            "unit": "ns",
+            "range": "± 276.7649975188369"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 10)",
+            "value": 10918.73479715983,
+            "unit": "ns",
+            "range": "± 22.583810566075297"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 100747.55045572917,
+            "unit": "ns",
+            "range": "± 440.3665421100702"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 100)",
+            "value": 82318.67036946614,
+            "unit": "ns",
+            "range": "± 89.40723955482247"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 1166822.5227864583,
+            "unit": "ns",
+            "range": "± 4176.131968032788"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 1000)",
+            "value": 1053424.4739583333,
+            "unit": "ns",
+            "range": "± 10770.407288714581"
           }
         ]
       }
