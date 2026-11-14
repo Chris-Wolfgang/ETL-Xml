@@ -190,6 +190,29 @@ public sealed class XmlLoaderBufferWriterTests
         );
     }
 
+
+    [Fact]
+    public async Task BufferWriterStream_FlushAsync_when_token_is_cancelled_returns_a_cancelled_task()
+    {
+        var stream = new BufferWriterStream(new TestBufferWriter());
+
+        await Assert.ThrowsAsync<TaskCanceledException>
+        (
+            () => stream.FlushAsync(new CancellationToken(canceled: true))
+        );
+    }
+
+
+    [Fact]
+    public async Task BufferWriterStream_FlushAsync_when_token_is_not_cancelled_completes()
+    {
+        var stream = new BufferWriterStream(new TestBufferWriter());
+
+        await stream.FlushAsync(CancellationToken.None);
+
+        Assert.True(stream.CanWrite);
+    }
+
 #if NET5_0_OR_GREATER
 
 
