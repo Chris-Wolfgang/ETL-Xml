@@ -91,6 +91,28 @@ public class XmlSingleStreamExtractorTests
 
 
     [Fact]
+    public async Task ExtractAsync_when_content_follows_the_root_end_tag_stops_at_the_root_end_tag()
+    {
+        // A second top-level element is not well-formed, so XmlReader throws if it reads past the
+        // root's closing tag. The extractor must stop at that tag and never read the trailer.
+        var xml = "<ArrayOfPersonRecord><PersonRecord><FirstName>Alice</FirstName><LastName>Smith</LastName><Age>30</Age></PersonRecord></ArrayOfPersonRecord><Trailer />";
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+
+        var sut = new XmlSingleStreamExtractor<PersonRecord>(stream);
+
+        var results = new List<PersonRecord>();
+        await foreach (var item in sut.ExtractAsync())
+        {
+            results.Add(item);
+        }
+
+        var person = Assert.Single(results);
+        Assert.Equal("Alice", person.FirstName);
+    }
+
+
+
+    [Fact]
     public async Task ExtractAsync_when_custom_XmlReaderSettings_uses_settings()
     {
         var stream = CreateXmlStream(2);
