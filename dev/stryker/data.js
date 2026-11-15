@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794140866578,
+  "lastUpdate": 1794748162371,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Stryker mutation score": [
@@ -271,6 +271,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "Mutation score",
             "value": 81.55,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "b7cf78b4807d2a7bf85d9df70b8823d449a02cab",
+          "message": "ci: shadow gate re-measures the last-measured commit on the same runner on alert (#556)\n\nThe stored gh-pages point comes from a different night/runner, so any slow\nrunner night failed the gate (2026-11-13: all 8 benchmarks 1.25-1.9x slower\nwith no perf-relevant change). On an alert the job now builds the\nlast-measured commit, runs it and current back to back, and fails only if\ncurrent is still >20% slower. Alerting points are no longer pushed to\ngh-pages, and publish/issue steps are gated to main.\n\nCo-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-14T18:44:38Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/b7cf78b4807d2a7bf85d9df70b8823d449a02cab"
+        },
+        "date": 1794748158393,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score (tests/Wolfgang.Etl.Xml.Tests.Unit)",
+            "value": 85.29,
             "unit": "%"
           }
         ]
