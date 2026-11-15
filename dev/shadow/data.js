@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794655234178,
+  "lastUpdate": 1794743546058,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -2450,6 +2450,76 @@ window.BENCHMARK_DATA = {
             "value": 2350901547.6666665,
             "unit": "ns",
             "range": "± 2021239.6177802207"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "b7cf78b4807d2a7bf85d9df70b8823d449a02cab",
+          "message": "ci: shadow gate re-measures the last-measured commit on the same runner on alert (#556)\n\nThe stored gh-pages point comes from a different night/runner, so any slow\nrunner night failed the gate (2026-11-13: all 8 benchmarks 1.25-1.9x slower\nwith no perf-relevant change). On an alert the job now builds the\nlast-measured commit, runs it and current back to back, and fails only if\ncurrent is still >20% slower. Alerting points are no longer pushed to\ngh-pages, and publish/issue steps are gated to main.\n\nCo-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-14T18:44:38Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/b7cf78b4807d2a7bf85d9df70b8823d449a02cab"
+        },
+        "date": 1794743544791,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1154085.93359375,
+            "unit": "ns",
+            "range": "± 3158.984560948387"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 490710.7434895833,
+            "unit": "ns",
+            "range": "± 16339.455371737393"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 1671661.0390625,
+            "unit": "ns",
+            "range": "± 13217.928741777861"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 18341366.833333332,
+            "unit": "ns",
+            "range": "± 113589.3179387325"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 118448777.13333333,
+            "unit": "ns",
+            "range": "± 248534.37433404528"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 53947525.800000004,
+            "unit": "ns",
+            "range": "± 696574.698550607"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 182274704,
+            "unit": "ns",
+            "range": "± 20363756.226519138"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 1882019373.6666667,
+            "unit": "ns",
+            "range": "± 5446475.549520472"
           }
         ]
       }
