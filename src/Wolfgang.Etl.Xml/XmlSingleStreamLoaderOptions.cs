@@ -26,9 +26,12 @@ public sealed record XmlSingleStreamLoaderOptions : LoaderOptions
     /// </summary>
     /// <remarks>
     /// When <c>null</c> (default) the root element name is derived automatically as
-    /// <c>ArrayOf{TypeName}</c> (e.g. <c>ArrayOfPerson</c>). An empty or whitespace
-    /// value is not valid and will cause <see cref="XmlSingleStreamLoader{TRecord}"/>
-    /// to throw <see cref="System.ArgumentException"/> during construction.
+    /// <c>ArrayOf{TypeName}</c> (e.g. <c>ArrayOfPerson</c>); a generic record type uses the
+    /// name <c>XmlSerializer</c> would give it (<c>ArrayOfGOfInt32</c> for <c>G&lt;int&gt;</c>).
+    /// An empty or whitespace value, or one that is not a valid XML local name (for example
+    /// <c>my root</c> or <c>a:b</c>), is not valid and will cause
+    /// <see cref="XmlSingleStreamLoader{TRecord}"/> to throw <see cref="System.ArgumentException"/>
+    /// during construction.
     /// </remarks>
     public string? RootElementName { get; init; }
 
