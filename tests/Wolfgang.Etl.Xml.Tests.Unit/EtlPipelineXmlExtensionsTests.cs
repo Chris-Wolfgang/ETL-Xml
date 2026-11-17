@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Wolfgang.Etl.Abstractions;
@@ -78,6 +79,214 @@ public sealed class EtlPipelineXmlExtensionsTests
             File.Delete(inPath);
             File.Delete(outPath);
         }
+    }
+
+
+
+    [Fact]
+    public async Task XmlSingleStreamLoader_path_when_IsDryRun_leaves_an_existing_file_unchanged()
+    {
+        var outPath = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(outPath, "<precious/>");
+            var source = await CreateSingleStreamXmlAsync(People);
+
+            await EtlPipeline
+                .Create()
+                .XmlSingleStreamExtractor<PersonRecord>(source)
+                .XmlSingleStreamLoader(outPath, new XmlSingleStreamLoaderOptions { IsDryRun = true })
+                .RunAsync();
+
+            Assert.Equal
+            (
+                "<precious/>",
+                File.ReadAllText(outPath)
+            );
+        }
+        finally
+        {
+            File.Delete(outPath);
+        }
+    }
+
+
+
+    [Fact]
+    public async Task XmlSingleStreamLoader_path_when_IsDryRun_does_not_create_a_missing_file()
+    {
+        var outPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".xml");
+        var source = await CreateSingleStreamXmlAsync(People);
+
+        await EtlPipeline
+            .Create()
+            .XmlSingleStreamExtractor<PersonRecord>(source)
+            .XmlSingleStreamLoader(outPath, new XmlSingleStreamLoaderOptions { IsDryRun = true })
+            .RunAsync();
+
+        Assert.False(File.Exists(outPath));
+    }
+
+
+
+    [Fact]
+    public void XmlSingleStreamLoader_path_when_composed_but_never_run_leaves_an_existing_file_unchanged()
+    {
+        var outPath = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(outPath, "<precious/>");
+
+            _ = EtlPipeline
+                .Create()
+                .From(new List<PersonRecord>().ToAsyncEnumerable())
+                .XmlSingleStreamLoader(outPath);
+
+            Assert.Equal("<precious/>", File.ReadAllText(outPath));
+        }
+        finally
+        {
+            File.Delete(outPath);
+        }
+    }
+
+
+
+    [Fact]
+    public void XmlSingleStreamExtractor_path_when_composed_but_never_run_does_not_lock_the_file()
+    {
+        var inPath = Path.GetTempFileName();
+        try
+        {
+            _ = EtlPipeline.Create().XmlSingleStreamExtractor<PersonRecord>(inPath);
+
+            using (File.Open(inPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+            }
+        }
+        finally
+        {
+            File.Delete(inPath);
+        }
+    }
+
+
+
+    [Fact]
+    public async Task XmlSingleStreamExtractor_path_when_run_with_a_pre_cancelled_token_does_not_lock_the_file()
+    {
+        var inPath = Path.GetTempFileName();
+        try
+        {
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>
+            (
+                () => EtlPipeline
+                    .Create()
+                    .XmlSingleStreamExtractor<PersonRecord>(inPath)
+                    .XmlSingleStreamLoader(new MemoryStream())
+                    .RunAsync(null, cts.Token)
+            );
+
+            using (File.Open(inPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+            }
+        }
+        finally
+        {
+            File.Delete(inPath);
+        }
+    }
+
+
+
+    [Fact]
+    public async Task XmlSingleStreamExtractor_path_when_file_is_missing_fails_at_run_time()
+    {
+        var inPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".xml");
+
+        var pipeline = EtlPipeline
+            .Create()
+            .XmlSingleStreamExtractor<PersonRecord>(inPath)
+            .XmlSingleStreamLoader(new MemoryStream());
+
+        await Assert.ThrowsAsync<FileNotFoundException>(() => pipeline.RunAsync());
+    }
+
+
+
+    [Fact]
+    public void DeferredFileStream_exposes_forward_only_capabilities_and_rejects_seeking()
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            using var reader = DeferredFileStream.ForRead(path);
+            using var writer = DeferredFileStream.ForWrite(path);
+
+            Assert.True(reader.CanRead);
+            Assert.False(reader.CanWrite);
+            Assert.True(writer.CanWrite);
+            Assert.False(writer.CanRead);
+            Assert.False(reader.CanSeek);
+            Assert.Throws<NotSupportedException>(() => reader.Length);
+            Assert.Throws<NotSupportedException>(() => reader.Position);
+            Assert.Throws<NotSupportedException>(() => reader.Position = 0);
+            Assert.Throws<NotSupportedException>(() => reader.Seek(0, SeekOrigin.Begin));
+            Assert.Throws<NotSupportedException>(() => reader.SetLength(0));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+
+
+    [Fact]
+    public async Task DeferredFileStream_reads_and_writes_synchronously_and_asynchronously()
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            var data = new byte[] { 1, 2, 3, 4 };
+
+            var writer = DeferredFileStream.ForWrite(path);
+            writer.Write(data, 0, 2);
+            await writer.WriteAsync(data, 2, 2, CancellationToken.None);
+            writer.Flush();
+            await writer.FlushAsync(CancellationToken.None);
+            writer.Dispose();
+            Assert.False(writer.CanWrite);
+            Assert.Throws<ObjectDisposedException>(() => writer.Write(data, 0, 1));
+
+            var reader = DeferredFileStream.ForRead(path);
+            var buffer = new byte[4];
+            Assert.Equal(2, reader.Read(buffer, 0, 2));
+            Assert.Equal(2, await reader.ReadAsync(buffer, 2, 2, CancellationToken.None));
+            Assert.Equal(data, buffer);
+            reader.Dispose();
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+
+
+    [Fact]
+    public async Task DeferredFileStream_flush_before_first_use_does_not_open_the_file()
+    {
+        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".xml");
+
+        using var writer = DeferredFileStream.ForWrite(path);
+        writer.Flush();
+        await writer.FlushAsync(CancellationToken.None);
+
+        Assert.False(File.Exists(path));
     }
 
 

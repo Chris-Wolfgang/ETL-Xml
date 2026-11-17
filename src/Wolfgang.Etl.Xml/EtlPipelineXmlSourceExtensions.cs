@@ -46,7 +46,9 @@ public static class EtlPipelineXmlSourceExtensions
             throw new ArgumentNullException(nameof(path));
         }
 
-        var stream = File.OpenRead(path);
+        // The file is opened on the first read, inside the extraction, so a pipeline that is composed
+        // but never run (or is cancelled before extraction starts) never locks the file.
+        var stream = DeferredFileStream.ForRead(path);
 
         // The factory opened the stream, so it owns it: LeaveOpen = false makes the extractor close
         // the stream (via XmlReader.CloseInput) when the reader is disposed — on success and failure.
