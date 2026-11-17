@@ -360,16 +360,17 @@ public class XmlMultiStreamExtractorTests
 
 
 
-        public IEnumerable<Stream> Streams()
+        public IEnumerable<Stream> Streams() => ExpectedItems.Take(_count).Select(CreateStream);
+
+
+
+        private Stream CreateStream(PersonRecord item)
         {
-            foreach (var item in ExpectedItems.Take(_count))
-            {
-                var stream = new TrackingStream(this);
-                Serializer.Serialize(stream, item);
-                stream.Position = 0;
-                Opened++;
-                yield return stream;
-            }
+            var stream = new TrackingStream(this);
+            Serializer.Serialize(stream, item);
+            stream.Position = 0;
+            Opened++;
+            return stream;
         }
 
 
