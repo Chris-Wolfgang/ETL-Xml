@@ -259,6 +259,93 @@ public class XmlSingleStreamLoaderTests
 
 
     [Fact]
+    public async Task LoadAsync_when_source_fails_midway_leaves_a_document_that_is_not_well_formed()
+    {
+        var stream = new MemoryStream();
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, new XmlSingleStreamLoaderOptions { LeaveOpen = true });
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.LoadAsync(FailAfterOneRecord()));
+
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+        Assert.Contains("Alice", content, StringComparison.Ordinal);
+        Assert.DoesNotContain("</ArrayOfPersonRecord>", content, StringComparison.Ordinal);
+        Assert.Throws<XmlException>(() => System.Xml.Linq.XDocument.Parse(content.TrimStart('﻿')));
+        Assert.True(stream.CanRead, "LeaveOpen = true must leave the stream open after a failed load.");
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_cancelled_midway_leaves_a_document_that_is_not_well_formed()
+    {
+        var stream = new MemoryStream();
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, new XmlSingleStreamLoaderOptions { LeaveOpen = true });
+        using var cts = new System.Threading.CancellationTokenSource();
+
+        async IAsyncEnumerable<PersonRecord> CancelAfterOneRecord()
+        {
+            yield return new PersonRecord { FirstName = "Alice" };
+            await Task.Yield();
+            cts.Cancel();
+            yield return new PersonRecord { FirstName = "Bob" };
+        }
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sut.LoadAsync(CancelAfterOneRecord(), cts.Token));
+
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+        Assert.DoesNotContain("</ArrayOfPersonRecord>", content, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_source_fails_and_LeaveOpen_is_false_closes_the_stream()
+    {
+        var stream = new MemoryStream();
+        var sut = new XmlSingleStreamLoader<PersonRecord>(stream, new XmlSingleStreamLoaderOptions { LeaveOpen = false });
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.LoadAsync(FailAfterOneRecord()));
+
+        Assert.False(stream.CanWrite);
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_source_fails_and_flushing_also_fails_surfaces_the_original_exception()
+    {
+        var sut = new XmlSingleStreamLoader<PersonRecord>(new ThrowingWriteStream(), new XmlSingleStreamLoaderOptions { LeaveOpen = true });
+
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => sut.LoadAsync(FailAfterOneRecord()));
+
+        Assert.Equal("source failed", ex.Message);
+    }
+
+
+
+    private static async IAsyncEnumerable<PersonRecord> FailAfterOneRecord()
+    {
+        yield return new PersonRecord { FirstName = "Alice" };
+        await Task.Yield();
+        throw new InvalidOperationException("source failed");
+    }
+
+
+
+    private sealed class ThrowingWriteStream : MemoryStream
+    {
+        public override Task WriteAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
+            => throw new IOException("disk full");
+
+
+
+        public override Task FlushAsync(System.Threading.CancellationToken cancellationToken)
+            => throw new IOException("disk full");
+    }
+
+
+
+    [Fact]
     public async Task LoadAsync_when_rootElementName_is_null_uses_default_root_element()
     {
         var stream = new MemoryStream();
