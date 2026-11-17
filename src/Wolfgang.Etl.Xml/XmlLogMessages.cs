@@ -43,6 +43,9 @@ internal static class XmlLogMessages
     internal static readonly Action<ILogger, int, int, Exception?> SingleStreamLoadingCompleted =
         LoggerMessage.Define<int, int>(LogLevel.Information, new EventId(111, nameof(SingleStreamLoadingCompleted)), "XML single-stream loading completed. Loaded: {ItemCount}, skipped: {SkippedCount}.");
 
+    internal static readonly Action<ILogger, Exception?> AbandonedWriterFlushFailed =
+        LoggerMessage.Define(LogLevel.Debug, new EventId(112, nameof(AbandonedWriterFlushFailed)), "Flushing the partial output of a failed load also failed; the original failure is reported.");
+
 
 
     // ── MultiStream Extractor ────────────────────────────────────────
