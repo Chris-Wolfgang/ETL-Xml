@@ -214,17 +214,26 @@ public sealed class XmlMultiStreamExtractor<[DynamicallyAccessedMembers(XmlSeria
         var skipBudget = SkipItemCount;
         var streamIndex = 0;
 
-        foreach (var stream in _streams)
+        using var enumerator = _streams.GetEnumerator();
+        while (true)
         {
+            // Cancellation and the maximum are checked BEFORE MoveNext(): for a lazy sequence such
+            // as Select(File.OpenRead), MoveNext() is what opens the next stream, so checking after
+            // it would open one stream past the limit and leak it — the caller never sees it.
             token.ThrowIfCancellationRequested();
 
-            // Stop BEFORE opening the next stream once the maximum is reached (and nothing is left
-            // to skip): reading it first would consume, dispose and discard one stream past the limit.
             if (skipBudget == 0 && CurrentItemCount >= MaximumItemCount)
             {
                 XmlLogMessages.ReachedMaximumItemCount(_logger, MaximumItemCount, null);
                 break;
             }
+
+            if (!enumerator.MoveNext())
+            {
+                break;
+            }
+
+            var stream = enumerator.Current;
 
             XmlLogMessages.ReadingStream(_logger, streamIndex, null);
 
