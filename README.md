@@ -138,9 +138,13 @@ using System.IO.Compression;
 // Write gzip-compressed XML. LeaveOpen = false lets the loader dispose the
 // GZipStream when the load completes, flushing the gzip footer.
 using (var file = File.Create("people.xml.gz"))
-using (var gzip = new GZipStream(file, CompressionMode.Compress))
 {
-    var loader = new XmlSingleStreamLoader<Person>(gzip);
+    var gzip = new GZipStream(file, CompressionMode.Compress);
+    var loader = new XmlSingleStreamLoader<Person>
+    (
+        gzip,
+        new XmlSingleStreamLoaderOptions { LeaveOpen = false }
+    );
     await loader.LoadAsync(people);
 }
 

@@ -259,6 +259,43 @@ public class XmlSingleStreamLoaderTests
 
 
     [Fact]
+    public async Task LoadAsync_when_record_type_is_generic_default_root_element_is_a_valid_name()
+    {
+        var stream = new MemoryStream();
+        var sut = new XmlSingleStreamLoader<GenericRecord<int>>(stream);
+
+        await sut.LoadAsync(new List<GenericRecord<int>> { new() { Value = 7 } }.ToAsyncEnumerable());
+
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+
+        Assert.Contains("<ArrayOfGenericRecordOfInt32>", content, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_record_type_is_nested_generic_default_root_element_is_a_valid_name()
+    {
+        var stream = new MemoryStream();
+        var sut = new XmlSingleStreamLoader<GenericRecord<GenericRecord<string>>>(stream);
+
+        await sut.LoadAsync(new List<GenericRecord<GenericRecord<string>>> { new() }.ToAsyncEnumerable());
+
+        var content = Encoding.UTF8.GetString(stream.ToArray());
+
+        Assert.Contains("<ArrayOfGenericRecordOfGenericRecordOfString>", content, StringComparison.Ordinal);
+    }
+
+
+
+    public class GenericRecord<T>
+    {
+        public T? Value { get; set; }
+    }
+
+
+
+    [Fact]
     public async Task LoadAsync_when_source_fails_midway_leaves_a_document_that_is_not_well_formed()
     {
         var stream = new MemoryStream();

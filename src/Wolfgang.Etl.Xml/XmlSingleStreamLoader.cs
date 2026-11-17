@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -86,7 +87,7 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
     /// </exception>
     /// <exception cref="ArgumentException">
     /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty
-    /// or whitespace string.
+    /// or whitespace string, or is not a valid XML local name.
     /// </exception>
     /// <remarks>
     /// Hidden from IntelliSense because its optional <c>options</c> parameter overlaps the canonical
@@ -150,7 +151,7 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
     /// </exception>
     /// <exception cref="ArgumentException">
     /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty
-    /// or whitespace string.
+    /// or whitespace string, or is not a valid XML local name.
     /// </exception>
     /// <remarks>
     /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
@@ -260,6 +261,10 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
     /// Options that control loader behaviour. When <c>null</c>, defaults are used.
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="bufferWriter"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty or
+    /// whitespace string, or is not a valid XML local name.
+    /// </exception>
     /// <remarks>
     /// Hidden from IntelliSense because its optional <c>options</c> parameter overlaps the canonical
     /// <c>(source, options, logger)</c> constructor (S3427, see <c>src/Wolfgang.Etl.Xml/.editorconfig</c>); it is
@@ -314,6 +319,10 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="bufferWriter"/>, <paramref name="writerSettings"/>, or <paramref name="logger"/> is <c>null</c>.
     /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty or
+    /// whitespace string, or is not a valid XML local name.
+    /// </exception>
     /// <remarks>
     /// Superseded by <c>(source, options, logger)</c>: the record carries the reader/writer settings (ADR-0009). Retained
     /// permanently for binary compatibility with assemblies compiled against 0.8.x, which are bound to this exact signature;
@@ -352,6 +361,10 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
     /// </param>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="bufferWriter"/> is <c>null</c>.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <see cref="XmlSingleStreamLoaderOptions.RootElementName"/> is an empty or
+    /// whitespace string, or is not a valid XML local name.
     /// </exception>
     [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
     [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
@@ -577,11 +590,33 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
 
 
 
+    // Type.Name is not always a valid XML name (a generic type is G`1). Build the
+    // name the way XmlSerializer names the element for the same type — G<int> becomes GOfInt32 —
+    // and encode anything left over, so the default always validates.
+    private static string XmlTypeName(Type type)
+    {
+        var name = type.Name;
+        if (type.IsGenericType)
+        {
+            var tick = name.IndexOf('`');
+            if (tick >= 0)
+            {
+                name = name.Substring(0, tick);
+            }
+
+            name += "Of" + string.Concat(type.GetGenericArguments().Select(XmlTypeName));
+        }
+
+        return XmlConvert.EncodeLocalName(name);
+    }
+
+
+
     private static string ResolveRootElementName(string? rootElementName)
     {
         if (rootElementName is null)
         {
-            return "ArrayOf" + typeof(TRecord).Name;
+            return "ArrayOf" + XmlTypeName(typeof(TRecord));
         }
 
         if (string.IsNullOrWhiteSpace(rootElementName))
