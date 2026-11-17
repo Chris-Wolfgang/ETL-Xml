@@ -360,15 +360,15 @@ public class XmlSingleStreamLoaderTests
 
 
 
-    private static async IAsyncEnumerable<PersonRecord> FailAfterOneRecord()
-    {
-        yield return new PersonRecord { FirstName = "Alice" };
-        await Task.Yield();
-        throw new InvalidOperationException("source failed");
-    }
+    private static IAsyncEnumerable<PersonRecord> FailAfterOneRecord() =>
+        new[] { new PersonRecord { FirstName = "Alice" }, new PersonRecord { FirstName = "Bob" } }
+            .ToAsyncEnumerable()
+            .Select(p => p.FirstName == "Bob" ? throw new InvalidOperationException("source failed") : p);
 
 
 
+    // Stub stream whose members throw; which of them the XmlWriter actually reaches differs per TFM.
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     private sealed class ThrowingWriteStream : MemoryStream
     {
         public override Task WriteAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
