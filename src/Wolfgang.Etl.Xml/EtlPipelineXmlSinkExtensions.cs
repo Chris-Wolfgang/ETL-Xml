@@ -108,7 +108,7 @@ public static class EtlPipelineXmlSinkExtensions
     )
         where T : notnull, new()
     {
-        return XmlSingleStreamLoader<T>(pipeline, path, progress, options: null);
+        return XmlSingleStreamLoader(pipeline, path, progress, options: null);
     }
 
 
@@ -177,7 +177,7 @@ public static class EtlPipelineXmlSinkExtensions
     )
         where T : notnull, new()
     {
-        return XmlSingleStreamLoader<T>(pipeline, stream, progress, options: null);
+        return XmlSingleStreamLoader(pipeline, stream, progress, options: null);
     }
 
 
