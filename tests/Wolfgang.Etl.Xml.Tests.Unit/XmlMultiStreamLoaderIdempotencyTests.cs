@@ -13,8 +13,15 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 public sealed class XmlMultiStreamLoaderIdempotencyTests
     : IdempotentLoaderContractTests<XmlMultiStreamLoader<PersonRecord>, PersonRecord>
 {
-    protected override XmlMultiStreamLoader<PersonRecord> CreateSut(int itemCount) =>
-        new(_ => new MemoryStream());
+    private XmlMultiStreamLoader<PersonRecord>? _sut;
+
+
+
+    protected override XmlMultiStreamLoader<PersonRecord> CreateSut(int itemCount)
+    {
+        _sut = new XmlMultiStreamLoader<PersonRecord>(_ => new MemoryStream());
+        return _sut;
+    }
 
 
 
@@ -25,7 +32,7 @@ public sealed class XmlMultiStreamLoaderIdempotencyTests
 
 
     // The loader's progress type is XmlReport, not the base Report the contract assumes.
-    protected override int GetCurrentItemCount(XmlMultiStreamLoader<PersonRecord> sut) => sut.CurrentItemCount;
+    protected override int GetCurrentItemCount(XmlMultiStreamLoader<PersonRecord> sut) => _sut!.CurrentItemCount;
 
 
 
