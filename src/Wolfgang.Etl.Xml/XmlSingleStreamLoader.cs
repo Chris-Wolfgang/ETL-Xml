@@ -540,17 +540,17 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
 
 
     // Best effort: the load already failed, so a flush error must not replace the original exception.
-    private static async Task FlushAbandonedWriterAsync(XmlWriter writer)
+    private async Task FlushAbandonedWriterAsync(XmlWriter writer)
     {
         try
         {
             await writer.FlushAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031 // the original failure is the one to surface
-        catch (Exception)
+        catch (Exception ex)
 #pragma warning restore CA1031
         {
-            // Intentionally swallowed.
+            XmlLogMessages.AbandonedWriterFlushFailed(_logger, ex);
         }
     }
 
