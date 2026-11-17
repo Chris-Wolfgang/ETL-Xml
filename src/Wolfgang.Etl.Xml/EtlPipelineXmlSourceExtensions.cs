@@ -135,7 +135,33 @@ public static class EtlPipelineXmlSourceExtensions
     /// <param name="pipeline">The pipeline seed from <see cref="EtlPipeline.Create"/>.</param>
     /// <param name="stream">The stream to read the XML document from.</param>
     /// <param name="progress">Receives the extractor's <see cref="XmlReport"/> reports.</param>
-    /// <param name="options">Optional extractor options. When <see langword="null"/>, defaults are used.</param>
+    /// <returns>An <see cref="IEtlPipeline{T}"/> for chaining.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="pipeline"/>, <paramref name="stream"/> or <paramref name="progress"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipeline<T> XmlSingleStreamExtractor<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
+    (
+        this EtlPipeline pipeline,
+        Stream stream,
+        IProgress<XmlReport> progress
+    )
+        where T : notnull, new()
+    {
+        return XmlSingleStreamExtractor<T>(pipeline, stream, progress, options: null);
+    }
+
+
+
+    /// <summary>
+    /// Starts a pipeline that reads records from a single-root XML stream and reports the extractor's
+    /// own <see cref="XmlReport"/> progress to <paramref name="progress"/> while the pipeline runs.
+    /// The caller owns the stream.
+    /// </summary>
+    /// <typeparam name="T">The record type to deserialize.</typeparam>
+    /// <param name="pipeline">The pipeline seed from <see cref="EtlPipeline.Create"/>.</param>
+    /// <param name="stream">The stream to read the XML document from.</param>
+    /// <param name="progress">Receives the extractor's <see cref="XmlReport"/> reports.</param>
+    /// <param name="options">The extractor options. When <see langword="null"/>, defaults are used.</param>
     /// <returns>An <see cref="IEtlPipeline{T}"/> for chaining.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/>, <paramref name="stream"/> or <paramref name="progress"/> is <see langword="null"/>.</exception>
     [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
@@ -145,7 +171,7 @@ public static class EtlPipelineXmlSourceExtensions
         this EtlPipeline pipeline,
         Stream stream,
         IProgress<XmlReport> progress,
-        XmlSingleStreamExtractorOptions? options = null
+        XmlSingleStreamExtractorOptions? options
     )
         where T : notnull, new()
     {

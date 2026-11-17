@@ -96,7 +96,33 @@ public static class EtlPipelineXmlSinkExtensions
     /// <param name="pipeline">The pipeline to terminate.</param>
     /// <param name="path">The path of the XML file to write.</param>
     /// <param name="progress">Receives the loader's <see cref="XmlReport"/> reports.</param>
-    /// <param name="options">Optional loader options. When <see langword="null"/>, defaults are used.</param>
+    /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="pipeline"/>, <paramref name="path"/> or <paramref name="progress"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipelineSink XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
+    (
+        this IEtlPipeline<T> pipeline,
+        string path,
+        IProgress<XmlReport> progress
+    )
+        where T : notnull, new()
+    {
+        return XmlSingleStreamLoader<T>(pipeline, path, progress, options: null);
+    }
+
+
+
+    /// <summary>
+    /// Terminates the pipeline, writing all records as a single-root XML document to a file, and
+    /// reports the loader's own <see cref="XmlReport"/> progress to <paramref name="progress"/> while
+    /// the pipeline runs. The factory owns the file stream and closes it after the run.
+    /// </summary>
+    /// <typeparam name="T">The record type to serialize.</typeparam>
+    /// <param name="pipeline">The pipeline to terminate.</param>
+    /// <param name="path">The path of the XML file to write.</param>
+    /// <param name="progress">Receives the loader's <see cref="XmlReport"/> reports.</param>
+    /// <param name="options">The loader options. When <see langword="null"/>, defaults are used.</param>
     /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/>, <paramref name="path"/> or <paramref name="progress"/> is <see langword="null"/>.</exception>
     [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
@@ -106,7 +132,7 @@ public static class EtlPipelineXmlSinkExtensions
         this IEtlPipeline<T> pipeline,
         string path,
         IProgress<XmlReport> progress,
-        XmlSingleStreamLoaderOptions? options = null
+        XmlSingleStreamLoaderOptions? options
     )
         where T : notnull, new()
     {
@@ -139,7 +165,33 @@ public static class EtlPipelineXmlSinkExtensions
     /// <param name="pipeline">The pipeline to terminate.</param>
     /// <param name="stream">The stream to write the XML document to.</param>
     /// <param name="progress">Receives the loader's <see cref="XmlReport"/> reports.</param>
-    /// <param name="options">Optional loader options. When <see langword="null"/>, defaults are used.</param>
+    /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="pipeline"/>, <paramref name="stream"/> or <paramref name="progress"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipelineSink XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
+    (
+        this IEtlPipeline<T> pipeline,
+        Stream stream,
+        IProgress<XmlReport> progress
+    )
+        where T : notnull, new()
+    {
+        return XmlSingleStreamLoader<T>(pipeline, stream, progress, options: null);
+    }
+
+
+
+    /// <summary>
+    /// Terminates the pipeline, writing all records as a single-root XML document to a stream, and
+    /// reports the loader's own <see cref="XmlReport"/> progress to <paramref name="progress"/> while
+    /// the pipeline runs. The caller owns the stream.
+    /// </summary>
+    /// <typeparam name="T">The record type to serialize.</typeparam>
+    /// <param name="pipeline">The pipeline to terminate.</param>
+    /// <param name="stream">The stream to write the XML document to.</param>
+    /// <param name="progress">Receives the loader's <see cref="XmlReport"/> reports.</param>
+    /// <param name="options">The loader options. When <see langword="null"/>, defaults are used.</param>
     /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/>, <paramref name="stream"/> or <paramref name="progress"/> is <see langword="null"/>.</exception>
     [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
@@ -149,7 +201,7 @@ public static class EtlPipelineXmlSinkExtensions
         this IEtlPipeline<T> pipeline,
         Stream stream,
         IProgress<XmlReport> progress,
-        XmlSingleStreamLoaderOptions? options = null
+        XmlSingleStreamLoaderOptions? options
     )
         where T : notnull, new()
     {
