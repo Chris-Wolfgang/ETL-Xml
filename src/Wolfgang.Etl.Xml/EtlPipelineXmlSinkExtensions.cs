@@ -47,7 +47,9 @@ public static class EtlPipelineXmlSinkExtensions
             throw new ArgumentNullException(nameof(path));
         }
 
-        var stream = File.Create(path);
+        // The file is opened (created/truncated) on the first write, not here: composing the pipeline
+        // has no file-system side effects, and a dry run never touches an existing destination.
+        var stream = DeferredFileStream.ForWrite(path);
         try
         {
             var loader = new XmlSingleStreamLoader<T>(stream, options);
