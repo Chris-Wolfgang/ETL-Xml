@@ -71,6 +71,24 @@ public class XmlSingleStreamExtractorTests
 
 
     [Fact]
+    public async Task ExtractAsync_when_MaximumItemCount_is_reached_does_not_deserialize_the_next_record()
+    {
+        var xml = "<R><PersonRecord><FirstName>a</FirstName></PersonRecord><PersonRecord><Age>notanint</Age></PersonRecord></R>";
+        var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(xml));
+        var sut = new XmlSingleStreamExtractor<PersonRecord>(stream, new XmlSingleStreamExtractorOptions { MaximumItemCount = 1 });
+
+        var results = new List<PersonRecord>();
+        await foreach (var item in sut.ExtractAsync())
+        {
+            results.Add(item);
+        }
+
+        Assert.Equal("a", Assert.Single(results).FirstName);
+    }
+
+
+
+    [Fact]
     public async Task ExtractAsync_when_single_item_extracts_correctly()
     {
         var xml = "<?xml version=\"1.0\"?><ArrayOfPersonRecord><PersonRecord><FirstName>Alice</FirstName><LastName>Smith</LastName><Age>30</Age></PersonRecord></ArrayOfPersonRecord>";

@@ -297,6 +297,13 @@ public sealed class XmlSingleStreamExtractor<[DynamicallyAccessedMembers(XmlSeri
                 continue;
             }
 
+            // Stop BEFORE deserializing a record past the maximum: it could throw on data the
+            // caller never asked for.
+            if (HasReachedMaximum(skipBudget))
+            {
+                break;
+            }
+
             var item = TryDeserializeChildElement(reader, out var consumedElement);
 
             // Recorded even on the null path: skipping it there re-read and swallowed the
@@ -318,18 +325,25 @@ public sealed class XmlSingleStreamExtractor<[DynamicallyAccessedMembers(XmlSeri
                 continue;
             }
 
-            if (CurrentItemCount >= MaximumItemCount)
-            {
-                XmlLogMessages.ReachedMaximumItemCount(_logger, MaximumItemCount, null);
-                break;
-            }
-
             RecordExtracted();
 
             yield return item;
         }
 
         XmlLogMessages.SingleStreamExtractionCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, null);
+    }
+
+
+
+    private bool HasReachedMaximum(int skipBudget)
+    {
+        if (skipBudget != 0 || CurrentItemCount < MaximumItemCount)
+        {
+            return false;
+        }
+
+        XmlLogMessages.ReachedMaximumItemCount(_logger, MaximumItemCount, null);
+        return true;
     }
 
 
