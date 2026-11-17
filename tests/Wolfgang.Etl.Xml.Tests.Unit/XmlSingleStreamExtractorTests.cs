@@ -74,7 +74,7 @@ public class XmlSingleStreamExtractorTests
     public async Task ExtractAsync_when_MaximumItemCount_is_reached_does_not_deserialize_the_next_record()
     {
         var xml = "<R><PersonRecord><FirstName>a</FirstName></PersonRecord><PersonRecord><Age>notanint</Age></PersonRecord></R>";
-        var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(xml));
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         var sut = new XmlSingleStreamExtractor<PersonRecord>(stream, new XmlSingleStreamExtractorOptions { MaximumItemCount = 1 });
 
         var results = new List<PersonRecord>();
