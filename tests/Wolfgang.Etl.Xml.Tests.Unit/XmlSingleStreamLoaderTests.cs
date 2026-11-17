@@ -363,7 +363,7 @@ public class XmlSingleStreamLoaderTests
     private static IAsyncEnumerable<PersonRecord> FailAfterOneRecord() =>
         new[] { new PersonRecord { FirstName = "Alice" }, new PersonRecord { FirstName = "Bob" } }
             .ToAsyncEnumerable()
-            .Select(p => p.FirstName == "Bob" ? throw new InvalidOperationException("source failed") : p);
+            .Select(p => string.Equals(p.FirstName, "Bob", StringComparison.Ordinal) ? throw new InvalidOperationException("source failed") : p);
 
 
 
