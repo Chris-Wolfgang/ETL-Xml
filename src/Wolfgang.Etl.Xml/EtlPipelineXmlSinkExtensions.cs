@@ -88,41 +88,6 @@ public static class EtlPipelineXmlSinkExtensions
 
 
     /// <summary>
-    /// Terminates the pipeline, writing one XML document per record to a stream chosen per record.
-    /// The loader closes each stream after writing its record.
-    /// </summary>
-    /// <typeparam name="T">The record type to serialize.</typeparam>
-    /// <param name="pipeline">The pipeline to terminate.</param>
-    /// <param name="streamFactory">
-    /// A factory that receives each record and returns the stream to write it to. The loader disposes
-    /// the returned stream after writing.
-    /// </param>
-    /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="streamFactory"/> is <see langword="null"/>.</exception>
-    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
-    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
-    public static IEtlPipelineSink XmlMultiStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
-    (
-        this IEtlPipeline<T> pipeline,
-        Func<T, Stream> streamFactory
-    )
-        where T : notnull, new()
-    {
-        if (pipeline is null)
-        {
-            throw new ArgumentNullException(nameof(pipeline));
-        }
-
-        if (streamFactory is null)
-        {
-            throw new ArgumentNullException(nameof(streamFactory));
-        }
-
-        return pipeline.To(new XmlMultiStreamLoader<T>(streamFactory));
-    }
-
-
-    /// <summary>
     /// Terminates the pipeline, writing all records as a single-root XML document to a file, and
     /// reports the loader's own <see cref="XmlReport"/> progress to <paramref name="progress"/> while
     /// the pipeline runs. The factory owns the file stream and closes it after the run.
@@ -162,6 +127,7 @@ public static class EtlPipelineXmlSinkExtensions
 
         return ToFile(pipeline, path, options, progress);
     }
+
 
 
     /// <summary>
@@ -206,6 +172,43 @@ public static class EtlPipelineXmlSinkExtensions
     }
 
 
+
+    /// <summary>
+    /// Terminates the pipeline, writing one XML document per record to a stream chosen per record.
+    /// The loader closes each stream after writing its record.
+    /// </summary>
+    /// <typeparam name="T">The record type to serialize.</typeparam>
+    /// <param name="pipeline">The pipeline to terminate.</param>
+    /// <param name="streamFactory">
+    /// A factory that receives each record and returns the stream to write it to. The loader disposes
+    /// the returned stream after writing.
+    /// </param>
+    /// <returns>A runnable <see cref="IEtlPipelineSink"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="streamFactory"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipelineSink XmlMultiStreamLoader<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
+    (
+        this IEtlPipeline<T> pipeline,
+        Func<T, Stream> streamFactory
+    )
+        where T : notnull, new()
+    {
+        if (pipeline is null)
+        {
+            throw new ArgumentNullException(nameof(pipeline));
+        }
+
+        if (streamFactory is null)
+        {
+            throw new ArgumentNullException(nameof(streamFactory));
+        }
+
+        return pipeline.To(new XmlMultiStreamLoader<T>(streamFactory));
+    }
+
+
+
     /// <summary>
     /// Terminates the pipeline, writing one XML document per record to a stream chosen per record,
     /// and reports the loader's own <see cref="XmlReport"/> progress to <paramref name="progress"/>
@@ -247,6 +250,7 @@ public static class EtlPipelineXmlSinkExtensions
 
         return pipeline.To(new XmlMultiStreamLoader<T>(streamFactory), progress);
     }
+
 
 
     [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
