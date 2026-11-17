@@ -86,39 +86,6 @@ public static class EtlPipelineXmlSourceExtensions
 
 
     /// <summary>
-    /// Starts a pipeline that reads one record per stream from a sequence of single-document XML
-    /// streams. Each stream is closed by the extractor after its record is read.
-    /// </summary>
-    /// <typeparam name="T">The record type to deserialize.</typeparam>
-    /// <param name="pipeline">The pipeline seed from <see cref="EtlPipeline.Create"/>.</param>
-    /// <param name="streams">The streams to read, one XML document each.</param>
-    /// <returns>An <see cref="IEtlPipeline{T}"/> for chaining.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="streams"/> is <see langword="null"/>.</exception>
-    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
-    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
-    public static IEtlPipeline<T> XmlMultiStreamExtractor<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
-    (
-        this EtlPipeline pipeline,
-        IEnumerable<Stream> streams
-    )
-        where T : notnull, new()
-    {
-        if (pipeline is null)
-        {
-            throw new ArgumentNullException(nameof(pipeline));
-        }
-
-        if (streams is null)
-        {
-            throw new ArgumentNullException(nameof(streams));
-        }
-
-        return pipeline.From(new XmlMultiStreamExtractor<T>(streams));
-    }
-
-
-
-    /// <summary>
     /// Starts a pipeline that reads records from a single-root XML file and reports the extractor's
     /// own <see cref="XmlReport"/> progress to <paramref name="progress"/> while the pipeline runs.
     /// The factory owns the file stream and closes it when extraction finishes.
@@ -198,6 +165,39 @@ public static class EtlPipelineXmlSourceExtensions
         }
 
         return pipeline.From(new XmlSingleStreamExtractor<T>(stream, options), progress);
+    }
+
+
+
+    /// <summary>
+    /// Starts a pipeline that reads one record per stream from a sequence of single-document XML
+    /// streams. Each stream is closed by the extractor after its record is read.
+    /// </summary>
+    /// <typeparam name="T">The record type to deserialize.</typeparam>
+    /// <param name="pipeline">The pipeline seed from <see cref="EtlPipeline.Create"/>.</param>
+    /// <param name="streams">The streams to read, one XML document each.</param>
+    /// <returns>An <see cref="IEtlPipeline{T}"/> for chaining.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="streams"/> is <see langword="null"/>.</exception>
+    [RequiresUnreferencedCode(XmlSerialization.UnreferencedCodeMessage)]
+    [RequiresDynamicCode(XmlSerialization.DynamicCodeMessage)]
+    public static IEtlPipeline<T> XmlMultiStreamExtractor<[DynamicallyAccessedMembers(XmlSerialization.RecordMembers)] T>
+    (
+        this EtlPipeline pipeline,
+        IEnumerable<Stream> streams
+    )
+        where T : notnull, new()
+    {
+        if (pipeline is null)
+        {
+            throw new ArgumentNullException(nameof(pipeline));
+        }
+
+        if (streams is null)
+        {
+            throw new ArgumentNullException(nameof(streams));
+        }
+
+        return pipeline.From(new XmlMultiStreamExtractor<T>(streams));
     }
 
 
