@@ -446,6 +446,7 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
         // nothing to the output stream — no writer is created, so the document (including
         // the root-element wrapper) is never emitted and the stream is left untouched.
         var writer = IsDryRun ? null : await CreateDocumentWriterAsync().ConfigureAwait(false);
+        var completed = false;
         try
         {
             await foreach (var item in items.WithCancellation(token).ConfigureAwait(false))
@@ -482,10 +483,12 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
                 await writer.WriteEndDocumentAsync().ConfigureAwait(false);
                 await writer.FlushAsync().ConfigureAwait(false);
             }
+
+            completed = true;
         }
         finally
         {
-            await DisposeOutputAsync(writer).ConfigureAwait(false);
+            await DisposeOutputAsync(writer, completed).ConfigureAwait(false);
         }
 
         XmlLogMessages.SingleStreamLoadingCompleted(_logger, CurrentItemCount, CurrentSkippedItemCount, null);
@@ -493,16 +496,27 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
 
 
 
-    // Disposes the output at the end of a load. For a real load that is the writer, whose
+    // Disposes the output at the end of a load. For a completed real load that is the writer, whose
     // CloseOutput (== !_leaveOpen) closes the stream. A dry run creates no writer, so the
     // destination stream is closed directly when LeaveOpen = false — close-on-complete is
     // honoured either way.
+    //
+    // A load that failed or was cancelled must NOT dispose the writer: XmlWriter.Dispose auto-closes
+    // every open element, which would turn the partial output into a complete, well-formed
+    // document that is indistinguishable from a successful load with fewer records. Instead the
+    // buffered bytes are flushed and the stream is closed directly, so the root element is left
+    // unclosed and the truncation is visible to any consumer that parses the file.
 #if NETSTANDARD2_0 || NET462 || NET481
 #pragma warning disable CS1998 // only synchronous disposal is available on this TFM
 #endif
-    private async Task DisposeOutputAsync(XmlWriter? writer)
+    private async Task DisposeOutputAsync(XmlWriter? writer, bool completed)
     {
-        if (writer is not null)
+        if (writer is not null && !completed)
+        {
+            await FlushAbandonedWriterAsync(writer).ConfigureAwait(false);
+        }
+
+        if (writer is not null && completed)
         {
 #if NETSTANDARD2_0 || NET462 || NET481
             writer.Dispose();
@@ -522,6 +536,23 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
 #if NETSTANDARD2_0 || NET462 || NET481
 #pragma warning restore CS1998
 #endif
+
+
+
+    // Best effort: the load already failed, so a flush error must not replace the original exception.
+    private async Task FlushAbandonedWriterAsync(XmlWriter writer)
+    {
+        try
+        {
+            await writer.FlushAsync().ConfigureAwait(false);
+        }
+#pragma warning disable CA1031 // the original failure is the one to surface
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            XmlLogMessages.AbandonedWriterFlushFailed(_logger, ex);
+        }
+    }
 
 
 
