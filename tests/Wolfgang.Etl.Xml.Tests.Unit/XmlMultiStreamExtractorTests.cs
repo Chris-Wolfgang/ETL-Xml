@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
@@ -112,6 +113,49 @@ public class XmlMultiStreamExtractorTests
         Assert.Throws<ObjectDisposedException>(() => streams[0].ReadByte());
         Assert.True(streams[1].CanRead);
         Assert.True(streams[2].CanRead);
+    }
+
+
+
+    [Fact]
+    public async Task ExtractAsync_when_MaximumItemCount_stops_early_does_not_open_a_lazy_stream_past_the_limit()
+    {
+        var tracker = new LazyStreamTracker(4);
+        var sut = new XmlMultiStreamExtractor<PersonRecord>(tracker.Streams(), new XmlMultiStreamExtractorOptions { MaximumItemCount = 2 });
+
+        var count = 0;
+        await foreach (var _ in sut.ExtractAsync())
+        {
+            count++;
+        }
+
+        Assert.Equal(2, count);
+        Assert.Equal(2, tracker.Opened);
+        Assert.Equal(2, tracker.Disposed);
+    }
+
+
+
+    [Fact]
+    public async Task ExtractAsync_when_cancelled_does_not_open_a_lazy_stream_after_cancellation()
+    {
+        var tracker = new LazyStreamTracker(4);
+        using var cts = new CancellationTokenSource();
+        var sut = new XmlMultiStreamExtractor<PersonRecord>(tracker.Streams());
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>
+        (
+            async () =>
+            {
+                await foreach (var _ in sut.ExtractAsync(cts.Token))
+                {
+                    cts.Cancel();
+                }
+            }
+        );
+
+        Assert.Equal(1, tracker.Opened);
+        Assert.Equal(1, tracker.Disposed);
     }
 
 
@@ -294,5 +338,64 @@ public class XmlMultiStreamExtractorTests
                 NullLogger<XmlMultiStreamExtractor<PersonRecord>>.Instance
             )
         );
+    }
+
+
+
+    private sealed class LazyStreamTracker
+    {
+        private readonly int _count;
+
+
+
+        public LazyStreamTracker(int count) => _count = count;
+
+
+
+        public int Opened { get; private set; }
+
+
+
+        public int Disposed { get; private set; }
+
+
+
+        public IEnumerable<Stream> Streams() => ExpectedItems.Take(_count).Select(CreateStream);
+
+
+
+        private Stream CreateStream(PersonRecord item)
+        {
+            var stream = new TrackingStream(this);
+            Serializer.Serialize(stream, item);
+            stream.Position = 0;
+            Opened++;
+            return stream;
+        }
+
+
+
+        private sealed class TrackingStream : MemoryStream
+        {
+            private readonly LazyStreamTracker _owner;
+            private bool _counted;
+
+
+
+            public TrackingStream(LazyStreamTracker owner) => _owner = owner;
+
+
+
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing && !_counted)
+                {
+                    _counted = true;
+                    _owner.Disposed++;
+                }
+
+                base.Dispose(disposing);
+            }
+        }
     }
 }
