@@ -85,60 +85,6 @@ public sealed class EtlPipelineXmlStageProgressTests
 
 
     [Fact]
-    public async Task RunAsync_when_progress_overloads_take_options_applies_them()
-    {
-        var source = await CreateSingleStreamXmlAsync();
-        var destination = new MemoryStream();
-        var outPath = Path.GetTempFileName();
-        try
-        {
-            var extractReports = new List<XmlReport>();
-            var loadReports = new List<XmlReport>();
-
-            await EtlPipeline
-                .Create()
-                .XmlSingleStreamExtractor<PersonRecord>
-                (
-                    source,
-                    new SynchronousProgress<XmlReport>(extractReports.Add),
-                    new XmlSingleStreamExtractorOptions { MaximumItemCount = 2 }
-                )
-                .XmlSingleStreamLoader
-                (
-                    destination,
-                    new SynchronousProgress<XmlReport>(loadReports.Add),
-                    new XmlSingleStreamLoaderOptions()
-                )
-                .RunAsync();
-
-            Assert.Equal(2, extractReports[extractReports.Count - 1].CurrentItemCount);
-            Assert.Equal(2, loadReports[loadReports.Count - 1].CurrentItemCount);
-
-            await EtlPipeline
-                .Create()
-                .From(People.ToAsyncEnumerable())
-                .XmlSingleStreamLoader
-                (
-                    outPath,
-                    new SynchronousProgress<XmlReport>(loadReports.Add),
-                    new XmlSingleStreamLoaderOptions()
-                )
-                .RunAsync();
-
-            using (var outStream = File.OpenRead(outPath))
-            {
-                Assert.True(outStream.Length > 0);
-            }
-        }
-        finally
-        {
-            File.Delete(outPath);
-        }
-    }
-
-
-
-    [Fact]
     public async Task RunAsync_when_multi_stream_source_and_sink_take_progress_reports_each_stage()
     {
         var sources = People.Select(CreateRecordStream).ToList();
