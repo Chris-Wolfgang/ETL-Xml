@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794743546058,
+  "lastUpdate": 1795092249568,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Xml shadow workloads": [
@@ -2520,6 +2520,76 @@ window.BENCHMARK_DATA = {
             "value": 1882019373.6666667,
             "unit": "ns",
             "range": "± 5446475.549520472"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "fe40bb695a4c731262f4c9e960a17e8df16c5da0",
+          "message": "test: run the idempotency contract against XmlMultiStreamLoader (#583)\n\n* test: run the idempotency contract against XmlMultiStreamLoader\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* test: read the loader count from the created instance (CA1062)\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* test: guard the sut parameter instead of holding the loader in a field (CA1001)\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-18T13:21:38Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/fe40bb695a4c731262f4c9e960a17e8df16c5da0"
+        },
+        "date": 1795092248112,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 1000)",
+            "value": 1088206.7942708333,
+            "unit": "ns",
+            "range": "± 16509.0808460242"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 1000)",
+            "value": 471953.3610026042,
+            "unit": "ns",
+            "range": "± 7381.720401410278"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 1000)",
+            "value": 1567299.3645833333,
+            "unit": "ns",
+            "range": "± 47594.33737550379"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 1000)",
+            "value": 17224323.145833332,
+            "unit": "ns",
+            "range": "± 18552.271326482354"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Extract(RecordCount: 100000)",
+            "value": 115507084.73333333,
+            "unit": "ns",
+            "range": "± 2748640.403562172"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.Load(RecordCount: 100000)",
+            "value": 50018002.24242424,
+            "unit": "ns",
+            "range": "± 1057268.6850933612"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.RoundTrip(RecordCount: 100000)",
+            "value": 185181734,
+            "unit": "ns",
+            "range": "± 38756996.55592999"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.ShadowWorkloads.XmlShadowWorkloads.ConcurrentExtractors(RecordCount: 100000)",
+            "value": 1800866207.3333333,
+            "unit": "ns",
+            "range": "± 28811828.818303432"
           }
         ]
       }
