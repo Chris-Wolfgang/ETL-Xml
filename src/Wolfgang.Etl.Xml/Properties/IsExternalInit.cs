@@ -2,9 +2,9 @@
 // netstandard2.0, net462, and net481. Declaring it here makes init accessors
 // available across all target frameworks without a package dependency.
 #if !NET5_0_OR_GREATER
-// ReSharper disable once CheckNamespace
 // The namespace is deliberate: the polyfill must live in the framework's own
 // namespace for the compiler to recognise it.
+// ReSharper disable once CheckNamespace
 namespace System.Runtime.CompilerServices
 {
     using Diagnostics.CodeAnalysis;
