@@ -233,7 +233,11 @@ public sealed class XmlMultiStreamExtractor<[DynamicallyAccessedMembers(XmlSeria
                 break;
             }
 
-            var stream = enumerator.Current;
+            // The sequence is caller-supplied, so an element can be null whatever its annotation says.
+            // Fail with the same exception the multi-stream loader throws for a null stream, rather
+            // than a NullReferenceException from the dispose in DeserializeStreamOrHandleErrorAsync.
+            var stream = enumerator.Current
+                ?? throw new InvalidOperationException($"The stream sequence yielded null for stream number {streamIndex + 1}.");
 
             XmlLogMessages.ReadingStream(_logger, streamIndex, null);
 

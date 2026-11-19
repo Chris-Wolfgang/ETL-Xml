@@ -593,6 +593,12 @@ public sealed class XmlSingleStreamLoader<[DynamicallyAccessedMembers(XmlSeriali
     // Type.Name is not always a valid XML name (a generic type is G`1). Build the
     // name the way XmlSerializer names the element for the same type — G<int> becomes GOfInt32 —
     // and encode anything left over, so the default always validates.
+    [SuppressMessage
+    (
+        "ReSharper",
+        "AssignNullToNotNullAttribute",
+        Justification = "XmlConvert.EncodeLocalName returns null only for a null argument, and name is never null. InspectCode still reads the result as nullable, and a null-forgiving operator instead is reported as redundant (RedundantSuppressNullableWarningExpression, S8969)."
+    )]
     private static string XmlTypeName(Type type)
     {
         var name = type.Name;
