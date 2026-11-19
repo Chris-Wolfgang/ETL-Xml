@@ -11,7 +11,7 @@ namespace Wolfgang.Etl.Xml.Tests.Unit;
 /// destination per record on every run and carries no state over from the previous run.
 /// </summary>
 public sealed class XmlMultiStreamLoaderIdempotencyTests
-    : IdempotentLoaderContractTests<XmlMultiStreamLoader<PersonRecord>, PersonRecord>
+    : IdempotentLoaderContractTests<XmlMultiStreamLoader<PersonRecord>, PersonRecord, XmlReport>
 {
     protected override XmlMultiStreamLoader<PersonRecord> CreateSut(int itemCount) =>
         new(_ => new MemoryStream());
@@ -21,11 +21,6 @@ public sealed class XmlMultiStreamLoaderIdempotencyTests
     // The loader writes to caller-supplied streams and keeps no collected items of its own, so the
     // contract's collection check does not apply.
     protected override IReadOnlyList<PersonRecord>? TryGetLoadedItems(XmlMultiStreamLoader<PersonRecord> sut) => null;
-
-
-
-    // The loader's progress type is XmlReport, not the base Report the contract assumes.
-    protected override int GetCurrentItemCount(XmlMultiStreamLoader<PersonRecord> sut) => sut?.CurrentItemCount ?? 0;
 
 
 
