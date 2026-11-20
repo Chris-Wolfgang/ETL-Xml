@@ -2,9 +2,9 @@
 
 using System.ComponentModel;
 
-// ReSharper disable once CheckNamespace
 // The namespace is deliberate: the polyfill must live in the framework's own
 // namespace for the compiler to recognise it.
+// ReSharper disable once CheckNamespace
 namespace System.Diagnostics.CodeAnalysis;
 
 /// <summary>

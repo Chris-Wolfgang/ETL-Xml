@@ -118,6 +118,33 @@ public class XmlMultiStreamExtractorTests
 
 
     [Fact]
+    public async Task ExtractAsync_when_the_sequence_yields_a_null_stream_throws_InvalidOperationException()
+    {
+        var first = new MemoryStream();
+        Serializer.Serialize(first, ExpectedItems[0]);
+        first.Position = 0;
+
+        var sut = new XmlMultiStreamExtractor<PersonRecord>(new Stream[] { first, null! });
+
+        var results = new List<PersonRecord>();
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>
+        (
+            async () =>
+            {
+                await foreach (var item in sut.ExtractAsync())
+                {
+                    results.Add(item);
+                }
+            }
+        );
+
+        Assert.Equal("The stream sequence yielded null for stream number 2.", ex.Message);
+        Assert.Single(results);
+    }
+
+
+
+    [Fact]
     public async Task ExtractAsync_when_MaximumItemCount_stops_early_does_not_open_a_lazy_stream_past_the_limit()
     {
         var tracker = new LazyStreamTracker(4);

@@ -445,6 +445,20 @@ This library uses **`BannedSymbols.txt`** to prohibit synchronous APIs and enfor
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download) (older SDKs work for restoring the older TFMs but the build/test matrix targets the full range up to .NET 10.0)
 - Optional: [PowerShell Core](https://github.com/PowerShell/PowerShell) for formatting scripts
 
+### Test matrix
+
+Every pull request runs the test suite on five legs (`.github/workflows/pr.yaml`), each over the target frameworks that runtime supports there:
+
+| Leg | Job | Target frameworks |
+|-----|-----|-------------------|
+| linux-x64 | Stage 1 (coverage gate) | netcoreapp3.1, net5.0 and later |
+| windows-x64 | Stage 2 | every TFM, net462 to net10.0 |
+| macos-arm64 | Stage 3 | net6.0 and later |
+| linux-arm64 | Stage 4 (`ubuntu-24.04-arm`) | net6.0 and later |
+| windows-arm64 | Stage 5 (`windows-11-arm`) | net6.0 and later |
+
+The Native-AOT smoke consumer is published and run on linux-x64 and linux-arm64 (`.github/workflows/aot-smoke.yaml`).
+
 ### Build Steps
 
 ```bash
