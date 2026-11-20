@@ -86,6 +86,30 @@ public class XmlMultiStreamLoaderTests
 
 
     [Fact]
+    public async Task LoadAsync_when_options_record_is_null_writes_every_record()
+    {
+        // A null options record keeps every default, IsDryRun = false included: the loader writes.
+        var streams = new List<MemoryStream>();
+        var sut = new XmlMultiStreamLoader<PersonRecord>
+        (
+            _ =>
+            {
+                var stream = new MemoryStream();
+                streams.Add(stream);
+                return stream;
+            },
+            (XmlMultiStreamLoaderOptions?)null
+        );
+
+        await sut.LoadAsync(new[] { new PersonRecord { FirstName = "Alice", LastName = "Smith", Age = 30 } }.ToAsyncEnumerable());
+
+        Assert.Single(streams);
+        Assert.True(streams[0].ToArray().Length > 0);
+    }
+
+
+
+    [Fact]
     public Task LoadAsync_when_stream_factory_returns_null_throws_InvalidOperationException()
     {
         var sut = new XmlMultiStreamLoader<PersonRecord>(_ => (Stream)null!);
