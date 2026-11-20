@@ -11,6 +11,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPackable>false</IsPackable>
+    <!-- Not a test project: it is an executable that aot-smoke.yaml publishes and runs. The
+         pr.yaml ARM64 stages (template) fail a project under tests/ that neither references
+         Microsoft.NET.Test.Sdk nor opts out explicitly, so the opt-out is stated here (#541). -->
+    <IsTestProject>false</IsTestProject>
     <PublishAot>true</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
 
