@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795138176368,
+  "lastUpdate": 1795180812444,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "BenchmarkDotNet": [
@@ -4788,6 +4788,120 @@ window.BENCHMARK_DATA = {
             "value": 1036180.4036458334,
             "unit": "ns",
             "range": "± 11454.437715428301"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "addc16ec2effc1ec9b27ba63561d065c128e8b4e",
+          "message": "fix(inspectcode): put each polyfill's CheckNamespace suppression on the line above its namespace (#596)\n\nThe `// ReSharper disable once CheckNamespace` comments sat two comment lines above\nthe namespace declaration. Code scanning alert 857 reports CheckNamespace on\nRequiresDynamicCodeAttribute.cs:8 on main although the line carries the\nsuppression; local InspectCode runs do not reproduce it. Move the suppression\ndirectly above `namespace` in all six polyfills (the placement ReSharper's own\nquick-fix uses) so it cannot depend on how \"next line\" is resolved.\n\nCloses #592\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-20T08:17:38-05:00",
+          "tree_id": "7e68f38af95323c31dd7b2aaee34e1e152c5f64c",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/addc16ec2effc1ec9b27ba63561d065c128e8b4e"
+        },
+        "date": 1795180810312,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 30676.231384277344,
+            "unit": "ns",
+            "range": "± 437.7688578009464"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 306931.4710286458,
+            "unit": "ns",
+            "range": "± 3360.3214265385814"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 3097948.5208333335,
+            "unit": "ns",
+            "range": "± 60851.60638782747"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 15703.413503011068,
+            "unit": "ns",
+            "range": "± 95.44598903024242"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 146929.43269856772,
+            "unit": "ns",
+            "range": "± 3080.2273541093346"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlMultiStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 1504512.9290364583,
+            "unit": "ns",
+            "range": "± 22594.096356341546"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 10)",
+            "value": 19229.316243489582,
+            "unit": "ns",
+            "range": "± 96.6804806184957"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 100)",
+            "value": 138750.9728190104,
+            "unit": "ns",
+            "range": "± 969.4731764059646"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamExtractorBenchmarks.ExtractAsync(ItemCount: 1000)",
+            "value": 1283000.3076171875,
+            "unit": "ns",
+            "range": "± 3505.9149060066093"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 10)",
+            "value": 9066.071212768555,
+            "unit": "ns",
+            "range": "± 38.56844389071687"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 10)",
+            "value": 8396.866816202799,
+            "unit": "ns",
+            "range": "± 59.61444654143944"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 100)",
+            "value": 68134.37223307292,
+            "unit": "ns",
+            "range": "± 817.7310827253057"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 100)",
+            "value": 57113.779459635414,
+            "unit": "ns",
+            "range": "± 1823.8483886168624"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadAsync(ItemCount: 1000)",
+            "value": 786256.0260416666,
+            "unit": "ns",
+            "range": "± 1478.5303928347307"
+          },
+          {
+            "name": "Wolfgang.Etl.Xml.Benchmarks.XmlSingleStreamLoaderBenchmarks.LoadNoIndentAsync(ItemCount: 1000)",
+            "value": 636244.7408854166,
+            "unit": "ns",
+            "range": "± 21613.31507466259"
           }
         ]
       }
