@@ -6,10 +6,13 @@ function of the source at a given commit. That means **you don't have to trust o
 CI**: you can rebuild the library yourself from the published tag and confirm, byte
 for byte, that the assembly we shipped is the one the source produces.
 
-Our CI already proves the build is reproducible *across operating systems* —
-`.github/workflows/reproducible-build.yaml` packs the library on Ubuntu and on Windows
-and fails if any target framework's `.dll` or `.pdb` hash differs between the two
-(#138, #456). Two inputs used to differ per OS and are now pinned:
+Our CI checks reproducibility on every pull request with the fleet's canonical
+`.github/workflows/reproducible-build.yaml`. The gate packs the same commit twice on
+Ubuntu, with a full `git clean` in between, and fails unless every target framework's
+`.dll` and `.pdb` is byte-identical and every `.nupkg` / `.snupkg` matches entry by
+entry. A second job packs the commit on Windows and reports, without gating, whether
+the hashes also match the Ubuntu build. Two inputs used to differ per OS and are pinned
+(#138, #456):
 `Directory.Build.targets` rewrites the SDK-generated sources (`AssemblyInfo.cs`,
 `*.AssemblyAttributes.cs`, `GlobalUsings.g.cs`) to LF before compilation, and
 `Directory.Build.props` makes the .NET Framework builds compile against the
@@ -69,7 +72,8 @@ on your machine, under your control.
 
 First rule out toolchain drift: a different SDK **feature band**, or a different .NET
 runtime running the compiler (its version string is recorded in the PDB), changes the
-output. The operating system no longer does. Confirm you used the SDK named in the
+output. The operating system should not (the Windows report job shows it for every pull
+request). Confirm you used the SDK named in the
 release and built with `-p:ContinuousIntegrationBuild=true`.
 
 If they still differ with matching tooling, that is a genuine reproducibility
