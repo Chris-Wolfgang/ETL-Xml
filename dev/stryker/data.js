@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794748162371,
+  "lastUpdate": 1795355341587,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-Xml",
   "entries": {
     "Stryker mutation score": [
@@ -298,6 +298,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "Mutation score (tests/Wolfgang.Etl.Xml.Tests.Unit)",
             "value": 85.29,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "c11d78919670589c7111af7eba8f0428ec3d40bd",
+          "message": "test: kill two Stryker survivors (#400) (#602)\n\n- XmlMultiStreamLoader(factory, options: null) writes every record, which pins\n  `IsDryRun ?? false` (survivor at XmlMultiStreamLoader.cs:271).\n- DeferredFileStream: a write after Dispose throws ObjectDisposedException and\n  creates no file (survivor at DeferredFileStream.cs:43).\n\nBoth kills were confirmed by applying each mutant by hand and seeing the new\ntest fail. Only adds tests; no existing test changed.\n\nRefs #400\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-20T21:55:22Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-Xml/commit/c11d78919670589c7111af7eba8f0428ec3d40bd"
+        },
+        "date": 1795355336359,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score (tests/Wolfgang.Etl.Xml.Tests.Unit)",
+            "value": 82.62,
             "unit": "%"
           }
         ]
