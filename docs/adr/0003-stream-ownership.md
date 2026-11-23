@@ -1,4 +1,4 @@
-# ADR-003 Path-based factories own the stream; stream-based factories honour LeaveOpen
+# ADR-0003 Path-based factories own the stream; stream-based factories honour LeaveOpen
 
 - **Status**: Accepted
 - **Date**: 2026-07-28
@@ -7,7 +7,7 @@
 
 ## Context
 
-The `EtlPipeline` XML factories (ADR-002) come in two flavours per direction:
+The `EtlPipeline` XML factories (ADR-0002) come in two flavours per direction:
 
 - A **path** overload — `XmlSingleStreamExtractor<T>("in.xml")` / `XmlSingleStreamLoader<T>("out.xml")` — where the factory itself opens the file.
 - A **stream** overload — `XmlSingleStreamExtractor<T>(stream, options)` — where the caller supplies the stream.

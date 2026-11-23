@@ -1,4 +1,4 @@
-# ADR-004 Trim and Native AOT: annotate the XmlSerializer boundary, keep the record's members
+# ADR-0004 Trim and Native AOT: annotate the XmlSerializer boundary, keep the record's members
 
 - **Status**: Proposed
 - **Date**: 2026-10-30

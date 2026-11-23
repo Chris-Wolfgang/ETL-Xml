@@ -1,4 +1,4 @@
-# ADR-005 Async-only I/O enforced through BannedSymbols.txt
+# ADR-0005 Async-only I/O enforced through BannedSymbols.txt
 
 - **Status**: Accepted
 - **Date**: 2026-11-17

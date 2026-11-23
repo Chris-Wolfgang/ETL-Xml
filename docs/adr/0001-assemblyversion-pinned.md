@@ -1,4 +1,4 @@
-# ADR-001 AssemblyVersion pinned at 1.0.0.0
+# ADR-0001 AssemblyVersion pinned at 1.0.0.0
 
 - **Status**: Accepted
 - **Date**: 2026-07-28

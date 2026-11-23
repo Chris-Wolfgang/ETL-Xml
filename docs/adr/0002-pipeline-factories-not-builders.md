@@ -1,4 +1,4 @@
-# ADR-002 EtlPipeline XML factories are plain extension methods, not builder interfaces
+# ADR-0002 EtlPipeline XML factories are plain extension methods, not builder interfaces
 
 - **Status**: Accepted
 - **Date**: 2026-07-28
