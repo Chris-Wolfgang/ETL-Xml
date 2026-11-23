@@ -20,6 +20,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 
+## [0.11.0] - 2026-11-23
+
+### Added
+
+- The `EtlPipeline` XML factories (`XmlSingleStreamExtractor`, `XmlMultiStreamExtractor`, `XmlSingleStreamLoader`, `XmlMultiStreamLoader`) gain overloads that take an `IProgress<XmlReport>`, so a pipeline stage reports its own typed progress. (#582)
+- The package now declares `IsAotCompatible` on net8.0+: every public constructor and `EtlPipeline` XML factory carries `[RequiresDynamicCode]` as well as `[RequiresUnreferencedCode]`, and the record type parameter carries `[DynamicallyAccessedMembers]`, so a trimmed or Native AOT application keeps the record's public properties and fields instead of silently writing and reading empty elements. (#293)
+
+### Fixed
+
+- Two log events now match their counterparts: a multi-stream document that deserializes to null logs at `Debug` (was `Warning`), the same level as the single-stream extractor's null-element skip, and the null-stream-factory error logs the one-based item number (`{ItemNumber}`, was the zero-based `{StreamIndex}`), the same number the thrown `InvalidOperationException` reports. (#463)
+- Updated `Wolfgang.Etl.Abstractions`, `Wolfgang.Etl.ErrorPolicies`, `Wolfgang.Etl.TestKit` and `Wolfgang.Etl.TestKit.Xunit` to 0.28.0. The update brings two behaviour fixes to pipelines built with this library: `EtlPipelineProgress.LoadedItemCount` is now the loader's own count of loaded records (it no longer over-reports when a loader skips records, discards one through an error policy or stops at `MaximumItemCount`), and when a run fails or is cancelled and the final progress report also throws, the caller now receives the run's own exception. The multi-stream loader idempotency test now derives from the three-type-argument `IdempotentLoaderContractTests<TSut, TItem, TProgress>` (the two-argument base is obsolete) and no longer overrides `GetCurrentItemCount`. (#593)
+- `XmlSingleStreamExtractor<T>` no longer deserializes one record past `MaximumItemCount` (which could throw on a malformed record the caller never asked for), and `XmlMultiStreamExtractor<T>` no longer pulls — and so opens, for a lazy sequence such as `Select(File.OpenRead)` — one stream past `MaximumItemCount` or after cancellation, which leaked the stream. (#565)
+- `XmlSingleStreamLoader<T>` now derives a valid default root element name for generic record types (`G<int>` gives `ArrayOfGOfInt32`, as `XmlSerializer` would name it) instead of an invalid `ArrayOfG`1` that failed on the first write. Documentation corrected: the README gzip snippet now passes `LeaveOpen = false` as its comment says, and the `RootElementName` and loader constructor `ArgumentException` docs now list the invalid-local-name case. (#569)
+- `XmlSingleStreamLoader<T>` no longer repairs the output after a failed or cancelled load. Previously the writer was disposed on the failure path, which closed the root element and left a complete, well-formed document holding only the records written so far. The buffered bytes are now flushed and the stream closed directly (when `LeaveOpen = false`), so the root element stays unclosed and the truncation is visible to any consumer that parses the file. (#570)
+- `XmlMultiStreamExtractor` now records the `wolfgang.etl.xml.items.errored` metric when the error policy skips or dead-letters a stream, matching `XmlMultiStreamLoader`. (#480)
+- `XmlMultiStreamExtractor` now throws `InvalidOperationException` ("The stream sequence yielded null for stream number N.") when the caller's stream sequence contains a `null` element, instead of a `NullReferenceException`, matching the multi-stream loader's null-stream error. (#595)
+- `XmlMultiStreamExtractor` stops before opening the next stream once `MaximumItemCount` is reached, instead of reading, disposing and discarding one stream past the limit. (#500)
+- The path-based pipeline factories `XmlSingleStreamLoader<T>(path, options)` and `XmlSingleStreamExtractor<T>(path)` now open their file on first use instead of when the pipeline is composed. A dry run no longer truncates or creates the destination file, an abandoned or pre-cancelled pipeline no longer leaks a locked input file, and a missing input file now surfaces as `FileNotFoundException` when the pipeline runs rather than when it is composed. (#564)
+- The path-based `XmlSingleStreamLoader<T>(path, options)` pipeline sink now closes the file it opened when the loader rejects its options (for example an empty `RootElementName`), instead of leaking the handle. (#479)
+
+### Documentation
+
+- The `XmlMultiStreamLoader` remarks now say that each document carries the default `xmlns:xsi`/`xmlns:xsd` declarations, which `XmlSingleStreamLoader` omits. (#466)
+- XML doc comments match the code: the multi-stream extractor example uses the options record, the hidden `(source, options = null)` overloads say why they are hidden, the multi-stream extractor documents that streams it never reaches stay caller-owned, and issue numbers no longer appear in IntelliSense text. (#485)
+
+### Internal
+
+- `PackageValidationBaselineVersion` advances to 0.10.0 now that the package is on the NuGet CDN, so the next release validates its API surface against what actually shipped. (#393)
+- On net5.0, net6.0 and net7.0 the buffer-writer loaders now write spans and memory straight into the `IBufferWriter<byte>` (they previously rented and copied an array), and net8.0+ also skips that copy for `WriteAsync(ReadOnlyMemory<byte>)`. (#487)
+- Updated `Wolfgang.Etl.Abstractions`, `Wolfgang.Etl.ErrorPolicies`, `Wolfgang.Etl.TestKit` and `Wolfgang.Etl.TestKit.Xunit` to 0.27.0. (#581)
+- `XmlSingleStreamLoader` constructor comments state the delegation rule only; the incident history they narrated stays in the 0.7.0 CHANGELOG entry. No code changed. (#463)
+- Added the opt-in idempotency contract tests for `XmlMultiStreamLoader<T>`, which can be run more than once on the same instance. (#583)
+- The `CheckNamespace` suppression in each framework polyfill now sits directly above its `namespace` line; no behaviour change. (#596)
+- The internal `RequiresDynamicCode` / `RequiresUnreferencedCode` polyfills on older target frameworks back `Message` with a field instead of an auto-property; no public surface changed. (#557)
+- Source files use the repository's three-blank-lines-between-members spacing throughout; no code changed. (#507)
+
 ## [0.10.0] - 2026-09-22
 
 ### Added
@@ -266,7 +302,8 @@ Initial public release.
 ### Fixed
 - Dropped `netcoreapp3.1` from the test TFM matrix where the CI image does not provide the SDK ([#16](https://github.com/Chris-Wolfgang/ETL-Xml/pull/16)).
 
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/Chris-Wolfgang/ETL-Xml/compare/v0.8.0...v0.8.1
