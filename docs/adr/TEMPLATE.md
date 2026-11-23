@@ -1,6 +1,6 @@
-# ADR-NNN Short title in noun form
+# ADR-NNNN Short title in noun form
 
-- **Status**: Proposed | Accepted | Superseded by ADR-NNN | Deprecated
+- **Status**: Proposed | Accepted | Superseded by ADR-NNNN | Deprecated
 - **Date**: YYYY-MM-DD
 
 ---
