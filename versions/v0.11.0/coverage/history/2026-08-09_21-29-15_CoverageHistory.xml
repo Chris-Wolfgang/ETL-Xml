@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2026-08-09_21-29-15" tag="">
+  <assembly name="Wolfgang.Etl.Xml">
+    <class name="Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions" coveredlines="17" coverablelines="17" totallines="116" coveredbranches="12" totalbranches="12" coveredcodeelements="3" fullcoveredcodeelements="3" totalcodeelements="3" />
+    <class name="Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions" coveredlines="21" coverablelines="21" totallines="119" coveredbranches="12" totalbranches="12" coveredcodeelements="3" fullcoveredcodeelements="3" totalcodeelements="3" />
+    <class name="Wolfgang.Etl.Xml.XmlLogMessages" coveredlines="30" coverablelines="30" totallines="74" coveredbranches="0" totalbranches="0" coveredcodeelements="1" fullcoveredcodeelements="1" totalcodeelements="1" />
+    <class name="Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1" coveredlines="90" coverablelines="94" totallines="283" coveredbranches="36" totalbranches="40" coveredcodeelements="10" fullcoveredcodeelements="9" totalcodeelements="10" />
+    <class name="Wolfgang.Etl.Xml.XmlMultiStreamLoader`1" coveredlines="97" coverablelines="101" totallines="317" coveredbranches="35" totalbranches="42" coveredcodeelements="11" fullcoveredcodeelements="10" totalcodeelements="11" />
+    <class name="Wolfgang.Etl.Xml.XmlReport" coveredlines="4" coverablelines="4" totallines="35" coveredbranches="0" totalbranches="0" coveredcodeelements="2" fullcoveredcodeelements="2" totalcodeelements="2" />
+    <class name="Wolfgang.Etl.Xml.XmlSingleStreamExtractor`1" coveredlines="85" coverablelines="93" totallines="296" coveredbranches="51" totalbranches="64" coveredcodeelements="10" fullcoveredcodeelements="7" totalcodeelements="10" />
+    <class name="Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions" coveredlines="1" coverablelines="1" totallines="28" coveredbranches="0" totalbranches="0" coveredcodeelements="1" fullcoveredcodeelements="1" totalcodeelements="1" />
+    <class name="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1" coveredlines="117" coverablelines="122" totallines="391" coveredbranches="47" totalbranches="56" coveredcodeelements="12" fullcoveredcodeelements="10" totalcodeelements="12" />
+    <class name="Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions" coveredlines="2" coverablelines="2" totallines="45" coveredbranches="0" totalbranches="0" coveredcodeelements="2" fullcoveredcodeelements="2" totalcodeelements="2" />
+  </assembly>
+</coverage>

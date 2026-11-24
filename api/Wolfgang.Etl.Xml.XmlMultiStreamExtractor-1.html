@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/new/v0.10.0/apiSpec/new?filename=Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.Xml.XmlMultiStreamExtractor%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/new/v0.11.0/apiSpec/new?filename=Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.Xml.XmlMultiStreamExtractor%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,11 +75,11 @@
 
 
   <h1 id="Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1" class="text-break">
-Class XmlMultiStreamExtractor&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L43"><i class="bi bi-code-slash"></i></a>
+Class XmlMultiStreamExtractor&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L50"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.Xml.html">Xml</a></dd></dl>
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Etl</span>.<a class="xref" href="Wolfgang.Etl.Xml.html">Xml</a></dd></dl>
   <dl><dt>Assembly</dt><dd>Wolfgang.Etl.Xml.dll</dd></dl>
   </div>
 
@@ -196,7 +196,10 @@ reading one XML document per stream.</p>
 var extractor = new XmlMultiStreamExtractor&lt;Person&gt;
 (
     streams,
-    new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit },
+    new XmlMultiStreamExtractorOptions
+    {
+        ReaderSettings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit },
+    },
     logger
 );
 await foreach (var person in extractor.ExtractAsync(cancellationToken))
@@ -208,7 +211,10 @@ await foreach (var person in extractor.ExtractAsync(cancellationToken))
   <h2 id="Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1_remarks">Remarks</h2>
   <div class="markdown level0 remarks"><p>Iterates over an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable&lt;T&gt;</a> of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> instances,
 deserializing a single <code class="typeparamref">TRecord</code> from each stream.
-Each stream is disposed after the item is read.
+Each stream the enumeration reaches is disposed after its item is read. Streams it never reaches
+(it stopped at <span class="xref">Wolfgang.Etl.Abstractions.ExtractorBase&lt;TSource, TProgress&gt;.MaximumItemCount</span>, was cancelled, or the
+error policy aborted) are not opened or disposed by the extractor; the caller still owns them, which is
+why a lazy sequence such as <code>Select(File.OpenRead)</code> is the intended shape.
 Extraction stops when the enumerable is exhausted or <span class="xref">Wolfgang.Etl.Abstractions.ExtractorBase&lt;TSource, TProgress&gt;.MaximumItemCount</span> is reached.</p>
 </div>
 
@@ -221,7 +227,7 @@ Extraction stops when the enumerable is exhausted or <span class="xref">Wolfgang
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1__ctor_System_Collections_Generic_IEnumerable_System_IO_Stream__Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamExtractor__0___" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor(System.Collections.Generic.IEnumerable{System.IO.Stream},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamExtractor{`0}})">
   XmlMultiStreamExtractor(IEnumerable&lt;Stream&gt;, ILogger&lt;XmlMultiStreamExtractor&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L106"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html">XmlMultiStreamExtractor&lt;TRecord&gt;</a> class
@@ -230,7 +236,8 @@ with a logger.</p>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.&quot;)]
+    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which reflects over the record type and every type reachable from it. The record type&#39;s own public properties, fields and parameterless constructor are preserved; nested, derived ([XmlInclude]) and collection element types are not, and the trimmer may remove their members. Reference or root those types (for example with DynamicDependency or a TrimmerRootDescriptor) when trimming.&quot;)]
+[RequiresDynamicCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which generates serialization code at run time. Under Native AOT it falls back to its slower reflection-based mode, which works only for members that survive trimming.&quot;)]
 public XmlMultiStreamExtractor(IEnumerable&lt;Stream&gt; streams, ILogger&lt;XmlMultiStreamExtractor&lt;TRecord&gt;&gt;? logger = null)</code></pre>
   </div>
 
@@ -266,7 +273,7 @@ public XmlMultiStreamExtractor(IEnumerable&lt;Stream&gt; streams, ILogger&lt;Xml
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1__ctor_System_Collections_Generic_IEnumerable_System_IO_Stream__Wolfgang_Etl_Xml_XmlMultiStreamExtractorOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamExtractor__0___" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.#ctor(System.Collections.Generic.IEnumerable{System.IO.Stream},Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamExtractor{`0}})">
   XmlMultiStreamExtractor(IEnumerable&lt;Stream&gt;, XmlMultiStreamExtractorOptions?, ILogger&lt;XmlMultiStreamExtractor&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L154"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L164"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlMultiStreamExtractor-1.html">XmlMultiStreamExtractor&lt;TRecord&gt;</a> class configured through an options record.</p>
@@ -274,7 +281,8 @@ public XmlMultiStreamExtractor(IEnumerable&lt;Stream&gt; streams, ILogger&lt;Xml
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;XmlMultiStreamExtractor deserializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.&quot;)]
+    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which reflects over the record type and every type reachable from it. The record type&#39;s own public properties, fields and parameterless constructor are preserved; nested, derived ([XmlInclude]) and collection element types are not, and the trimmer may remove their members. Reference or root those types (for example with DynamicDependency or a TrimmerRootDescriptor) when trimming.&quot;)]
+[RequiresDynamicCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which generates serialization code at run time. Under Native AOT it falls back to its slower reflection-based mode, which works only for members that survive trimming.&quot;)]
 public XmlMultiStreamExtractor(IEnumerable&lt;Stream&gt; streams, XmlMultiStreamExtractorOptions? options, ILogger&lt;XmlMultiStreamExtractor&lt;TRecord&gt;&gt;? logger = null)</code></pre>
   </div>
 
@@ -316,7 +324,7 @@ public XmlMultiStreamExtractor(IEnumerable&lt;Stream&gt; streams, XmlMultiStream
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1_CreateProgressReport" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L314"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L341"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a progress report of type TProgress. This gives the derived class the opportunity to
@@ -350,7 +358,7 @@ implement a custom progress report that is specific to the extraction process.</
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1_CreateProgressTimer_System_IProgress_Wolfgang_Etl_Xml_XmlReport__" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.CreateProgressTimer(System.IProgress{Wolfgang.Etl.Xml.XmlReport})">
   CreateProgressTimer(IProgress&lt;XmlReport&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L323"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L351"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -391,7 +399,7 @@ Override this method in a derived class to inject a custom timer
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamExtractor_1_ExtractWorkerAsync_System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamExtractor`1.ExtractWorkerAsync(System.Threading.CancellationToken)">
   ExtractWorkerAsync(CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L196"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L206"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>This method is the core implementation of the extraction logic and should be
@@ -432,7 +440,7 @@ The result may be an empty sequence if no data is available or if the extraction
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L43" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamExtractor.cs/#L50" class="edit-link">Edit this page</a>
         </div>
 
 

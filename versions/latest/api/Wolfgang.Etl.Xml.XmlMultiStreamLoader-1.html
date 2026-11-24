@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/new/v0.10.0/apiSpec/new?filename=Wolfgang_Etl_Xml_XmlMultiStreamLoader_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.Xml.XmlMultiStreamLoader%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/new/v0.11.0/apiSpec/new?filename=Wolfgang_Etl_Xml_XmlMultiStreamLoader_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.Xml.XmlMultiStreamLoader%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,11 +75,11 @@
 
 
   <h1 id="Wolfgang_Etl_Xml_XmlMultiStreamLoader_1" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamLoader`1" class="text-break">
-Class XmlMultiStreamLoader&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L38"><i class="bi bi-code-slash"></i></a>
+Class XmlMultiStreamLoader&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L44"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.Xml.html">Xml</a></dd></dl>
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Etl</span>.<a class="xref" href="Wolfgang.Etl.Xml.html">Xml</a></dd></dl>
   <dl><dt>Assembly</dt><dd>Wolfgang.Etl.Xml.dll</dd></dl>
   </div>
 
@@ -204,6 +204,12 @@ await loader.LoadAsync(items, cancellationToken);</code></pre>
 serializes the item as a single XML document, and disposes the stream.
 The factory receives the item being written, allowing stream creation based on item properties
 (e.g., generating file names from record fields).</p>
+<p>
+Each document is written by <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.xml.serialization.xmlserializer">XmlSerializer</a> with its default namespaces, so the
+element carries the <code>xmlns:xsi</code> and <code>xmlns:xsd</code> declarations. This differs from
+<a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a>, which writes its records without them inside a
+shared root element. Both forms read back through the matching extractor.
+</p>
 </div>
 
 
@@ -215,16 +221,17 @@ The factory receives the item being written, allowing stream creation based on i
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_Buffers_IBufferWriter_System_Byte___Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamLoader__0___" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.Buffers.IBufferWriter{System.Byte}},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})">
   XmlMultiStreamLoader(Func&lt;TRecord, IBufferWriter&lt;byte&gt;&gt;, ILogger&lt;XmlMultiStreamLoader&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L191"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L201"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html">XmlMultiStreamLoader&lt;TRecord&gt;</a> class with an
-<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.ibufferwriter-1">IBufferWriter&lt;T&gt;</a>-of-bytes factory (#8) and a logger.</p>
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.ibufferwriter-1">IBufferWriter&lt;T&gt;</a>-of-bytes factory and a logger.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.&quot;)]
+    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which reflects over the record type and every type reachable from it. The record type&#39;s own public properties, fields and parameterless constructor are preserved; nested, derived ([XmlInclude]) and collection element types are not, and the trimmer may remove their members. Reference or root those types (for example with DynamicDependency or a TrimmerRootDescriptor) when trimming.&quot;)]
+[RequiresDynamicCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which generates serialization code at run time. Under Native AOT it falls back to its slower reflection-based mode, which works only for members that survive trimming.&quot;)]
 public XmlMultiStreamLoader(Func&lt;TRecord, IBufferWriter&lt;byte&gt;&gt; bufferWriterFactory, ILogger&lt;XmlMultiStreamLoader&lt;TRecord&gt;&gt;? logger = null)</code></pre>
   </div>
 
@@ -261,7 +268,7 @@ of bytes to write it to.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_Buffers_IBufferWriter_System_Byte___Wolfgang_Etl_Xml_XmlMultiStreamLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamLoader__0___" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.Buffers.IBufferWriter{System.Byte}},Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})">
   XmlMultiStreamLoader(Func&lt;TRecord, IBufferWriter&lt;byte&gt;&gt;, XmlMultiStreamLoaderOptions?, ILogger&lt;XmlMultiStreamLoader&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L270"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L283"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html">XmlMultiStreamLoader&lt;TRecord&gt;</a> class writing to buffer writers, configured through an options record.</p>
@@ -269,7 +276,8 @@ of bytes to write it to.</p>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.&quot;)]
+    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which reflects over the record type and every type reachable from it. The record type&#39;s own public properties, fields and parameterless constructor are preserved; nested, derived ([XmlInclude]) and collection element types are not, and the trimmer may remove their members. Reference or root those types (for example with DynamicDependency or a TrimmerRootDescriptor) when trimming.&quot;)]
+[RequiresDynamicCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which generates serialization code at run time. Under Native AOT it falls back to its slower reflection-based mode, which works only for members that survive trimming.&quot;)]
 public XmlMultiStreamLoader(Func&lt;TRecord, IBufferWriter&lt;byte&gt;&gt; bufferWriterFactory, XmlMultiStreamLoaderOptions? options, ILogger&lt;XmlMultiStreamLoader&lt;TRecord&gt;&gt;? logger = null)</code></pre>
   </div>
 
@@ -307,7 +315,7 @@ public XmlMultiStreamLoader(Func&lt;TRecord, IBufferWriter&lt;byte&gt;&gt; buffe
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_IO_Stream__Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamLoader__0___" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.IO.Stream},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})">
   XmlMultiStreamLoader(Func&lt;TRecord, Stream&gt;, ILogger&lt;XmlMultiStreamLoader&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L106"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html">XmlMultiStreamLoader&lt;TRecord&gt;</a> class
@@ -316,7 +324,8 @@ with a logger.</p>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.&quot;)]
+    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which reflects over the record type and every type reachable from it. The record type&#39;s own public properties, fields and parameterless constructor are preserved; nested, derived ([XmlInclude]) and collection element types are not, and the trimmer may remove their members. Reference or root those types (for example with DynamicDependency or a TrimmerRootDescriptor) when trimming.&quot;)]
+[RequiresDynamicCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which generates serialization code at run time. Under Native AOT it falls back to its slower reflection-based mode, which works only for members that survive trimming.&quot;)]
 public XmlMultiStreamLoader(Func&lt;TRecord, Stream&gt; streamFactory, ILogger&lt;XmlMultiStreamLoader&lt;TRecord&gt;&gt;? logger = null)</code></pre>
   </div>
 
@@ -353,7 +362,7 @@ The loader will dispose the stream after writing.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamLoader_1__ctor_System_Func__0_System_IO_Stream__Wolfgang_Etl_Xml_XmlMultiStreamLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlMultiStreamLoader__0___" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.#ctor(System.Func{`0,System.IO.Stream},Wolfgang.Etl.Xml.XmlMultiStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlMultiStreamLoader{`0}})">
   XmlMultiStreamLoader(Func&lt;TRecord, Stream&gt;, XmlMultiStreamLoaderOptions?, ILogger&lt;XmlMultiStreamLoader&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L246"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L258"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlMultiStreamLoader-1.html">XmlMultiStreamLoader&lt;TRecord&gt;</a> class configured through an options record.</p>
@@ -361,7 +370,8 @@ The loader will dispose the stream after writing.</p>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;XmlMultiStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.&quot;)]
+    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which reflects over the record type and every type reachable from it. The record type&#39;s own public properties, fields and parameterless constructor are preserved; nested, derived ([XmlInclude]) and collection element types are not, and the trimmer may remove their members. Reference or root those types (for example with DynamicDependency or a TrimmerRootDescriptor) when trimming.&quot;)]
+[RequiresDynamicCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which generates serialization code at run time. Under Native AOT it falls back to its slower reflection-based mode, which works only for members that survive trimming.&quot;)]
 public XmlMultiStreamLoader(Func&lt;TRecord, Stream&gt; streamFactory, XmlMultiStreamLoaderOptions? options, ILogger&lt;XmlMultiStreamLoader&lt;TRecord&gt;&gt;? logger = null)</code></pre>
   </div>
 
@@ -403,10 +413,10 @@ public XmlMultiStreamLoader(Func&lt;TRecord, Stream&gt; streamFactory, XmlMultiS
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamLoader_1_IsDryRun" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.IsDryRun">
   IsDryRun
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L341"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L359"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode.
 When <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, the load enumerates the source, honours
 <span class="xref">Wolfgang.Etl.Abstractions.LoaderBase&lt;TDestination, TProgress&gt;.SkipItemCount</span> /
 <span class="xref">Wolfgang.Etl.Abstractions.LoaderBase&lt;TDestination, TProgress&gt;.MaximumItemCount</span>, advances the progress
@@ -444,7 +454,7 @@ writes nothing. Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/l
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamLoader_1_CreateProgressReport" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L483"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L501"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a progress report of type TProgress. This gives the derived class the opportunity to
@@ -478,7 +488,7 @@ implement a custom progress report that is specific to the loading process.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamLoader_1_CreateProgressTimer_System_IProgress_Wolfgang_Etl_Xml_XmlReport__" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.CreateProgressTimer(System.IProgress{Wolfgang.Etl.Xml.XmlReport})">
   CreateProgressTimer(IProgress&lt;XmlReport&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L492"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L511"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -519,7 +529,7 @@ Override this method in a derived class to inject a custom timer
 
   <h3 id="Wolfgang_Etl_Xml_XmlMultiStreamLoader_1_LoadWorkerAsync_System_Collections_Generic_IAsyncEnumerable__0__System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.Xml.XmlMultiStreamLoader`1.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Threading.CancellationToken)">
   LoadWorkerAsync(IAsyncEnumerable&lt;TRecord&gt;, CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L346"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L364"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>This method is the core implementation of the loading logic and should be
@@ -558,12 +568,6 @@ overridden by derived classes.</p>
   <div class="markdown level1 remarks"><p>Items may be an empty sequence if no data is available or if the loading fails.</p>
 </div>
 
-  <h4 class="section">Exceptions</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
-    <dd><p>Argument items is null</p>
-</dd>
-  </dl>
 
 
 
@@ -571,7 +575,7 @@ overridden by derived classes.</p>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L38" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlMultiStreamLoader.cs/#L44" class="edit-link">Edit this page</a>
         </div>
 
 

@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/new/v0.10.0/apiSpec/new?filename=Wolfgang_Etl_Xml_XmlSingleStreamLoader_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.Xml.XmlSingleStreamLoader%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/new/v0.11.0/apiSpec/new?filename=Wolfgang_Etl_Xml_XmlSingleStreamLoader_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.Xml.XmlSingleStreamLoader%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,11 +75,11 @@
 
 
   <h1 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1" class="text-break">
-Class XmlSingleStreamLoader&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L55"><i class="bi bi-code-slash"></i></a>
+Class XmlSingleStreamLoader&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L56"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.Xml.html">Xml</a></dd></dl>
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Etl</span>.<a class="xref" href="Wolfgang.Etl.Xml.html">Xml</a></dd></dl>
   <dl><dt>Assembly</dt><dd>Wolfgang.Etl.Xml.dll</dd></dl>
   </div>
 
@@ -233,11 +233,11 @@ to <code>false</code>, mirroring the behaviour of <a class="xref" href="https://
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_Buffers_IBufferWriter_System_Byte__Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.Buffers.IBufferWriter{System.Byte},Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})">
   XmlSingleStreamLoader(IBufferWriter&lt;byte&gt;, XmlSingleStreamLoaderOptions?, ILogger&lt;XmlSingleStreamLoader&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L352"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L369"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a> class writing
-to an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.ibufferwriter-1">IBufferWriter&lt;T&gt;</a> of bytes (#8). This is the canonical buffer-writer
+to an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.ibufferwriter-1">IBufferWriter&lt;T&gt;</a> of bytes. This is the canonical buffer-writer
 overload — it is the only one that lets <code class="paramref">options</code> and
 <code class="paramref">logger</code> be supplied together without also supplying
 <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.xml.xmlwritersettings">XmlWriterSettings</a>.</p>
@@ -245,7 +245,8 @@ overload — it is the only one that lets <code class="paramref">options</code> 
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.&quot;)]
+    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which reflects over the record type and every type reachable from it. The record type&#39;s own public properties, fields and parameterless constructor are preserved; nested, derived ([XmlInclude]) and collection element types are not, and the trimmer may remove their members. Reference or root those types (for example with DynamicDependency or a TrimmerRootDescriptor) when trimming.&quot;)]
+[RequiresDynamicCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which generates serialization code at run time. Under Native AOT it falls back to its slower reflection-based mode, which works only for members that survive trimming.&quot;)]
 public XmlSingleStreamLoader(IBufferWriter&lt;byte&gt; bufferWriter, XmlSingleStreamLoaderOptions? options, ILogger&lt;XmlSingleStreamLoader&lt;TRecord&gt;&gt;? logger = null)</code></pre>
   </div>
 
@@ -275,6 +276,10 @@ public XmlSingleStreamLoader(IBufferWriter&lt;byte&gt; bufferWriter, XmlSingleSt
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
     <dd><p>Thrown when <code class="paramref">bufferWriter</code> is <code>null</code>.</p>
 </dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>Thrown when <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions.html#Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_RootElementName">RootElementName</a> is an empty or
+whitespace string, or is not a valid XML local name.</p>
+</dd>
   </dl>
 
 
@@ -283,7 +288,7 @@ public XmlSingleStreamLoader(IBufferWriter&lt;byte&gt; bufferWriter, XmlSingleSt
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1__ctor_System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_Xml_XmlSingleStreamLoader__0___" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.Xml.XmlSingleStreamLoader{`0}})">
   XmlSingleStreamLoader(Stream, XmlSingleStreamLoaderOptions?, ILogger&lt;XmlSingleStreamLoader&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L213"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L216"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Wolfgang.Etl.Xml.XmlSingleStreamLoader-1.html">XmlSingleStreamLoader&lt;TRecord&gt;</a> class.
@@ -294,7 +299,8 @@ together without also supplying <a class="xref" href="https://learn.microsoft.co
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;XmlSingleStreamLoader serializes TRecord via System.Xml.Serialization.XmlSerializer, which uses runtime reflection/Reflection.Emit the trimmer cannot follow. The library is not trim/NativeAOT safe.&quot;)]
+    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which reflects over the record type and every type reachable from it. The record type&#39;s own public properties, fields and parameterless constructor are preserved; nested, derived ([XmlInclude]) and collection element types are not, and the trimmer may remove their members. Reference or root those types (for example with DynamicDependency or a TrimmerRootDescriptor) when trimming.&quot;)]
+[RequiresDynamicCode(&quot;Records are serialized with System.Xml.Serialization.XmlSerializer, which generates serialization code at run time. Under Native AOT it falls back to its slower reflection-based mode, which works only for members that survive trimming.&quot;)]
 public XmlSingleStreamLoader(Stream stream, XmlSingleStreamLoaderOptions? options, ILogger&lt;XmlSingleStreamLoader&lt;TRecord&gt;&gt;? logger = null)</code></pre>
   </div>
 
@@ -349,10 +355,10 @@ whitespace string, or is not a valid XML local name.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_IsDryRun" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.IsDryRun">
   IsDryRun
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L407"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L427"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode (#176).
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the loader runs in <em>dry-run</em> mode.
 When <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, the load enumerates the source, honours
 <span class="xref">Wolfgang.Etl.Abstractions.LoaderBase&lt;TDestination, TProgress&gt;.SkipItemCount</span> /
 <span class="xref">Wolfgang.Etl.Abstractions.LoaderBase&lt;TDestination, TProgress&gt;.MaximumItemCount</span>, advances the progress
@@ -390,7 +396,7 @@ counters, and logs as usual, but writes nothing to the output stream. Defaults t
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_CreateProgressReport" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L578"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L657"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a progress report of type TProgress. This gives the derived class the opportunity to
@@ -424,7 +430,7 @@ implement a custom progress report that is specific to the loading process.</p>
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_CreateProgressTimer_System_IProgress_Wolfgang_Etl_Xml_XmlReport__" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.CreateProgressTimer(System.IProgress{Wolfgang.Etl.Xml.XmlReport})">
   CreateProgressTimer(IProgress&lt;XmlReport&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L588"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L667"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -465,7 +471,7 @@ Override this method in a derived class to inject a custom timer
 
   <h3 id="Wolfgang_Etl_Xml_XmlSingleStreamLoader_1_LoadWorkerAsync_System_Collections_Generic_IAsyncEnumerable__0__System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.Xml.XmlSingleStreamLoader`1.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Threading.CancellationToken)">
   LoadWorkerAsync(IAsyncEnumerable&lt;TRecord&gt;, CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L412"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L432"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>This method is the core implementation of the loading logic and should be
@@ -504,12 +510,6 @@ overridden by derived classes.</p>
   <div class="markdown level1 remarks"><p>Items may be an empty sequence if no data is available or if the loading fails.</p>
 </div>
 
-  <h4 class="section">Exceptions</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
-    <dd><p>Argument items is null</p>
-</dd>
-  </dl>
 
 
 
@@ -517,7 +517,7 @@ overridden by derived classes.</p>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L55" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/src/Wolfgang.Etl.Xml/XmlSingleStreamLoader.cs/#L56" class="edit-link">Edit this page</a>
         </div>
 
 

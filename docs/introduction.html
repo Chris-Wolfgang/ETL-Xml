@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/docfx_project/docs/introduction.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/docfx_project/docs/introduction.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,12 @@
 <li><strong>Skip and maximum</strong> — <code>SkipItemCount</code> and <code>MaximumItemCount</code> properties for paging through large XML sources.</li>
 <li><strong>Custom XML settings</strong> — Accepts <code>XmlReaderSettings</code> and <code>XmlWriterSettings</code> for full control over XML behavior.</li>
 <li><strong>Structured logging</strong> — High-performance <code>LoggerMessage</code>-based logging with categorized event IDs.</li>
-<li><strong>Multi-TFM support</strong> — Targets .NET Framework 4.6.2+, .NET Standard 2.0, .NET 8.0, and .NET 10.0.</li>
+<li><strong><code>EtlPipeline</code> factories</strong> — Fluent source and sink extension methods (<code>XmlSingleStreamExtractor&lt;T&gt;</code>, <code>XmlSingleStreamLoader&lt;T&gt;</code> and the multi-stream pair) that plug straight into an <code>EtlPipeline</code> chain.</li>
+<li><strong>Error policies and dead-lettering</strong> — The multi-stream extractor and loader honour <code>ErrorPolicy</code> to skip or dead-letter a failed stream or record and keep going.</li>
+<li><strong>Metrics</strong> — <code>System.Diagnostics.Metrics</code> counters and an operation-duration histogram on the <code>Wolfgang.Etl.Xml</code> meter.</li>
+<li><strong>Dry run</strong> — <code>IsDryRun</code> on the loader options enumerates and counts without writing.</li>
+<li><strong><code>IBufferWriter&lt;byte&gt;</code> destinations</strong> — Both loaders can write to a buffer writer instead of a <code>Stream</code>.</li>
+<li><strong>Multi-TFM support</strong> — Targets .NET Framework 4.6.2 and 4.8.1, .NET Standard 2.0, and .NET 5.0, 6.0, 7.0, 8.0 and 10.0.</li>
 </ul>
 <h2 id="getting-help">Getting Help</h2>
 <p>If you need help with Wolfgang.Etl.Xml, please:</p>
@@ -103,7 +108,7 @@
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.10.0/docfx_project/docs/introduction.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-Xml/blob/v0.11.0/docfx_project/docs/introduction.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>

@@ -29,6 +29,15 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), System.Func(Of T, System.IO.Stream))
   nameWithType: EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader<T>(IEtlPipeline<T>, Func<T, Stream>)
   nameWithType.vb: EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader(Of T)(IEtlPipeline(Of T), Func(Of T, Stream))
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.Func{``0,System.IO.Stream},System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name: XmlMultiStreamLoader<T>(IEtlPipeline<T>, Func<T, Stream>, IProgress<XmlReport>)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlMultiStreamLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_Func___0_System_IO_Stream__System_IProgress_Wolfgang_Etl_Xml_XmlReport__
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.Func{``0,System.IO.Stream},System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name.vb: XmlMultiStreamLoader(Of T)(IEtlPipeline(Of T), Func(Of T, Stream), IProgress(Of XmlReport))
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader<T>(Wolfgang.Etl.Abstractions.IEtlPipeline<T>, System.Func<T, System.IO.Stream>, System.IProgress<Wolfgang.Etl.Xml.XmlReport>)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), System.Func(Of T, System.IO.Stream), System.IProgress(Of Wolfgang.Etl.Xml.XmlReport))
+  nameWithType: EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader<T>(IEtlPipeline<T>, Func<T, Stream>, IProgress<XmlReport>)
+  nameWithType.vb: EtlPipelineXmlSinkExtensions.XmlMultiStreamLoader(Of T)(IEtlPipeline(Of T), Func(Of T, Stream), IProgress(Of XmlReport))
 - uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader*
   name: XmlSingleStreamLoader
   href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlSingleStreamLoader_
@@ -36,6 +45,15 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader
   nameWithType: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.IO.Stream,System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name: XmlSingleStreamLoader<T>(IEtlPipeline<T>, Stream, IProgress<XmlReport>)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlSingleStreamLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_IO_Stream_System_IProgress_Wolfgang_Etl_Xml_XmlReport__
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.IO.Stream,System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name.vb: XmlSingleStreamLoader(Of T)(IEtlPipeline(Of T), Stream, IProgress(Of XmlReport))
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(Wolfgang.Etl.Abstractions.IEtlPipeline<T>, System.IO.Stream, System.IProgress<Wolfgang.Etl.Xml.XmlReport>)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), System.IO.Stream, System.IProgress(Of Wolfgang.Etl.Xml.XmlReport))
+  nameWithType: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(IEtlPipeline<T>, Stream, IProgress<XmlReport>)
+  nameWithType.vb: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader(Of T)(IEtlPipeline(Of T), Stream, IProgress(Of XmlReport))
 - uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
   name: XmlSingleStreamLoader<T>(IEtlPipeline<T>, Stream, XmlSingleStreamLoaderOptions?)
   href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlSingleStreamLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_
@@ -45,6 +63,15 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), System.IO.Stream, Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
   nameWithType: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(IEtlPipeline<T>, Stream, XmlSingleStreamLoaderOptions?)
   nameWithType.vb: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader(Of T)(IEtlPipeline(Of T), Stream, XmlSingleStreamLoaderOptions)
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.String,System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name: XmlSingleStreamLoader<T>(IEtlPipeline<T>, string, IProgress<XmlReport>)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlSingleStreamLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_String_System_IProgress_Wolfgang_Etl_Xml_XmlReport__
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.String,System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name.vb: XmlSingleStreamLoader(Of T)(IEtlPipeline(Of T), String, IProgress(Of XmlReport))
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(Wolfgang.Etl.Abstractions.IEtlPipeline<T>, string, System.IProgress<Wolfgang.Etl.Xml.XmlReport>)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), String, System.IProgress(Of Wolfgang.Etl.Xml.XmlReport))
+  nameWithType: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader<T>(IEtlPipeline<T>, string, IProgress<XmlReport>)
+  nameWithType.vb: EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader(Of T)(IEtlPipeline(Of T), String, IProgress(Of XmlReport))
 - uid: Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.XmlSingleStreamLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.String,Wolfgang.Etl.Xml.XmlSingleStreamLoaderOptions)
   name: XmlSingleStreamLoader<T>(IEtlPipeline<T>, string, XmlSingleStreamLoaderOptions?)
   href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSinkExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSinkExtensions_XmlSingleStreamLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_String_Wolfgang_Etl_Xml_XmlSingleStreamLoaderOptions_
@@ -76,6 +103,15 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, System.Collections.Generic.IEnumerable(Of System.IO.Stream))
   nameWithType: EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor<T>(EtlPipeline, IEnumerable<Stream>)
   nameWithType.vb: EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor(Of T)(EtlPipeline, IEnumerable(Of Stream))
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.Collections.Generic.IEnumerable{System.IO.Stream},System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name: XmlMultiStreamExtractor<T>(EtlPipeline, IEnumerable<Stream>, IProgress<XmlReport>)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSourceExtensions_XmlMultiStreamExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_System_Collections_Generic_IEnumerable_System_IO_Stream__System_IProgress_Wolfgang_Etl_Xml_XmlReport__
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.Collections.Generic.IEnumerable{System.IO.Stream},System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name.vb: XmlMultiStreamExtractor(Of T)(EtlPipeline, IEnumerable(Of Stream), IProgress(Of XmlReport))
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor<T>(Wolfgang.Etl.Abstractions.EtlPipeline, System.Collections.Generic.IEnumerable<System.IO.Stream>, System.IProgress<Wolfgang.Etl.Xml.XmlReport>)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, System.Collections.Generic.IEnumerable(Of System.IO.Stream), System.IProgress(Of Wolfgang.Etl.Xml.XmlReport))
+  nameWithType: EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor<T>(EtlPipeline, IEnumerable<Stream>, IProgress<XmlReport>)
+  nameWithType.vb: EtlPipelineXmlSourceExtensions.XmlMultiStreamExtractor(Of T)(EtlPipeline, IEnumerable(Of Stream), IProgress(Of XmlReport))
 - uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor*
   name: XmlSingleStreamExtractor
   href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSourceExtensions_XmlSingleStreamExtractor_
@@ -83,6 +119,15 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor
   nameWithType: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.IO.Stream,System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name: XmlSingleStreamExtractor<T>(EtlPipeline, Stream, IProgress<XmlReport>)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSourceExtensions_XmlSingleStreamExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_System_IO_Stream_System_IProgress_Wolfgang_Etl_Xml_XmlReport__
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.IO.Stream,System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name.vb: XmlSingleStreamExtractor(Of T)(EtlPipeline, Stream, IProgress(Of XmlReport))
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(Wolfgang.Etl.Abstractions.EtlPipeline, System.IO.Stream, System.IProgress<Wolfgang.Etl.Xml.XmlReport>)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, System.IO.Stream, System.IProgress(Of Wolfgang.Etl.Xml.XmlReport))
+  nameWithType: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(EtlPipeline, Stream, IProgress<XmlReport>)
+  nameWithType.vb: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(EtlPipeline, Stream, IProgress(Of XmlReport))
 - uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.IO.Stream,Wolfgang.Etl.Xml.XmlSingleStreamExtractorOptions)
   name: XmlSingleStreamExtractor<T>(EtlPipeline, Stream, XmlSingleStreamExtractorOptions?)
   href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSourceExtensions_XmlSingleStreamExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_System_IO_Stream_Wolfgang_Etl_Xml_XmlSingleStreamExtractorOptions_
@@ -101,6 +146,15 @@ references:
   fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, String)
   nameWithType: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(EtlPipeline, string)
   nameWithType.vb: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(EtlPipeline, String)
+- uid: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.String,System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name: XmlSingleStreamExtractor<T>(EtlPipeline, string, IProgress<XmlReport>)
+  href: api/Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.html#Wolfgang_Etl_Xml_EtlPipelineXmlSourceExtensions_XmlSingleStreamExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_System_String_System_IProgress_Wolfgang_Etl_Xml_XmlReport__
+  commentId: M:Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.String,System.IProgress{Wolfgang.Etl.Xml.XmlReport})
+  name.vb: XmlSingleStreamExtractor(Of T)(EtlPipeline, String, IProgress(Of XmlReport))
+  fullName: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(Wolfgang.Etl.Abstractions.EtlPipeline, string, System.IProgress<Wolfgang.Etl.Xml.XmlReport>)
+  fullName.vb: Wolfgang.Etl.Xml.EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, String, System.IProgress(Of Wolfgang.Etl.Xml.XmlReport))
+  nameWithType: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor<T>(EtlPipeline, string, IProgress<XmlReport>)
+  nameWithType.vb: EtlPipelineXmlSourceExtensions.XmlSingleStreamExtractor(Of T)(EtlPipeline, String, IProgress(Of XmlReport))
 - uid: Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions
   name: XmlMultiStreamExtractorOptions
   href: api/Wolfgang.Etl.Xml.XmlMultiStreamExtractorOptions.html
