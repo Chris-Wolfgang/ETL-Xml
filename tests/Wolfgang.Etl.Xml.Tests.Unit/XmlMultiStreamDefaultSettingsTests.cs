@@ -104,7 +104,7 @@ public class XmlMultiStreamDefaultSettingsTests
         var exception = await Record.ExceptionAsync(() => DrainAsync(sut));
 
         Assert.NotNull(exception);
-        Assert.Contains(Flatten(exception), e => e is XmlException);
+        Assert.Contains(Flatten(exception).ToList(), e => e is XmlException);
     }
 
 
