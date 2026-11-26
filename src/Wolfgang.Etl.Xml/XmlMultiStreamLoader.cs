@@ -31,6 +31,16 @@ namespace Wolfgang.Etl.Xml;
 /// <see cref="XmlSingleStreamLoader{TRecord}"/>, which writes its records without them inside a
 /// shared root element. Both forms read back through the matching extractor.
 /// </para>
+/// <para>
+/// <b>Synchronous I/O.</b> <see cref="System.Xml.Serialization.XmlSerializer"/> has no asynchronous API, so each
+/// record is written with synchronous write calls on the caller's stream even though this stage's API is
+/// asynchronous. A stream that forbids synchronous I/O (for example an ASP.NET Core request or response body with
+/// <c>AllowSynchronousIO = false</c>) makes the stage throw <see cref="InvalidOperationException"/>, and on file or
+/// network streams each buffer flush blocks a thread-pool thread. Workaround: use the
+/// <see cref="IBufferWriter{T}"/> overload with an in-memory writer such as <c>ArrayBufferWriter&lt;byte&gt;</c>,
+/// then <c>await destination.WriteAsync(writer.WrittenMemory)</c> for each record.
+/// Real asynchronous I/O is tracked in https://github.com/Chris-Wolfgang/ETL-Xml/issues/612.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>

@@ -398,6 +398,33 @@ await loader.LoadAsync(transformer.TransformAsync(extractor.ExtractAsync()));
 // extractor.CurrentItemCount == 5, extractor.CurrentSkippedItemCount == 10
 ```
 
+### Synchronous I/O inside the async APIs
+
+`XmlSerializer` has no asynchronous API, so all four stages read and write each record with **synchronous**
+calls on the stream you pass in, even though `ExtractAsync` / `LoadAsync` are asynchronous:
+
+- A stream that forbids synchronous I/O makes the stage throw `InvalidOperationException`, for example an
+  ASP.NET Core request or response body with the default `AllowSynchronousIO = false`.
+- On file and network streams, each buffer fill or flush blocks a thread-pool thread, and the cancellation
+  token cannot interrupt a blocked read or write.
+
+Workaround: keep the stage on an in-memory buffer and do the real I/O asynchronously yourself.
+
+```csharp
+// Extract: copy the request body into memory first.
+var buffer = new MemoryStream();
+await request.Body.CopyToAsync(buffer, cancellationToken);
+buffer.Position = 0;
+var extractor = new XmlSingleStreamExtractor<Person>(buffer);
+
+// Load: serialize into memory, then write it out asynchronously.
+var output = new ArrayBufferWriter<byte>();
+await new XmlSingleStreamLoader<Person>(output).LoadAsync(people, cancellationToken);
+await response.Body.WriteAsync(output.WrittenMemory, cancellationToken);
+```
+
+Real asynchronous stream I/O is tracked in [#612](https://github.com/Chris-Wolfgang/ETL-Xml/issues/612).
+
 ---
 
 ## 🎯 Supported Frameworks
@@ -427,7 +454,9 @@ This project enforces **strict code quality standards** through **8 specialized 
 
 ### Async-First Enforcement
 
-This library uses **`BannedSymbols.txt`** to prohibit synchronous APIs and enforce async-first patterns:
+The library's own code uses **`BannedSymbols.txt`** to prohibit synchronous APIs and enforce async-first patterns.
+This covers the code in this repository only: `XmlSerializer` itself still does synchronous I/O on the caller's
+stream (see [Synchronous I/O inside the async APIs](#synchronous-io-inside-the-async-apis)).
 
 **Blocked APIs Include:**
 - `Task.Wait()`, `Task.Result` - Use `await` instead
