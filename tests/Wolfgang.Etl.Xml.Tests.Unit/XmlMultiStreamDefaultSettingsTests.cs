@@ -101,7 +101,7 @@ public class XmlMultiStreamDefaultSettingsTests
     {
         var sut = new XmlMultiStreamExtractor<PersonRecord>(new[] { ToStream(DocumentWithDtd) });
 
-        var exception = await Record.ExceptionAsync(() => DrainAsync(sut));
+        var exception = await Record.ExceptionAsync(async () => _ = await DrainAsync(sut));
 
         Assert.NotNull(exception);
         Assert.Contains(Flatten(exception).ToList(), e => e is XmlException);
