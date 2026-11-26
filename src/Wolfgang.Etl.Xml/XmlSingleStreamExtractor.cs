@@ -30,6 +30,15 @@ namespace Wolfgang.Etl.Xml;
 /// to <c>false</c>, mirroring the behaviour of <see cref="System.IO.StreamReader"/> and
 /// <see cref="System.IO.BinaryReader"/>.
 /// </para>
+/// <para>
+/// <b>Synchronous I/O.</b> <see cref="System.Xml.Serialization.XmlSerializer"/> has no asynchronous API, so each
+/// record is read with synchronous read calls on the caller's stream even though this stage's API is
+/// asynchronous. A stream that forbids synchronous I/O (for example an ASP.NET Core request or response body with
+/// <c>AllowSynchronousIO = false</c>) makes the stage throw <see cref="InvalidOperationException"/>, and on file or
+/// network streams each buffer fill blocks a thread-pool thread. Workaround: buffer the input first with
+/// <c>await source.CopyToAsync(memoryStream)</c>, rewind it, and extract from the <see cref="MemoryStream"/>.
+/// Real asynchronous I/O is tracked in https://github.com/Chris-Wolfgang/ETL-Xml/issues/612.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
