@@ -42,6 +42,24 @@ Each release attaches a **`reproducible-build-manifest.json`** listing the expec
 }
 ```
 
+Each release also attaches two plain-text files, the same ones every library in the
+fleet publishes:
+
+- **`SHA256SUMS.txt`**: one `<sha256>  <tfm>/<file>` line for every `.dll` and `.pdb` the
+  release built (`net10.0/Wolfgang.Etl.Xml.dll`, `net10.0/Wolfgang.Etl.Xml.pdb`, …), plus
+  one line per published `.nupkg` / `.snupkg`. The package lines identify the exact files
+  pushed to nuget.org; as above, a rebuild will not reproduce them.
+- **`BUILD-MANIFEST.txt`**: the tag, commit, workflow run, exact `dotnet --version`, runner
+  OS and image, and the `ContinuousIntegrationBuild` / `Deterministic` values the release
+  was built with. Use its SDK line to pick the SDK for your rebuild.
+
+Both are subjects of the release's build-provenance attestation, so you can check they
+came from this repository's release workflow:
+
+```bash
+gh attestation verify SHA256SUMS.txt --repo Chris-Wolfgang/ETL-Xml
+```
+
 ## Verify a published package
 
 You need the same **major .NET SDK** the release was built with (see the SDK line in
@@ -61,8 +79,8 @@ dotnet build src/Wolfgang.Etl.Xml/Wolfgang.Etl.Xml.csproj \
   -c Release -f net10.0 -p:ContinuousIntegrationBuild=true
 sha256sum src/Wolfgang.Etl.Xml/bin/Release/net10.0/Wolfgang.Etl.Xml.dll
 
-# 3. Compare — the two hashes, and the value in reproducible-build-manifest.json,
-#    must all match.
+# 3. Compare — the two hashes, the value in reproducible-build-manifest.json and the
+#    net10.0/Wolfgang.Etl.Xml.dll line in SHA256SUMS.txt must all match.
 ```
 
 A match means the published binary is exactly what the tagged source compiles to,
