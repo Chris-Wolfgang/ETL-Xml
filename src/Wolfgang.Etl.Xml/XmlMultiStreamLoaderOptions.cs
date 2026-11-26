@@ -11,8 +11,13 @@ public sealed record XmlMultiStreamLoaderOptions : LoaderOptions
 {
     /// <summary>
     /// Gets the <see cref="XmlWriterSettings"/> each destination's writer is created with. <see langword="null"/> (the
-    /// default) uses the loader's defaults.
+    /// default) uses the loader's defaults, the same as <see cref="XmlSingleStreamLoader{TRecord}"/>: UTF-8 with a
+    /// byte-order mark and <see cref="XmlWriterSettings.Indent"/> set to <see langword="true"/>.
     /// </summary>
+    /// <remarks>
+    /// The settings are cloned for each destination, and <see cref="XmlWriterSettings.CloseOutput"/> is always forced
+    /// to <see langword="false"/>. Supplied settings replace the defaults as a whole.
+    /// </remarks>
     public XmlWriterSettings? WriterSettings { get; init; }
 
 

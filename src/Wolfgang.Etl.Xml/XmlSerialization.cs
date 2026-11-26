@@ -82,17 +82,6 @@ internal static class XmlSerialization
 
 
 
-    /// <summary>Deserializes one document from <paramref name="stream"/>.</summary>
-    /// <param name="serializer">The serializer to use.</param>
-    /// <param name="stream">The stream holding the document.</param>
-    /// <returns>The deserialized object, or <see langword="null"/>.</returns>
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = SuppressionJustification)]
-    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = SuppressionJustification)]
-    internal static object? Deserialize(XmlSerializer serializer, Stream stream) =>
-        serializer.Deserialize(stream);
-
-
-
     /// <summary>Serializes <paramref name="item"/> to <paramref name="writer"/>.</summary>
     /// <param name="serializer">The serializer to use.</param>
     /// <param name="writer">The writer to serialize to.</param>
@@ -113,15 +102,4 @@ internal static class XmlSerialization
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = SuppressionJustification)]
     internal static void Serialize(XmlSerializer serializer, XmlWriter writer, object item, XmlSerializerNamespaces namespaces) =>
         serializer.Serialize(writer, item, namespaces);
-
-
-
-    /// <summary>Serializes <paramref name="item"/> to <paramref name="stream"/>.</summary>
-    /// <param name="serializer">The serializer to use.</param>
-    /// <param name="stream">The stream to serialize to.</param>
-    /// <param name="item">The item to serialize.</param>
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = SuppressionJustification)]
-    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = SuppressionJustification)]
-    internal static void Serialize(XmlSerializer serializer, Stream stream, object item) =>
-        serializer.Serialize(stream, item);
 }
