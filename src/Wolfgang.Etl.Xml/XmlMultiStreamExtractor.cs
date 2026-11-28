@@ -322,18 +322,25 @@ public sealed class XmlMultiStreamExtractor<[DynamicallyAccessedMembers(XmlSeria
 
 
 
+    // One path whether or not settings were supplied (#571): the reader is always built from a clone of the
+    // caller's settings, or from the library default (DTDs prohibited, no resolver), matching the single-stream
+    // extractor on every target framework.
     private TRecord? DeserializeFromStream(Stream stream)
     {
-        if (_readerSettings is not null)
-        {
-            var settings = _readerSettings.Clone();
-            settings.CloseInput = false;
-            using var reader = XmlReader.Create(stream, settings);
-            return (TRecord?)XmlSerialization.Deserialize(Serializer, reader);
-        }
-
-        return (TRecord?)XmlSerialization.Deserialize(Serializer, stream);
+        var settings = _readerSettings?.Clone() ?? CreateDefaultReaderSettings();
+        settings.CloseInput = false;
+        using var reader = XmlReader.Create(stream, settings);
+        return (TRecord?)XmlSerialization.Deserialize(Serializer, reader);
     }
+
+
+
+    private static XmlReaderSettings CreateDefaultReaderSettings() =>
+        new()
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+        };
 
 
 

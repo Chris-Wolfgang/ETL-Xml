@@ -480,19 +480,15 @@ public sealed class XmlMultiStreamLoader<[DynamicallyAccessedMembers(XmlSerializ
 
 
 
+    // One path whether or not settings were supplied (#571): the writer is always built from a clone of the
+    // caller's settings, or from the library default (UTF-8 with a BOM, Indent = true), matching the
+    // single-stream loader.
     private void SerializeToStream(Stream stream, TRecord item)
     {
-        if (_writerSettings is not null)
-        {
-            var settings = _writerSettings.Clone();
-            settings.CloseOutput = false;
-            using var writer = XmlWriter.Create(stream, settings);
-            XmlSerialization.Serialize(Serializer, writer, item);
-        }
-        else
-        {
-            XmlSerialization.Serialize(Serializer, stream, item);
-        }
+        var settings = _writerSettings?.Clone() ?? new XmlWriterSettings { Indent = true };
+        settings.CloseOutput = false;
+        using var writer = XmlWriter.Create(stream, settings);
+        XmlSerialization.Serialize(Serializer, writer, item);
     }
 
 
